@@ -57,8 +57,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendSMS(String phoneNumber, String message) {
+        try {
+
+        }catch ()
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+        showMessage("SMS sent");
     }
 
     @Override
