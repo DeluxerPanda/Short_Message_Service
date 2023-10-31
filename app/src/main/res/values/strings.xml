@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">sms Sender</string>
+    <string name="phone_hint">Enter Phone Number</string>
+    <string name="set_time_hint">Enter Time</string>
+    <string name="send_sms_text">Send SMS</string>
+</resources>
