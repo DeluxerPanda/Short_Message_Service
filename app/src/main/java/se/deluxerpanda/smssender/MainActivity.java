@@ -1,57 +1,59 @@
-package se.deluxerpanda.smssender;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.icu.util.Calendar;
+package se.deluxerpanda.smssender;// MainActivity.java
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Intent;
+import android.telephony.SmsManager;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText phoneNumberEditText;
-    private EditText timeEditText;
+    private static final int SMS_PERMISSION_REQUEST_CODE = 1;
+    private EditText phoneNumberEditText, messageEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView((R.layout.activity_main));
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
-        timeEditText = findViewById(R.id.timeEditText);
+        messageEditText = findViewById(R.id.timeEditText);
 
+        Button sendButton = findViewById(R.id.sendB);
+        sendButton.setOnClickListener(view -> {
+            String phoneNumber = phoneNumberEditText.getText().toString();
+            String message = messageEditText.getText().toString();
+            sendSMS(phoneNumber, message);
+        });
+
+
+        // Check and request permission if needed
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
+                    SMS_PERMISSION_REQUEST_CODE);
+        }
     }
 
-    public void sendSMS(View view) {
-        String phoneNumber = phoneNumberEditText.getText().toString();
-        String time = timeEditText.getText().toString();
-
-
-
-        // Parse the time into hours and minutes
-        int hours = Integer.parseInt(time.substring(0, 2));
-        int minutes = Integer.parseInt(time.substring(3, 5));
-
-        // Schedule the SMS sending
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent intent = new Intent(this, SMSSenderReceiver.class);
-        intent.putExtra("phoneNumber", phoneNumber);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, getTimeInMillis(hours, minutes), pendingIntent);
-
-        Toast.makeText(this, "SMS will be sent at " + time, Toast.LENGTH_SHORT).show();
+    private void sendSMS(String phoneNumber, String message) {
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null);
     }
 
-    private long getTimeInMillis(int hours, int minutes) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hours);
-        calendar.set(Calendar.MINUTE, minutes);
-        calendar.set(Calendar.SECOND, 0);
-        return calendar.getTimeInMillis();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+            } else {
+                // Permission denied
+            }
+        }
     }
 }

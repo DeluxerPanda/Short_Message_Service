@@ -29,7 +29,8 @@
         android:textColorHint="#A1887F"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:importantForAutofill="no" />
+        android:importantForAutofill="no"
+        tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
         android:id="@+id/timeEditText"
@@ -42,15 +43,17 @@
         android:textColorHint="#A1887F"
         android:textSize="20sp"
         android:textStyle="bold"
-        tools:ignore="TextFields" />
+        tools:ignore="TextFields,VisualLintTextFieldSize" />
 
     <Button
+        android:id="@+id/sendB"
         android:layout_width="379dp"
         android:layout_height="wrap_content"
         android:onClick="sendSMS"
         android:text="@string/send_sms_text"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="VisualLintButtonSize" />
 
 </LinearLayout>
