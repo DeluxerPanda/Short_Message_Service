@@ -6,9 +6,12 @@ import android.app.TimePickerDialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -23,6 +26,7 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
     private EditText phoneNumberEditText, messageEditText;
+    private LinearLayout pickDateEndsBox;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
@@ -39,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         messageEditText = findViewById(R.id.messageEditText);
+
+        pickDateEndsBox = findViewById(R.id.pickDateEndsBox);
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
@@ -68,10 +74,26 @@ public class MainActivity extends AppCompatActivity {
             timePickerFragment.show(getSupportFragmentManager(), "timePicker");
         });
 
-        Button pickDateButton = findViewById(R.id.pickDate);
-        pickDateButton.setOnClickListener(view -> {
+        Button pickDateStartButton = findViewById(R.id.pickDateStarts);
+        pickDateStartButton.setOnClickListener(view -> {
                 DatePickerFragment datePickerFragment = new DatePickerFragment();
                 datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+        });
+        Button pickDateEndsButton = findViewById(R.id.pickDateEnds);
+        pickDateEndsButton.setOnClickListener(view -> {
+            DatePickerFragment datePickerFragment = new DatePickerFragment();
+            datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+        });
+
+        CheckBox pickDateEndsCheckBox = findViewById(R.id.checkBox);
+        pickDateEndsCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            if (isChecked) {
+                // CheckBox is checked
+                pickDateEndsBox.setVisibility(View.GONE);
+            } else {
+                // CheckBox is unchecked
+                pickDateEndsBox.setVisibility(View.VISIBLE);
+            }
         });
 
 

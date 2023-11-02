@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">sms sender</string>
     <string name="phone_hint">Enter Phone Number</string>
-    <string name="message_Text_hint">Enter a message</string>
+    <string name="message_Text_hint">Enter message</string>
     <string name="send_sms_text">Schedule sms</string>
-    <string name="data_button_text">Set a Date</string>
-    <string name="time_button_text">Set a time</string>
+    <string name="time_button_text">Set time</string>
+    <string name="data_button_start_text">Date Starts at</string>
+    <string name="data_button_ends_text">Date ends at</string>
+    <string name="data_CheckBox_ends_text">Date: never ends!</string>
 </resources>
