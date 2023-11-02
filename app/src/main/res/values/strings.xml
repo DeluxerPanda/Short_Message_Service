@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">sms sender</string>
     <string name="phone_hint">Enter Phone Number</string>
-    <string name="set_time_hint">Enter Time</string>
-    <string name="send_sms_text">Send SMS</string>
+    <string name="message_Text_hint">Enter a message</string>
+    <string name="send_sms_text">Schedule sms</string>
+    <string name="data_button_text">Set a Date</string>
+    <string name="time_button_text">Set a time</string>
 </resources>

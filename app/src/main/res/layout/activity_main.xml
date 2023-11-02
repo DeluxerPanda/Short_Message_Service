@@ -33,12 +33,12 @@
         tools:ignore="VisualLintTextFieldSize" />
 
     <EditText
-        android:id="@+id/timeEditText"
+        android:id="@+id/messageEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/set_time_hint"
+        android:hint="@string/message_Text_hint"
         android:importantForAutofill="no"
-        android:inputType="time"
+        android:inputType="textImeMultiLine"
         android:textAlignment="center"
         android:textColorHint="#A1887F"
         android:textSize="20sp"
@@ -46,10 +46,22 @@
         tools:ignore="TextFields,VisualLintTextFieldSize" />
 
     <Button
+        android:id="@+id/pickTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/time_button_text" />
+
+
+    <Button
+        android:id="@+id/pickDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/data_button_text" />
+
+    <Button
         android:id="@+id/sendB"
         android:layout_width="379dp"
         android:layout_height="wrap_content"
-        android:onClick="sendSMS"
         android:text="@string/send_sms_text"
         android:textAlignment="center"
         android:textSize="20sp"
