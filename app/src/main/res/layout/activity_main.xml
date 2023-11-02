@@ -57,7 +57,7 @@
             tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
 
         <TextView
-            android:id="@+id/editTextText"
+            android:id="@+id/SetTimeText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -86,7 +86,7 @@
             tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
 
         <TextView
-            android:id="@+id/editTextText2"
+            android:id="@+id/SetDateStartText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -116,7 +116,7 @@
             tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
 
         <TextView
-            android:id="@+id/editTextText3"
+            android:id="@+id/SetDateEndsText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
