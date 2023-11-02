@@ -22,7 +22,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         SetDateEndsText = findViewById(R.id.SetDateEndsText);
 
 
-     //   SetTimeTex.setText(" "+timeText);
+        SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
         SetDateEndsText.setText(" " + formattedDate);
 
@@ -171,6 +174,29 @@ public static class DatePickerFragment extends DialogFragment
         // Do something with the date the user picks.
         String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
         SetDateStartText.setText(" " + formattedDate);
+
+        String formattedDate2 = SetDateEndsText.getText().toString();
+
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date date1 = dateFormat.parse(formattedDate);
+            Date date2 = dateFormat.parse(formattedDate2);
+
+            if (date1.compareTo(date2) > 0) {
+                // date1 is after date2
+                SetDateEndsText.setText("aaaa");
+            } else if (date1.compareTo(date2) < 0) {
+                // date1 is before date2
+                SetDateEndsText.setText("bbb");
+            } else {
+                // date1 and date2 are equal
+                SetDateEndsText.setText("hhhhh");
+            }
+        } catch (ParseException e) {
+            // Handle parsing exceptions if the date strings are not in the expected format
+            SetDateEndsText.setText("ööööö");
+        }
+
     }
 }
 // data Dialog start (ends)
