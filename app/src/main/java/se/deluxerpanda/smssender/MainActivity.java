@@ -126,9 +126,6 @@ public class MainActivity extends AppCompatActivity {
                 pickDateEndsBox.setVisibility(View.VISIBLE);
             }
         });
-
-
-
     }
 
     //time Dialog (start)
