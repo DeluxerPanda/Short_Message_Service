@@ -24,6 +24,8 @@ import androidx.fragment.app.DialogFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -35,6 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private static TextView SetDateStartText;
     private static TextView SetDateEndsText;
     private LinearLayout pickDateEndsBox;
+
+    public static int timeHourSaved = -1;
+    public static int timeMinuteSaved = -1;
+
+    private static String startDate;
+    private static String endDate;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
@@ -105,15 +113,16 @@ public class MainActivity extends AppCompatActivity {
             timePickerFragment.show(getSupportFragmentManager(), "timePicker");
         });
 
+        // Find the "start" date button and set a click listener
         Button pickDateStartButton = findViewById(R.id.pickDateStarts);
         pickDateStartButton.setOnClickListener(view -> {
-                DatePickerFragment datePickerFragment = new DatePickerFragment();
-                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+            showDatePicker(true);
         });
+
+        // Find the "end" date button and set a click listener
         Button pickDateEndsButton = findViewById(R.id.pickDateEnds);
         pickDateEndsButton.setOnClickListener(view -> {
-            DatePickerFragment datePickerFragment = new DatePickerFragment();
-            datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+            showDatePicker(false);
         });
 
         CheckBox pickDateEndsCheckBox = findViewById(R.id.checkBox);
@@ -127,7 +136,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void showDatePicker(boolean isStartDate) {
+        DatePickerFragment datePickerFragment = new DatePickerFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("isStartDate", isStartDate);
+        datePickerFragment.setArguments(args);
+        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
     //time Dialog (start)
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
@@ -139,92 +154,71 @@ public class MainActivity extends AppCompatActivity {
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it with 24-hour format.
-            return new TimePickerDialog(getActivity(), this, hour, minute, true);
+            if (timeHourSaved != -1 && timeMinuteSaved != -1) {
+                return new TimePickerDialog(getActivity(), this, timeHourSaved, timeMinuteSaved, true);
+            }else {
+                // Create a new instance of TimePickerDialog and return it with 24-hour format.
+                return new TimePickerDialog(getActivity(), this, hour, minute, true);
+            }
+
         }
 
         public void onTimeSet(TimePicker view, int hour , int minute) {
             // Do something with the time the user picks.
+             timeHourSaved = hour;
+            timeMinuteSaved = minute;
             String timeText = hour  + ":" + minute;
             SetTimeText.setText(" "+timeText);
         }
     }
 //time  Dialog (ends)
 
-//date Dialog Start  (start)
-public static class DatePickerFragment extends DialogFragment
-        implements DatePickerDialog.OnDateSetListener {
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // Use the current date as the default date in the picker.
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        // Create a new instance of DatePickerDialog and return it.
-        return new DatePickerDialog(requireContext(), this, year, month, day);
-    }
-
-    public void onDateSet(DatePicker view, int year, int month, int day) {
-        // Do something with the date the user picks.
-        String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-        SetDateStartText.setText(" " + formattedDate);
-
-        String formattedDate2 = SetDateEndsText.getText().toString();
-
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            Date date1 = dateFormat.parse(formattedDate);
-            Date date2 = dateFormat.parse(formattedDate2);
-
-            if (date1.compareTo(date2) > 0) {
-                // date1 is after date2
-                SetDateEndsText.setText("aaaa");
-            } else if (date1.compareTo(date2) < 0) {
-                // date1 is before date2
-                SetDateEndsText.setText("bbb");
-            } else {
-                // date1 and date2 are equal
-                SetDateEndsText.setText("hhhhh");
-            }
-        } catch (ParseException e) {
-            // Handle parsing exceptions if the date strings are not in the expected format
-            SetDateEndsText.setText("ööööö");
-        }
-
-    }
-}
-// data Dialog start (ends)
-
-//date Dialog ends  (start)
-    public static class DatePickerFragment2 extends DialogFragment
+    public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker.
             final Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            // Create a new instance of DatePickerDialog and return it.
-            return new DatePickerDialog(requireContext(), this, year, month, day);
+            // Create a DatePickerDialog and set the minimum date to the current date
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
+            Date date = new Date();
+            datePickerDialog.getDatePicker().setMinDate(date.getTime()); // Set minimum date to now
+
+            // If it's the "end" date picker, set the minimum date to the "start" date
+            if (!getArguments().getBoolean("isStartDate")) {
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
+                    datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return datePickerDialog;
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date the user picks.
             String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-            SetDateStartText.setText(" " + formattedDate);
+            boolean isStartDate = getArguments().getBoolean("isStartDate");
+
+            if (isStartDate) {
+                SetDateStartText.setText(" " + formattedDate);
+            } else {
+                SetDateEndsText.setText(" " + formattedDate);
+            }
         }
     }
-// data Dialog ends (ends)
+
+
 
     private void sendSMS(String phoneNumber, String message) {
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+          //  smsManager.sendTextMessage(phoneNumber, null, message, null, null);
         showMessage("SMS sent");
     }
 
