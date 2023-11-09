@@ -2,11 +2,12 @@
     <string name="app_name">Short Message Service</string>
     <string name="app_tab_name">Sms Scheduler</string>
     <string name="phone_hint">Enter Phone Number</string>
-    <string name="message_Text_hint">Enter message</string>
+    <string name="message_Text_hint">Enter message\n(max 160 characters)</string>
     <string name="send_sms_text">Schedule sms</string>
     <string name="time_button_text">Set time</string>
     <string name="data_button_start_text">Date Starts at</string>
     <string name="data_button_ends_text">Date ends at</string>
     <string name="data_CheckBox_ends_text">Date: never ends!</string>
-    <string name="History_name">History</string>
+    <string name="history_name">History</string>
+    <string name="logding_data">Loading data from code</string>
 </resources>

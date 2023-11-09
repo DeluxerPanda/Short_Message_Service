@@ -34,7 +34,7 @@
     <EditText
         android:id="@+id/messageEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="79dp"
         android:hint="@string/message_Text_hint"
         android:importantForAutofill="no"
         android:inputType="textImeMultiLine"
@@ -64,7 +64,7 @@
             android:ems="10"
             android:importantForAutofill="no"
             android:minHeight="48dp"
-            android:text="@android:string/untitled"
+            android:text="@string/logding_data"
             android:textAlignment="textStart"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -93,7 +93,7 @@
             android:ems="10"
             android:importantForAutofill="no"
             android:minHeight="48dp"
-            android:text="@android:string/untitled"
+            android:text="@string/logding_data"
             android:textAlignment="textStart"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -113,7 +113,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/data_button_ends_text"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+            android:visibility="visible"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/SetDateEndsText"
@@ -123,7 +125,7 @@
             android:ems="10"
             android:importantForAutofill="no"
             android:minHeight="48dp"
-            android:text="@android:string/untitled"
+            android:text="@string/logding_data"
             android:textAlignment="textStart"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -162,6 +164,6 @@
         android:textAlignment="center"
         android:textSize="34sp"
         android:textStyle="bold|italic"
-        tools:text="@string/History_name" />
+        tools:text="@string/history_name" />
 
 </LinearLayout>

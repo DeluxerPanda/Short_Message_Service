@@ -1,12 +1,19 @@
 package se.deluxerpanda.smssender;
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -24,8 +31,6 @@ import androidx.fragment.app.DialogFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -84,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         SetDateStartText.setText(" " + formattedDate);
         SetDateEndsText.setText(" " + formattedDate);
 
+
+
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
             String phoneNumber = phoneNumberEditText.getText().toString();
@@ -91,8 +98,9 @@ public class MainActivity extends AppCompatActivity {
             if (hasSendSmsPermission()) {
                 if (!phoneNumber.isEmpty() && !message.isEmpty()) {
                     sendSMS(phoneNumber, message);
+                    hideKeyboard();
                 } else {
-                    showMessage("Please fill in both phone number and message fields.");
+                    Toast.makeText(this,"Please fill in both phone number and message fields.",Toast.LENGTH_SHORT).show();
                 }
             } else {
                 requestSendSmsPermission();
@@ -112,29 +120,28 @@ public class MainActivity extends AppCompatActivity {
             timePickerFragment.show(getSupportFragmentManager(), "timePicker");
         });
 
-        // Find the "start" date button and set a click listener
+
         Button pickDateStartButton = findViewById(R.id.pickDateStarts);
         pickDateStartButton.setOnClickListener(view -> {
             showDatePicker(true);
         });
 
-        // Find the "end" date button and set a click listener
+
         Button pickDateEndsButton = findViewById(R.id.pickDateEnds);
         pickDateEndsButton.setOnClickListener(view -> {
-            showDatePicker(false);
+                showDatePicker(false);
         });
 
         CheckBox pickDateEndsCheckBox = findViewById(R.id.checkBox);
         pickDateEndsCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             if (isChecked) {
-                // CheckBox is checked
                 pickDateEndsBox.setVisibility(View.GONE);
             } else {
-                // CheckBox is unchecked
                 pickDateEndsBox.setVisibility(View.VISIBLE);
             }
         });
     }
+
     private void showDatePicker(boolean isStartDate) {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
         Bundle args = new Bundle();
@@ -171,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 //time  Dialog (ends)
-
+//date  Dialog (starts)
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
         @NonNull
@@ -197,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
             return datePickerDialog;
         }
 
@@ -213,13 +219,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+//date  Dialog (ends)
 
     private void sendSMS(String phoneNumber, String message) {
         SmsManager smsManager = SmsManager.getDefault();
-        //  smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-        showMessage("SMS sent");
+        String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
+       if (message.length() <= 160) {
+           smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+           Toast.makeText(this,"SMS sent!",Toast.LENGTH_SHORT).show();
+       }else {
+           // Inside your activity or fragment
+           AlertDialog.Builder builder = new AlertDialog.Builder(this);
+           builder.setTitle("\uD83D\uDEA8 Max characters reached \uD83D\uDEA8");
+           builder.setMessage("The maximum character limit is 160, not "+message.length());
+           builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int which) {
+                   messageEditText.requestFocus(); // Set focus to the messageEditText
+                   showKeyboard();
+               }
+           });
+           builder.show();
+
+       }
     }
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -235,7 +260,23 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private void showMessage(String message) {
+    public void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = getCurrentFocus();
+
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+    public void showKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = getCurrentFocus();
+
+        if (view == null) {
+            imm.showSoftInput((View) view.getWindowToken(), 1);
+        }
     }
 }
