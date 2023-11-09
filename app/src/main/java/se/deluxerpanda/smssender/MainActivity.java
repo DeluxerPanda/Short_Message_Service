@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     private static TextView SetDateStartText;
     private static TextView SetDateEndsText;
     private LinearLayout pickDateEndsBox;
-
     public static int timeHourSaved = -1;
     public static int timeMinuteSaved = -1;
 
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
-// SetTimeText
+    // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -165,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
         public void onTimeSet(TimePicker view, int hour , int minute) {
             // Do something with the time the user picks.
-             timeHourSaved = hour;
+            timeHourSaved = hour;
             timeMinuteSaved = minute;
             String timeText = hour  + ":" + minute;
             SetTimeText.setText(" "+timeText);
@@ -217,8 +216,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void sendSMS(String phoneNumber, String message) {
-            SmsManager smsManager = SmsManager.getDefault();
-          //  smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+        SmsManager smsManager = SmsManager.getDefault();
+        //  smsManager.sendTextMessage(phoneNumber, null, message, null, null);
         showMessage("SMS sent");
     }
 

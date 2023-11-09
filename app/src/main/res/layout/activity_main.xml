@@ -154,4 +154,14 @@
         android:textStyle="bold"
         tools:ignore="VisualLintButtonSize" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:textAlignment="center"
+        android:textSize="34sp"
+        android:textStyle="bold|italic"
+        tools:text="@string/History_name" />
+
 </LinearLayout>
