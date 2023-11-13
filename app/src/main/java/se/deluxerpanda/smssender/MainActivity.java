@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         sendButton.setOnClickListener(view -> {
             String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
-            Toast.makeText(this,phonenumber+"<->"+message,Toast.LENGTH_SHORT).show();
             if (hasSendSmsPermission()) {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
                     scheduleSMS(phonenumber,message);
@@ -222,23 +221,21 @@ public class MainActivity extends AppCompatActivity {
 
 //date  Dialog (ends)
 
-    private void scheduleSMS(String phonenumber ,String message) {
+    private void scheduleSMS(String message, String phonenumber) {
 
         //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
        if (message.length() <= 160) {
            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-// Intent for the BroadcastReceiver that will handle the alarm
-           Intent alarmIntent = new Intent(this, AlarmReceiver.class);
 
-// Add String extras to the intent
-           alarmIntent.putExtra("SEND_NUMBER", phonenumber);
-           alarmIntent.putExtra("SEND_MESSAGE", message);
+           Intent intent = new Intent(this, AlarmReceiver.class);
+           intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+           intent.putExtra("EXTRA_MESSAGE", message);
 
-// Create PendingIntent with the correct flag
-           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE);
+           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-// Set the alarm to trigger after 10 seconds (adjust as needed)
-           long triggerTime = System.currentTimeMillis() + 10000; // 10 seconds
+
+
+           long triggerTime = System.currentTimeMillis() + 0;
            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
 
 
