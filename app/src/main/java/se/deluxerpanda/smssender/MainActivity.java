@@ -93,11 +93,12 @@ public class MainActivity extends AppCompatActivity {
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
-            String phoneNumber = phoneNumberEditText.getText().toString();
+            String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
+            Toast.makeText(this,phonenumber+"<->"+message,Toast.LENGTH_SHORT).show();
             if (hasSendSmsPermission()) {
-                if (!phoneNumber.isEmpty() && !message.isEmpty()) {
-                    sendSMS(phoneNumber, message);
+                if (!phonenumber.isEmpty() && !message.isEmpty()) {
+                    scheduleSMS(phonenumber,message);
                     hideKeyboard();
                 } else {
                     Toast.makeText(this,"Please fill in both phone number and message fields.",Toast.LENGTH_SHORT).show();
@@ -221,12 +222,26 @@ public class MainActivity extends AppCompatActivity {
 
 //date  Dialog (ends)
 
-    private void sendSMS(String phoneNumber, String message) {
-        SmsManager smsManager = SmsManager.getDefault();
-        String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
+    private void scheduleSMS(String phonenumber ,String message) {
+
+        //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
        if (message.length() <= 160) {
-           smsManager.sendTextMessage(phoneNumber, null, message, null, null);
-           Toast.makeText(this,"SMS sent!",Toast.LENGTH_SHORT).show();
+           AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+// Intent for the BroadcastReceiver that will handle the alarm
+           Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+
+// Add String extras to the intent
+           alarmIntent.putExtra("SEND_NUMBER", phonenumber);
+           alarmIntent.putExtra("SEND_MESSAGE", message);
+
+// Create PendingIntent with the correct flag
+           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE);
+
+// Set the alarm to trigger after 10 seconds (adjust as needed)
+           long triggerTime = System.currentTimeMillis() + 10000; // 10 seconds
+           alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+
+
        }else {
            // Inside your activity or fragment
            AlertDialog.Builder builder = new AlertDialog.Builder(this);
