@@ -9,9 +9,10 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -31,8 +32,12 @@ import androidx.fragment.app.DialogFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
@@ -66,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
         int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
+        int minute = c.get(Calendar.MINUTE)+ 6;
         String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
 
         String timeText = hour + ":" + minute;
@@ -140,6 +145,20 @@ public class MainActivity extends AppCompatActivity {
                 pickDateEndsBox.setVisibility(View.VISIBLE);
             }
         });
+
+        // Assuming you want to get the list of alarms when the activity starts
+        List<AlarmDetails> alarmList = getAllAlarms(this);
+
+        // Now you can use the alarmList as needed
+        for (AlarmDetails alarmDetails : alarmList) {
+            int alarmId = alarmDetails.getAlarmId();
+            long timeInMillis = alarmDetails.getTimeInMillis();
+        //    long DateStart = alarmDetails.DateStart();
+         //   long Clock_Time = alarmDetails.Clock_Time();
+            // Do something with the alarm details
+            Log.d("AlarmDetails", "" + "Alarm ID: " + alarmId + ", Millis: " + timeInMillis +", Date Start: " +", Time: " +", date end");
+        }
+
     }
 
     private void showDatePicker(boolean isStartDate) {
@@ -158,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             // Use the current time as the default values for the picker.
             final Calendar c = Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            int minute = c.get(Calendar.MINUTE)+ 6;
 
             if (timeHourSaved != -1 && timeMinuteSaved != -1) {
                 return new TimePickerDialog(getActivity(), this, timeHourSaved, timeMinuteSaved, true);
@@ -221,22 +240,36 @@ public class MainActivity extends AppCompatActivity {
 
 //date  Dialog (ends)
 
-    private void scheduleSMS(String message, String phonenumber) {
-
+    private void scheduleSMS(String phonenumber, String message) {
         //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
        if (message.length() <= 160) {
            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
            Intent intent = new Intent(this, AlarmReceiver.class);
+
+
            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-           intent.putExtra("EXTRA_MESSAGE", message);
+           intent.putExtra("EXTRA_MESSAGES", message);
 
-           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+           int alarmId = UUID.randomUUID().hashCode();
+           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+
+           String DateStart = (String) SetDateStartText.getText();
+           String Clock_Time = (String) SetTimeText.getText();
+           String dateTimeString = DateStart + " " + Clock_Time;
+           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
+
+           try {
+               Date date = sdf.parse(dateTimeString);
+               long triggerTime = date.getTime();
+               Log.d(String.valueOf(this), "Milliseconds since epoch: " + triggerTime);
+               alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
 
 
-
-           long triggerTime = System.currentTimeMillis() + 0;
-           alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+               saveAlarmDetails(this, alarmId, triggerTime);
+           } catch (ParseException e) {
+               e.printStackTrace();
+           }
 
 
        }else {
@@ -253,10 +286,58 @@ public class MainActivity extends AppCompatActivity {
            builder.show();
 
        }
+
     }
 
+    // Save alarm details in shared preferences
+    private void saveAlarmDetails(MainActivity mainActivity,int alarmId, long triggerTime) {
+        SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
 
+        // Use a unique key for each alarm
+        String key = "alarm_" + alarmId;
 
+        editor.putLong(key, triggerTime);
+        editor.apply();
+    }
+    public class AlarmDetails {
+        private int alarmId;
+        private long triggerTime;
+
+        public AlarmDetails(int alarmId, long triggerTime) {
+            this.alarmId = alarmId;
+            this.triggerTime = triggerTime;
+        }
+
+        public int getAlarmId() {
+            return alarmId;
+        }
+
+        public long getTimeInMillis() {
+            return triggerTime;
+        }
+    }
+
+    // Retrieve a list of all alarms
+    public List<AlarmDetails> getAllAlarms(Context context) {
+        List<AlarmDetails> alarmList = new ArrayList<>();
+        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
+
+        // Iterate through all saved alarms and add them to the list
+        Map<String, ?> allEntries = preferences.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String key = entry.getKey();
+            long triggerTime = preferences.getLong(key, 0);
+
+            // Extract the alarmId from the key
+            int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
+
+            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime);
+            alarmList.add(alarmDetails);
+        }
+
+        return alarmList;
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
