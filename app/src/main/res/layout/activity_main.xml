@@ -157,13 +157,14 @@
         tools:ignore="VisualLintButtonSize" />
 
     <TextView
-        android:id="@+id/history_name_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
+        android:text="@string/history_name"
         android:textAlignment="center"
-        android:textSize="34sp"
+        android:textSize="30sp"
         android:textStyle="bold|italic"
-        tools:text="@string/history_name" />
+        android:typeface="normal"
+        tools:ignore="TextSizeCheck" />
 
 </LinearLayout>
