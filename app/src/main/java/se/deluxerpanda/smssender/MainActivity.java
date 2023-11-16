@@ -11,8 +11,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -36,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -95,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
         SetDateStartText.setText(" " + formattedDate);
         SetDateEndsText.setText(" " + formattedDate);
 
-
-
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
             String phonenumber = phoneNumberEditText.getText().toString();
@@ -105,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
                     scheduleSMS(phonenumber,message);
                     hideKeyboard();
+                    History_info();
                 } else {
                     Toast.makeText(this,"Please fill in both phone number and message fields.",Toast.LENGTH_SHORT).show();
                 }
@@ -145,7 +145,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 pickDateEndsBox.setVisibility(View.VISIBLE);
             }
+
         });
+        History_info();
+    }
+    public void History_info(){
 
         // Assuming you want to get the list of alarms when the activity starts
         List<AlarmDetails> alarmList = getAllAlarms(this);
@@ -164,10 +168,37 @@ public class MainActivity extends AppCompatActivity {
             String formattedDateStart = sdf.format(date);
             String formattedClockTime = sdf2.format(date);
             Log.d("AlarmDetails", "" + "Alarm ID: " + alarmId + ", Millis: " + timeInMillis +", Date Start: "+ formattedDateStart +", Time: "+formattedClockTime+", date end");
+
+            LinearLayout parentLayout = findViewById(R.id.HE);
+
+            LinearLayout linearLayout = (LinearLayout) parentLayout;
+
+            // Add your dynamic TextView here
+            TextView dynamicTextView = new TextView(this);
+            dynamicTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            // Set dynamic information from the AlarmDetails object to the TextView
+            dynamicTextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
+            dynamicTextView.setTextSize(24);
+            dynamicTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
+            dynamicTextView.setTextColor(getResources().getColor(android.R.color.black));
+            dynamicTextView.setGravity(Gravity.CENTER);
+
+            // Add the dynamic TextView to the LinearLayout
+            linearLayout.addView(dynamicTextView);
+            dynamicTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(MainActivity.this, alarmId+"More comming soon!", Toast.LENGTH_SHORT).show();
+                }
+
+
+            });
         }
 
     }
-
     private void showDatePicker(boolean isStartDate) {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
         Bundle args = new Bundle();
