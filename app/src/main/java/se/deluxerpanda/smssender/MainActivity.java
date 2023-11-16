@@ -154,10 +154,16 @@ public class MainActivity extends AppCompatActivity {
         for (AlarmDetails alarmDetails : alarmList) {
             int alarmId = alarmDetails.getAlarmId();
             long timeInMillis = alarmDetails.getTimeInMillis();
-         //   String DateStart = alarmDetails.getDatestart();
-           // long Clock_Time = alarmDetails.getClock_Time();
-            // Do something with the alarm details
-            Log.d("AlarmDetails", "" + "Alarm ID: " + alarmId + ", Millis: " + timeInMillis +", Date Start: "+ "DateStart" +", Time: " +", date end");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
+
+            // Create a Date object and set it using the time in milliseconds
+            Date date = new Date(timeInMillis);
+
+            // Format the date and print the result
+            String formattedDateStart = sdf.format(date);
+            String formattedClockTime = sdf2.format(date);
+            Log.d("AlarmDetails", "" + "Alarm ID: " + alarmId + ", Millis: " + timeInMillis +", Date Start: "+ formattedDateStart +", Time: "+formattedClockTime+", date end");
         }
 
     }
@@ -265,9 +271,7 @@ public class MainActivity extends AppCompatActivity {
                long triggerTime = date.getTime();
                Log.d(String.valueOf(this), "Milliseconds since epoch: " + triggerTime);
                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-               String dateStart = DateStart;
-               Log.d(String.valueOf(this), dateStart);
-               saveAlarmDetails(this, alarmId, triggerTime, dateStart);
+               saveAlarmDetails(this, alarmId, triggerTime);
            } catch (ParseException e) {
                e.printStackTrace();
            }
@@ -291,26 +295,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Save alarm details in shared preferences
-    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, String dateStart) {
+    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime) {
         SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-     //   Log.d(String.valueOf(this), "2"+dateStart);
         // Use a unique key for each alarm
         String key = "alarm_" + alarmId;
         editor.putLong(key, triggerTime);
-        editor.putString(key + "_dateStart", dateStart);
         editor.apply();
     }
     public class AlarmDetails {
         private int alarmId;
         private long triggerTime;
 
-        private String dateStart;
 
-        public AlarmDetails(int alarmId, long triggerTime, String dateStart) {
+        public AlarmDetails(int alarmId, long triggerTime) {
             this.alarmId = alarmId;
             this.triggerTime = triggerTime;
-            this.dateStart = dateStart;
         }
 
         public int getAlarmId() {
@@ -321,9 +321,6 @@ public class MainActivity extends AppCompatActivity {
             return triggerTime;
         }
 
-        public String getDatestart(){
-            return dateStart;
-        }
     }
 
     // Retrieve a list of all alarms
@@ -334,17 +331,12 @@ public class MainActivity extends AppCompatActivity {
         // Iterate through all saved alarms and add them to the list
         Map<String, ?> allEntries = preferences.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-
-            Log.d("SharedPreferences", entry.getKey() + ": " + entry.getValue().toString());
             String key = entry.getKey();
             long triggerTime = preferences.getLong(key, 0);
 
-            String dateStart = preferences.getString(key + "_dateStart", "");
-      //         Log.d(String.valueOf(this), "3"+dateStart);
-
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
 
-            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, dateStart);
+            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime);
             alarmList.add(alarmDetails);
 
 
@@ -352,47 +344,6 @@ public class MainActivity extends AppCompatActivity {
 
         return alarmList;
     }
-
-/*
-    public List<AlarmDetails> getAllAlarms(Context context) {
-        List<AlarmDetails> alarmList = new ArrayList<>();
-        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-
-        // Iterate through all saved alarms and add them to the list
-        Map<String, ?> allEntries = preferences.getAll();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            Log.d("SharedPreferences", entry.getKey() + ": " + entry.getValue().toString());
-
-            String key = entry.getKey();
-            Object value = entry.getValue();
-
-            if (value instanceof Long) {
-                // If the value is a Long, directly use it
-                long triggerTime = (Long) value;
-                String dateStart = preferences.getString(key + "_dateStart", "");
-
-                int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
-
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, dateStart);
-                alarmList.add(alarmDetails);
-            } else if (value instanceof String) {
-                // If the value is a String, parse it as a Long
-                String dateStart = (String) value;
-
-                // Assuming that the value stored is a String representation of a Long
-                long triggerTime = Long.parseLong(dateStart);
-
-                int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
-
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, dateStart);
-                alarmList.add(alarmDetails);
-            }
-            // You might need additional handling for other data types if needed
-        }
-
-        return alarmList;
-    }
- */
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
