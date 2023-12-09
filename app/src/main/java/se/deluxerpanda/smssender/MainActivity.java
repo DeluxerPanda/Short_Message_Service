@@ -54,14 +54,17 @@ public class MainActivity extends AppCompatActivity {
 
     private static String startDate;
     private static String endDate;
+
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
+
     private void requestSendSmsPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
+
     // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         });
         History_info();
     }
+
     public void History_info(){
 
         // Assuming you want to get the list of alarms when the activity starts
@@ -193,12 +197,10 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Toast.makeText(MainActivity.this, alarmId+"More comming soon!", Toast.LENGTH_SHORT).show();
                 }
-
-
             });
         }
-
     }
+
     private void showDatePicker(boolean isStartDate) {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
         Bundle args = new Bundle();
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         datePickerFragment.setArguments(args);
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
+
     //time Dialog (start)
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
@@ -223,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
                 // Create a new instance of TimePickerDialog and return it with 24-hour format.
                 return new TimePickerDialog(getActivity(), this, hour, minute, true);
             }
-
         }
 
         public void onTimeSet(TimePicker view, int hour , int minute) {
