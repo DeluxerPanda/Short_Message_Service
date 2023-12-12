@@ -19,7 +19,8 @@ public class AlarmReceiver extends BroadcastReceiver {
           smsManager.sendTextMessage(phonenumber, null, message, null, null);
          Toast.makeText(context, "SMS sent to "+phonenumber+"message: "+message, Toast.LENGTH_LONG).show();
 
-        AlderCreator.showAlertBox_only_ok(context,"test", "This is the alert message.");
+        //AlderCreator.showAlertBox_only_ok( context,"test", "This is the alert message.");
+
 
 
     }

@@ -1,8 +1,8 @@
 package se.deluxerpanda.smssender;
-
-import android.app.AlertDialog;
 import android.content.Context;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.view.View;
 
 public class AlderCreator {
     public static void showAlertBox_only_ok(Context context, String title, String message) {
@@ -24,4 +24,5 @@ public class AlderCreator {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
 }

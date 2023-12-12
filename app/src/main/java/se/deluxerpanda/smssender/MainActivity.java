@@ -170,8 +170,14 @@ public class MainActivity extends AppCompatActivity {
 
             // Format the date and print the result
             String formattedDateStart = sdf.format(date);
+            String formattedDateEnd = sdf.format(alarmDetails.getFormattedDateEnd());
             String formattedClockTime = sdf2.format(date);
-            Log.d("AlarmDetails", "" + "Alarm ID: " + alarmId + ", Millis: " + timeInMillis +", Date Start: "+ formattedDateStart +", Time: "+formattedClockTime+", date end");
+            Log.d("AlarmDetails",
+                    "ID: " + alarmId
+                    + "\n Date Start: "+ formattedDateStart
+                    +"\n Date End: "+ formattedDateEnd
+                    +"\n Time: "+ formattedClockTime
+                    +"\n More comming soon!");
 
             LinearLayout parentLayout = findViewById(R.id.HE);
 
@@ -190,12 +196,17 @@ public class MainActivity extends AppCompatActivity {
             dynamicTextView.setTextColor(getResources().getColor(android.R.color.black));
             dynamicTextView.setGravity(Gravity.CENTER);
 
-            // Add the dynamic TextView to the LinearLayout
+            linearLayout.destroyDrawingCache();
             linearLayout.addView(dynamicTextView);
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(MainActivity.this, alarmId+"More comming soon!", Toast.LENGTH_SHORT).show();
+                AlderCreator.showAlertBox_only_ok(v.getContext(),
+                        "ID: " + alarmId, "ID: " + alarmId
+                        + "\n Date Start: "+ formattedDateStart
+                        +"\n Date End: "+formattedDateEnd
+                        +"\n Time: " + formattedClockTime
+                        +"\n More comming soon!");
                 }
             });
         }
@@ -295,16 +306,18 @@ public class MainActivity extends AppCompatActivity {
            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
            String DateStart = (String) SetDateStartText.getText();
+           String DateEnd = (String) SetDateEndsText.getText();
            String Clock_Time = (String) SetTimeText.getText();
            String dateTimeString = DateStart + " " + Clock_Time;
            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
-
+           SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
            try {
                Date date = sdf.parse(dateTimeString);
+               Date date2 = sdf2.parse(DateEnd);
                long triggerTime = date.getTime();
-               Log.d(String.valueOf(this), "Milliseconds since epoch: " + triggerTime);
+               long releaseTime = date2.getTime();
                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-               saveAlarmDetails(this, alarmId, triggerTime);
+               saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
            } catch (ParseException e) {
                e.printStackTrace();
            }
@@ -328,22 +341,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Save alarm details in shared preferences
-    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime) {
+    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, long releaseTime) {
         SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        // Use a unique key for each alarm
-        String key = "alarm_" + alarmId;
-        editor.putLong(key, triggerTime);
+
+        // Use unique keys for each alarm and each value
+        String triggerTimeKey = "triggerTime_" + alarmId;
+        String releaseTimeKey = "releaseTime_" + alarmId;
+
+        // Save the triggerTime and releaseTime using their respective keys
+        editor.putLong(triggerTimeKey, triggerTime);
+        editor.putLong(releaseTimeKey, releaseTime);
+
         editor.apply();
     }
+
     public class AlarmDetails {
         private int alarmId;
         private long triggerTime;
 
+        private long releaseTime;
 
-        public AlarmDetails(int alarmId, long triggerTime) {
+
+        public AlarmDetails(int alarmId, long triggerTime, long releaseTime) {
             this.alarmId = alarmId;
             this.triggerTime = triggerTime;
+            this.releaseTime = releaseTime;
         }
 
         public int getAlarmId() {
@@ -352,6 +375,9 @@ public class MainActivity extends AppCompatActivity {
 
         public long getTimeInMillis() {
             return triggerTime;
+        }
+        public long getFormattedDateEnd(){
+            return  releaseTime;
         }
 
     }
@@ -365,18 +391,23 @@ public class MainActivity extends AppCompatActivity {
         Map<String, ?> allEntries = preferences.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             String key = entry.getKey();
-            long triggerTime = preferences.getLong(key, 0);
+
+            // Separate keys for triggerTime and releaseTime
+            String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
+            String releaseTimeKey = "releaseTime_" + key.substring(key.lastIndexOf("_") + 1);
+
+            long triggerTime = preferences.getLong(triggerTimeKey, 0);
+            long releaseTime = preferences.getLong(releaseTimeKey, 0);
 
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
 
-            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime);
+            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime);
             alarmList.add(alarmDetails);
-
-
         }
 
         return alarmList;
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
