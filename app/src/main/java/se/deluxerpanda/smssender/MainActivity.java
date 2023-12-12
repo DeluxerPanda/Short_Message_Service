@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static String startDate;
     private static String endDate;
-
+    boolean checkBoxisChecked = false;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
@@ -145,8 +145,10 @@ public class MainActivity extends AppCompatActivity {
         pickDateEndsCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
             if (isChecked) {
                 pickDateEndsBox.setVisibility(View.GONE);
+                 checkBoxisChecked = true;
             } else {
                 pickDateEndsBox.setVisibility(View.VISIBLE);
+                 checkBoxisChecked = false;
             }
 
         });
@@ -154,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void History_info(){
-
         // Assuming you want to get the list of alarms when the activity starts
         List<AlarmDetails> alarmList = getAllAlarms(this);
 
@@ -178,10 +179,10 @@ public class MainActivity extends AppCompatActivity {
                     +"\n Date End: "+ formattedDateEnd
                     +"\n Time: "+ formattedClockTime
                     +"\n More comming soon!");
-
             LinearLayout parentLayout = findViewById(R.id.HE);
 
             LinearLayout linearLayout = (LinearLayout) parentLayout;
+
 
             // Add your dynamic TextView here
             TextView dynamicTextView = new TextView(this);
@@ -191,17 +192,16 @@ public class MainActivity extends AppCompatActivity {
 
             // Set dynamic information from the AlarmDetails object to the TextView
             dynamicTextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
-            dynamicTextView.setTextSize(24);
+            dynamicTextView.setTextSize(20);
             dynamicTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
             dynamicTextView.setTextColor(getResources().getColor(android.R.color.black));
             dynamicTextView.setGravity(Gravity.CENTER);
 
-            linearLayout.destroyDrawingCache();
             linearLayout.addView(dynamicTextView);
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                AlderCreator.showAlertBox_only_ok(v.getContext(),
+                AlderCreator.showAlertBox_for_History_info(v.getContext(),
                         "ID: " + alarmId, "ID: " + alarmId
                         + "\n Date Start: "+ formattedDateStart
                         +"\n Date End: "+formattedDateEnd
@@ -311,7 +311,11 @@ public class MainActivity extends AppCompatActivity {
            String dateTimeString = DateStart + " " + Clock_Time;
            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+          // if (checkBoxisChecked == true){
+           //    String sdf2 = "It never ends!";
+           //}
            try {
+
                Date date = sdf.parse(dateTimeString);
                Date date2 = sdf2.parse(DateEnd);
                long triggerTime = date.getTime();
