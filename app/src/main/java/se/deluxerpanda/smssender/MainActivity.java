@@ -37,8 +37,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -55,12 +57,13 @@ public class MainActivity extends AppCompatActivity {
     private static String startDate;
     private static String endDate;
     boolean checkBoxisChecked = false;
+
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void requestSendSmsPermission() {
+    private void requestPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this,"Please fill in both phone number and message fields.",Toast.LENGTH_SHORT).show();
                 }
             } else {
-                requestSendSmsPermission();
+                requestPermission();
             }
         });
 
@@ -156,36 +159,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void History_info(){
-        // Assuming you want to get the list of alarms when the activity starts
+        LinearLayout parentLayout = findViewById(R.id.app_backgrund);
+        LinearLayout linearLayout = (LinearLayout) parentLayout;
+        linearLayout.destroyDrawingCache();
+        linearLayout.removeAllViews();
+
         List<AlarmDetails> alarmList = getAllAlarms(this);
 
         // Now you can use the alarmList as needed
         for (AlarmDetails alarmDetails : alarmList) {
+
+          //  Log.d("AlarmDetails", "AlarmDetails:" + alarmDetails.toString());
             int alarmId = alarmDetails.getAlarmId();
-            long timeInMillis = alarmDetails.getTimeInMillis();
+
+           // long timeInMillis = alarmDetails.getTimeInMillis();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
 
             // Create a Date object and set it using the time in milliseconds
-            Date date = new Date(timeInMillis);
+         //   Date date = new Date(timeInMillis);
 
             // Format the date and print the result
-            String formattedDateStart = sdf.format(date);
+            String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
             String formattedDateEnd = sdf.format(alarmDetails.getFormattedDateEnd());
-            String formattedClockTime = sdf2.format(date);
+            String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
             Log.d("AlarmDetails",
                     "ID: " + alarmId
                     + "\n Date Start: "+ formattedDateStart
                     +"\n Date End: "+ formattedDateEnd
                     +"\n Time: "+ formattedClockTime
                     +"\n More comming soon!");
-            LinearLayout parentLayout = findViewById(R.id.HE);
 
-            LinearLayout linearLayout = (LinearLayout) parentLayout;
-
+            TextView dynamicTextView = new TextView(this);
 
             // Add your dynamic TextView here
-            TextView dynamicTextView = new TextView(this);
             dynamicTextView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -391,6 +398,8 @@ public class MainActivity extends AppCompatActivity {
         List<AlarmDetails> alarmList = new ArrayList<>();
         SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
 
+        Set<Integer> uniqueAlarmIds = new HashSet<>();
+
         // Iterate through all saved alarms and add them to the list
         Map<String, ?> allEntries = preferences.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
@@ -404,9 +413,14 @@ public class MainActivity extends AppCompatActivity {
             long releaseTime = preferences.getLong(releaseTimeKey, 0);
 
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
+            if (!uniqueAlarmIds.contains(alarmId)) {
 
-            AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime);
-            alarmList.add(alarmDetails);
+                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime);
+                alarmList.add(alarmDetails);
+
+                // Lägg till alarmId i set för att undvika dubbletter
+                uniqueAlarmIds.add(alarmId);
+            }
         }
 
         return alarmList;

@@ -12,12 +12,12 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SmsManager smsManager = SmsManager.getDefault();
 
-        String phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
+        String number = intent.getStringExtra("EXTRA_PHONE_NUMBER");
         String message = intent.getStringExtra("EXTRA_MESSAGES");
 
 
-          smsManager.sendTextMessage(phonenumber, null, message, null, null);
-         Toast.makeText(context, "SMS sent to "+phonenumber+"message: "+message, Toast.LENGTH_LONG).show();
+          smsManager.sendTextMessage(number, null, message, null, null);
+         Toast.makeText(context, "SMS sent to "+number+"message: "+message, Toast.LENGTH_LONG).show();
 
         //AlderCreator.showAlertBox_only_ok( context,"test", "This is the alert message.");
 
