@@ -1,9 +1,13 @@
 package se.deluxerpanda.smssender;
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -12,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,6 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -104,18 +110,76 @@ public class MainActivity extends AppCompatActivity {
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
+
+            Calendar currentCalendar = Calendar.getInstance();
+            long currentTimeInMillis = currentCalendar.getTimeInMillis();
+            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault());
+            String selectedDateString = (String) SetDateStartText.getText();
+            String selectedTimeString = (String) SetTimeText.getText();
+            Date selectedDateTime = null;
+            try {
+                selectedDateTime = sdfDateTime.parse(selectedDateString + " " + selectedTimeString);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
             String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
             if (hasSendSmsPermission()) {
-                if (!phonenumber.isEmpty() && !message.isEmpty()) {
+            if (!phonenumber.isEmpty() && !message.isEmpty() || !phonenumber.isEmpty() || !message.isEmpty()) {
+            if (message.length() <= 160) {
+                if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
                     scheduleSMS(phonenumber,message);
                     hideKeyboard();
                     History_info();
+                    phoneNumberEditText.setText("");
+                    messageEditText.setText("");
+
                 } else {
-                    Toast.makeText(this,"Please fill in both phone number and message fields.",Toast.LENGTH_SHORT).show();
+                        // Inside your activity or fragment
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("\uD83D\uDEA8 You cannot go back in time \uD83D\uDEA8");
+                        builder.setMessage("This time has passed. Choose different time");
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        builder.show();
                 }
             } else {
-                requestPermission();
+                // Inside your activity or fragment
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("\uD83D\uDEA8 Max characters reached \uD83D\uDEA8");
+                builder.setMessage("The maximum character limit is 160"+ "\n not "+message.length());
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.show();
+            }
+            } else {
+                // Inside your activity or fragment
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("\uD83D\uDEA8 Number and message are required \uD83D\uDEA8");
+                builder.setMessage("Please provide both phone number and message.");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                builder.show();
+            }
+            } else {
+                // Inside your activity or fragment
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("\uD83D\uDEA8 The app don't have permission \uD83D\uDEA8");
+                builder.setMessage("You must allow the app to send SMS");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermission();
+                    }
+                });
+                builder.show();
             }
         });
 
@@ -208,12 +272,12 @@ public class MainActivity extends AppCompatActivity {
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                AlderCreator.showAlertBox_for_History_info(v.getContext(),
+                AlertCreator.showAlertBox_for_History_info(v.getContext(),
                         "ID: " + alarmId, "ID: " + alarmId
                         + "\n Date Start: "+ formattedDateStart
                         +"\n Date End: "+formattedDateEnd
                         +"\n Time: " + formattedClockTime
-                        +"\n More comming soon!");
+                        +"\n More comming soon!",alarmId);
                 }
             });
         }
@@ -300,16 +364,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void scheduleSMS(String phonenumber, String message) {
         //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
-       if (message.length() <= 160) {
            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
            Intent intent = new Intent(this, AlarmReceiver.class);
 
+           int alarmId = UUID.randomUUID().hashCode();
 
            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
            intent.putExtra("EXTRA_MESSAGES", message);
+          intent.putExtra("EXTRA_ALARMID", alarmId);
 
-           int alarmId = UUID.randomUUID().hashCode();
+
            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
            String DateStart = (String) SetDateStartText.getText();
@@ -332,23 +397,6 @@ public class MainActivity extends AppCompatActivity {
            } catch (ParseException e) {
                e.printStackTrace();
            }
-
-
-       }else {
-           // Inside your activity or fragment
-           AlertDialog.Builder builder = new AlertDialog.Builder(this);
-           builder.setTitle("\uD83D\uDEA8 Max characters reached \uD83D\uDEA8");
-           builder.setMessage("The maximum character limit is 160, not "+message.length());
-           builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-               public void onClick(DialogInterface dialog, int which) {
-                   messageEditText.requestFocus(); // Set focus to the messageEditText
-                   showKeyboard();
-               }
-           });
-           builder.show();
-
-       }
-
     }
 
     // Save alarm details in shared preferences
@@ -434,15 +482,12 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
-                showMessage("Grate you have permission");
+                Toast.makeText(this, "The app has now permission", Toast.LENGTH_SHORT).show();
             } else {
                 // Permission denied
-                showMessage("Please grant SMS permission to send messages.");
+                Toast.makeText(this, "Please grant the app permission to send SMS", Toast.LENGTH_SHORT).show();
             }
         }
-    }
-    public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
