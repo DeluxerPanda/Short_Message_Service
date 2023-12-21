@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class AlertCreator {
+
     public static void showAlertBox_only_ok(Context context, String title, String message) {
         // Create an AlertDialog.Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -50,6 +52,7 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Oki", Toast.LENGTH_LONG).show();
+
                     }
                 })
                 .setNegativeButton("Edit", new DialogInterface.OnClickListener() {

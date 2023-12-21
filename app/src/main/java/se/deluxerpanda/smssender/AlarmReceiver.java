@@ -37,7 +37,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         String alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID",0));
 
         smsManager.sendTextMessage(number, null, message, null, null);
-        Toast.makeText(context, "SMS sent to " + number + " message: " + message +"Alarmid: "+alarmId, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "SMS sent to " + number + " message: " + message +" Alarmid: "+alarmId, Toast.LENGTH_LONG).show();
+
 
           MainActivity.removeAlarm(context,Integer.parseInt(alarmId));
     }

@@ -5,9 +5,9 @@
     <string name="message_Text_hint">Enter message\n(max 160 characters)</string>
     <string name="send_sms_text">Schedule sms</string>
     <string name="time_button_text">Set time</string>
-    <string name="data_button_start_text">Date Starts at</string>
-    <string name="data_button_ends_text">Date ends at</string>
-    <string name="data_CheckBox_ends_text">Date: never ends!</string>
+    <string name="data_button_start_text">sms starts at</string>
+    <string name="data_button_ends_text">sms expire after</string>
+    <string name="data_CheckBox_ends_text">sms never expire!</string>
     <string name="history_name">History</string>
     <string name="logding_data">Loading data from code</string>
 </resources>

@@ -226,6 +226,21 @@ public class MainActivity extends AppCompatActivity {
 
         List<AlarmDetails> alarmList = getAllAlarms(this);
 
+        if (alarmList.isEmpty()) {
+            TextView AlarmListIsEmptyTextView = new TextView(this);
+
+            // Add your dynamic TextView here
+            AlarmListIsEmptyTextView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            AlarmListIsEmptyTextView.setText("There are no SMS scheduled");
+            AlarmListIsEmptyTextView.setTextSize(20);
+            AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
+            AlarmListIsEmptyTextView.setTextColor(getResources().getColor(android.R.color.black));
+            AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
+            linearLayout.addView(AlarmListIsEmptyTextView);
+        } else {
         // Now you can use the alarmList as needed
         for (AlarmDetails alarmDetails : alarmList) {
 
@@ -276,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
     }
 
     private void showDatePicker(boolean isStartDate) {
@@ -378,17 +394,22 @@ public class MainActivity extends AppCompatActivity {
            String dateTimeString = DateStart + " " + Clock_Time;
            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-          // if (checkBoxisChecked == true){
-           //    String sdf2 = "It never ends!";
-           //}
+
            try {
 
                Date date = sdf.parse(dateTimeString);
                Date date2 = sdf2.parse(DateEnd);
                long triggerTime = date.getTime();
-               long releaseTime = date2.getTime();
-               alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-               saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
+               if (checkBoxisChecked == true){
+                   long releaseTime = -1;
+                   alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                   saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
+               }else {
+                   long releaseTime = date2.getTime();
+                   alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
+                   saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
+               }
+
            } catch (ParseException e) {
                e.printStackTrace();
            }
