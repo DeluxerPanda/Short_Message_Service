@@ -34,24 +34,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         String number = intent.getStringExtra("EXTRA_PHONE_NUMBER");
         String message = intent.getStringExtra("EXTRA_MESSAGES");
-        String alarmid = intent.getStringExtra("EXTRA_ALARMID");
+        String alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID",0));
 
         smsManager.sendTextMessage(number, null, message, null, null);
-        Toast.makeText(context, "SMS sent to " + number + " message: " + message +"Alarmid "+alarmid, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, "SMS sent to " + number + " message: " + message +"Alarmid: "+alarmId, Toast.LENGTH_LONG).show();
 
-        //AlderCreator.showAlertBox_only_ok( context,"test", "This is the alert message.");
-
-        try {
-            List<MainActivity.AlarmDetails> alarmList = new ArrayList<>();
-            SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-            Map<String, ?> allEntries = preferences.getAll();
-            Set<Integer> uniqueAlarmIds = new HashSet<>();
-            uniqueAlarmIds.remove(alarmid);
-           // MainActivity instance = new MainActivity();
-           // instance.History_info();
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-        }
+          MainActivity.removeAlarm(context,Integer.parseInt(alarmId));
     }
 
 }

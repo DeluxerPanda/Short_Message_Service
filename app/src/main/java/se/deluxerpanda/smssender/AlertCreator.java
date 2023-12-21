@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,24 +56,22 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Edit comming soon!", Toast.LENGTH_LONG).show();
+                        MainActivity.removeAlarm(context,alarmId);
+
                     }
                 })
+
+
+
                 .setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context, "(Not working) Deleted"+alarmId, Toast.LENGTH_LONG).show();
-                     //   List<MainActivity.AlarmDetails> alarmList = new ArrayList<>();
-                      //  SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-                      //  Set<Integer> uniqueAlarmIds = new HashSet<>();
-                      //  uniqueAlarmIds.remove(String.valueOf(alarmId));
-                      //  Intent intent = new Intent(context, MainActivity.class); // Replace YourAlarmReceiver with the actual class handling the alarm
-                      //  PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, 0);
-
-                       // alarmManager.cancel(pendingIntent);
-
-                        //pendingIntent.cancel();
+                        Toast.makeText(context, "Deleted: " + alarmId, Toast.LENGTH_LONG).show();
+                        MainActivity.removeAlarm(context,alarmId);
                     }
                 });
+
+
 
         // Set the color of the "DELETE" button to red
         AlertDialog alertDialog = builder.create();
@@ -93,5 +92,7 @@ public class AlertCreator {
         // Create and show the dialog
         alertDialog.show();
     }
+
+
 
 }

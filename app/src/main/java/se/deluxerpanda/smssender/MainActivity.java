@@ -1,13 +1,10 @@
 package se.deluxerpanda.smssender;
-import static androidx.core.content.ContextCompat.getSystemService;
 
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -16,7 +13,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -249,8 +245,8 @@ public class MainActivity extends AppCompatActivity {
             String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
             Log.d("AlarmDetails",
                     "ID: " + alarmId
-                    + "\n Date Start: "+ formattedDateStart
-                    +"\n Date End: "+ formattedDateEnd
+                    + "\n Start: "+ formattedDateStart
+                    +"\n End: "+ formattedDateEnd
                     +"\n Time: "+ formattedClockTime
                     +"\n More comming soon!");
 
@@ -261,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            // Set dynamic information from the AlarmDetails object to the TextView
             dynamicTextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
             dynamicTextView.setTextSize(20);
             dynamicTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
@@ -274,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                 AlertCreator.showAlertBox_for_History_info(v.getContext(),
                         "ID: " + alarmId, "ID: " + alarmId
-                        + "\n Date Start: "+ formattedDateStart
-                        +"\n Date End: "+formattedDateEnd
+                        + "\n Start: "+ formattedDateStart
+                        +"\n  End: "+formattedDateEnd
                         +"\n Time: " + formattedClockTime
                         +"\n More comming soon!",alarmId);
                 }
@@ -472,6 +467,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return alarmList;
+    }
+
+    public static void removeAlarm(Context context,int alarmId){
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, 0);
+
+        // Cancel the alarm
+        alarmManager.cancel(pendingIntent);
+
+        // Remove alarm details from shared preferences
+        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        // Remove entries for the specified alarmId
+        String triggerTimeKey = "triggerTime_" + alarmId;
+        String releaseTimeKey = "releaseTime_" + alarmId;
+
+        editor.remove(triggerTimeKey);
+        editor.remove(releaseTimeKey);
+
+        editor.apply();
     }
 
 
