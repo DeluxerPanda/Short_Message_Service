@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
@@ -59,7 +60,7 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Edit comming soon!", Toast.LENGTH_LONG).show();
-                        MainActivity.removeAlarm(context,alarmId);
+                      //  MainActivity.removeAlarm(context,alarmId);
 
                     }
                 })
@@ -71,6 +72,8 @@ public class AlertCreator {
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Deleted: " + alarmId, Toast.LENGTH_LONG).show();
                         MainActivity.removeAlarm(context,alarmId);
+                       // MainActivity obj = new MainActivity();
+                       // obj.History_info();
                     }
                 });
 

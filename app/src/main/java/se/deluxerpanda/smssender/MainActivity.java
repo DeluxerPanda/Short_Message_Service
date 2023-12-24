@@ -236,9 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
             AlarmListIsEmptyTextView.setText("There are no SMS scheduled");
             AlarmListIsEmptyTextView.setTextSize(20);
-            AlarmListIsEmptyTextView.setTextColor(R.color.white);
             AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
-            AlarmListIsEmptyTextView.setTextColor(getResources().getColor(android.R.color.black));
             AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
             linearLayout.addView(AlarmListIsEmptyTextView);
         } else {
@@ -276,8 +274,8 @@ public class MainActivity extends AppCompatActivity {
             dynamicTextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
             dynamicTextView.setTextSize(20);
             dynamicTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
-            dynamicTextView.setTextColor(getResources().getColor(android.R.color.black));
             dynamicTextView.setGravity(Gravity.CENTER);
+            dynamicTextView.setHintTextColor(R.color.md_theme_dark_onPrimary);
 
             linearLayout.addView(dynamicTextView);
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
