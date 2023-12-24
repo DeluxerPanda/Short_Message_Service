@@ -27,7 +27,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
+android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+}
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")

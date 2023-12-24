@@ -236,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
 
             AlarmListIsEmptyTextView.setText("There are no SMS scheduled");
             AlarmListIsEmptyTextView.setTextSize(20);
+            AlarmListIsEmptyTextView.setTextColor(R.color.white);
             AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
             AlarmListIsEmptyTextView.setTextColor(getResources().getColor(android.R.color.black));
             AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
