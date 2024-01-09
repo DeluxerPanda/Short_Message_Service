@@ -5,6 +5,8 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -13,6 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,6 +33,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
@@ -293,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
     }
     }
 
+
     private void showDatePicker(boolean isStartDate) {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
         Bundle args = new Bundle();
@@ -373,6 +379,7 @@ public class MainActivity extends AppCompatActivity {
 //date  Dialog (ends)
 
     private void scheduleSMS(String phonenumber, String message) {
+
         //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
@@ -384,8 +391,12 @@ public class MainActivity extends AppCompatActivity {
            intent.putExtra("EXTRA_MESSAGES", message);
           intent.putExtra("EXTRA_ALARMID", alarmId);
 
-
-           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, 0);
 
            String DateStart = (String) SetDateStartText.getText();
            String DateEnd = (String) SetDateEndsText.getText();
@@ -493,7 +504,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,0);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);
@@ -541,6 +552,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (view == null) {
             imm.showSoftInput((View) view.getWindowToken(), 1);
+        }
+    }
+    public static String CHANNEL_ID = "dusofjuoedf";
+    private String CHANNEL_NAME = String.valueOf(R.string.app_name);
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
         }
     }
 }

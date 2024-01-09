@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -62,6 +63,7 @@ public class AlertCreator {
                         Toast.makeText(context, "Edit comming soon!", Toast.LENGTH_LONG).show();
                       //  MainActivity.removeAlarm(context,alarmId);
 
+
                     }
                 })
 
@@ -71,15 +73,13 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Deleted: " + alarmId, Toast.LENGTH_LONG).show();
-                        MainActivity.removeAlarm(context,alarmId);
-                       // MainActivity obj = new MainActivity();
-                       // obj.History_info();
+
+                        MainActivity.removeAlarm(context, alarmId);
                     }
                 });
 
 
 
-        // Set the color of the "DELETE" button to red
         AlertDialog alertDialog = builder.create();
         alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
