@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -26,6 +27,8 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -43,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -57,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private static TextView SetTimeText;
     private static TextView SetDateStartText;
     private static TextView SetDateEndsText;
+    private static TextView selectedOptionText;
     private LinearLayout pickDateEndsBox;
     public static int timeHourSaved = -1;
     public static int timeMinuteSaved = -1;
@@ -64,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
     private static String startDate;
     private static String endDate;
     boolean checkBoxisChecked = false;
+    public static String CHANNEL_ID = String.valueOf(UUID.randomUUID().hashCode());
+
+    public static String CHANNEL_NAME = String.valueOf(R.string.app_name);
+
 
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
@@ -103,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
         SetDateStartText = findViewById(R.id.SetDateStartText);
 
         SetDateEndsText = findViewById(R.id.SetDateEndsText);
+
+        selectedOptionText = findViewById(R.id.selectedOptionText);
 
 
         SetTimeText.setText(" "+timeText);
@@ -209,19 +220,58 @@ public class MainActivity extends AppCompatActivity {
                 showDatePicker(false);
         });
 
-        CheckBox pickDateEndsCheckBox = findViewById(R.id.checkBox);
-        pickDateEndsCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if (isChecked) {
-                pickDateEndsBox.setVisibility(View.GONE);
-                 checkBoxisChecked = true;
-            } else {
-                pickDateEndsBox.setVisibility(View.VISIBLE);
-                 checkBoxisChecked = false;
+        Button chooseOptionButton = findViewById(R.id.chooseOptionButton);
+        chooseOptionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOptionsDialog();
             }
-
         });
         History_info();
     }
+
+    public void showOptionsDialog() {
+        // Get the layout inflater
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.options_dialog, null);
+
+        final String[] options = {
+                getString(R.string.data_CheckBox_every_year_text),
+                getString(R.string.data_CheckBox_every_month_text),
+                getString(R.string.data_CheckBox_every_week_text),
+                getString(R.string.data_CheckBox_every_day_text)};
+
+        RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
+
+        for (int i = 0; i < options.length; i++) {
+            RadioButton radioButton = new RadioButton(this);
+            radioButton.setText(options[i]);
+            radioGroup.addView(radioButton);
+
+            // Set a tag to identify the selected option
+            radioButton.setTag(i);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.send_every_text))
+                .setView(dialogView)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int selectedOptionIndex = radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId()));
+                        if (selectedOptionIndex != -1) {
+                            String selectedOption = options[selectedOptionIndex];
+                            selectedOptionText.setText(selectedOption);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
 
     public void History_info(){
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
@@ -378,8 +428,14 @@ public class MainActivity extends AppCompatActivity {
 
 //date  Dialog (ends)
 
-    private void scheduleSMS(String phonenumber, String message) {
+    private void scheduleSMS(String phonenumber, String message){
 
+        String DateStart = (String) SetDateStartText.getText();
+        String DateEnd = (String) SetDateEndsText.getText();
+        String Clock_Time = (String) SetTimeText.getText();
+        String dateTimeString = DateStart + " " + Clock_Time;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
         //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
@@ -391,34 +447,43 @@ public class MainActivity extends AppCompatActivity {
            intent.putExtra("EXTRA_MESSAGES", message);
           intent.putExtra("EXTRA_ALARMID", alarmId);
 
+        intent.putExtra("EXTRA_DATESTART", DateStart);
+        if (checkBoxisChecked == true){
+            try {
+                Calendar calendar = Calendar.getInstance();
+                Date date = sdf2.parse(DateEnd);
+                calendar.setTime(date);
+
+                // Add 100 years to the date
+                calendar.add(Calendar.YEAR, 100);
+
+                // Get the new date after adding 100 years
+                Date neverEndDate = calendar.getTime();
+             //  String DateEnd = neverEndDate;
+                // Format the new date as a string
+               String neverEndDateStr = sdf2.format(neverEndDate);
+                intent.putExtra("EXTRA_DATEEND", neverEndDateStr);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }else {
+            intent.putExtra("EXTRA_DATEEND", DateEnd);
+        }
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
             startService(intent);
         }
            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, 0);
-
-           String DateStart = (String) SetDateStartText.getText();
-           String DateEnd = (String) SetDateEndsText.getText();
-           String Clock_Time = (String) SetTimeText.getText();
-           String dateTimeString = DateStart + " " + Clock_Time;
-           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
-           SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-
            try {
-
                Date date = sdf.parse(dateTimeString);
                Date date2 = sdf2.parse(DateEnd);
                long triggerTime = date.getTime();
-               if (checkBoxisChecked == true){
-                   long releaseTime = -1;
-                   alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-                   saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
-               }else {
                    long releaseTime = date2.getTime();
                    alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
                    saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
-               }
 
            } catch (ParseException e) {
                e.printStackTrace();
@@ -554,8 +619,7 @@ public class MainActivity extends AppCompatActivity {
             imm.showSoftInput((View) view.getWindowToken(), 1);
         }
     }
-    public static String CHANNEL_ID = "dusofjuoedf";
-    private String CHANNEL_NAME = String.valueOf(R.string.app_name);
+
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);

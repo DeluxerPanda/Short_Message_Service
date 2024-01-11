@@ -53,17 +53,16 @@ public class AlertCreator {
                 .setNeutralButton("OKi", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context, "Oki", Toast.LENGTH_LONG).show();
-
+                        return;
                     }
                 })
                 .setNegativeButton("Edit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Edit comming soon!", Toast.LENGTH_LONG).show();
+
+
                       //  MainActivity.removeAlarm(context,alarmId);
-
-
                     }
                 })
 

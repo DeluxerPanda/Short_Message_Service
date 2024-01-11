@@ -4,10 +4,15 @@
     <string name="phone_hint">Enter Phone Number</string>
     <string name="message_Text_hint">Enter message\n(max 160 characters)</string>
     <string name="send_sms_text">Schedule sms</string>
-    <string name="time_button_text">Set time</string>
-    <string name="data_button_start_text">sms starts at</string>
-    <string name="data_button_ends_text">sms expire after</string>
-    <string name="data_CheckBox_ends_text">sms never expire!</string>
+    <string name="time_button_text">Set time:</string>
+    <string name="data_button_start_text">sms starts at:</string>
+    <string name="data_button_ends_text">sms expire after:</string>
+    <string name="data_CheckBox_every_day_text">Day</string>
+    <string name="data_CheckBox_every_week_text">Week</string>
+    <string name="data_CheckBox_every_month_text">Month</string>
+    <string name="data_CheckBox_every_year_text">Year</string>
+    <string name="send_every_text">send sms every:</string>
     <string name="history_name">History</string>
     <string name="logding_data">Loading data from code</string>
+    <string name="message_sent">sent to:</string>
 </resources>

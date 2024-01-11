@@ -133,19 +133,35 @@
             tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
 
     </LinearLayout>
-
-    <CheckBox
-        android:id="@+id/checkBox"
+    <LinearLayout
+        android:id="@+id/chooseOptionEndsBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:checked="false"
-        android:duplicateParentState="false"
-        android:text="@string/data_CheckBox_ends_text"
-        android:textAlignment="textStart"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:ignore="VisualLintButtonSize" />
+        android:orientation="horizontal">
 
+
+    <Button
+        android:id="@+id/chooseOptionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send_every_text" />
+
+        <TextView
+            android:id="@+id/selectedOptionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:importantForAutofill="no"
+            android:minHeight="48dp"
+            android:text="@string/logding_data"
+            android:textAlignment="textStart"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:typeface="normal"
+            tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
+
+    </LinearLayout>
     <Button
         android:id="@+id/sendB"
         android:layout_width="match_parent"
