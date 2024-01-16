@@ -2,6 +2,7 @@ package se.deluxerpanda.smssender;
 
 import android.annotation.SuppressLint;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,6 +19,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -28,8 +30,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 private String number;
 private String message;
-private String DateStart;
-private String DateEnd;
+private String dateStart;
+private String dateEnd;
+private  String repeatSmS;
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
@@ -41,26 +44,17 @@ private String DateEnd;
 
         String alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0));
 
-        DateStart = intent.getStringExtra("EXTRA_DATESTART");
-        DateEnd = intent.getStringExtra("EXTRA_DATEEND");
+        dateStart = intent.getStringExtra("EXTRA_DATESTART");
+        dateEnd = intent.getStringExtra("EXTRA_DATEEND");
 
-        Date date1;
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            date1 = sdf.parse(DateStart);
-            Log.d("AlarmDetails-in-TRY",
-                    "ID: " + alarmId
-                            + "\n Start: " + DateStart
-                            + "\n End: " + DateEnd);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        repeatSmS = intent.getStringExtra("EXTRA_REPEATSMS");
 
-            Log.d("AlarmDetails",
-                    "ID: " + alarmId
-                            + "\n Start: " + DateStart + "ints? " + date1
-                            + "\n End: " + DateEnd);
-            Toast.makeText(context, "SMS extends " + DateEnd + " Alarmid: " + alarmId, Toast.LENGTH_LONG).show();
+
+        Log.d("AlarmDetails",
+                "ID: " + alarmId
+                        + "\n Start: " + dateStart
+                        + "\n End: " + dateEnd
+                        + "\n Repeat evry: "+ repeatSmS);
 
         smsManager.sendTextMessage(number, null, message, null, null);
         Toast.makeText(context, "SMS sent to " + number + " message: " + message + " Alarmid: " + alarmId, Toast.LENGTH_LONG).show();
@@ -68,7 +62,7 @@ private String DateEnd;
         sendNotification(context);
         NotificationManager manager2 = context.getSystemService(NotificationManager.class);
         if (manager2.getNotificationChannel(MainActivity.CHANNEL_ID) != null) {
-            MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
+      //      MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
         }
 
 
@@ -101,5 +95,4 @@ private String DateEnd;
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(notificationId, builder.build());
     }
-
 }

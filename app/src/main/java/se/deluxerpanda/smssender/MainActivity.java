@@ -41,6 +41,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,6 +74,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static String CHANNEL_NAME = String.valueOf(R.string.app_name);
 
+    private String day;
+    private String week;
+    private String month;
+    private String year;
 
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
@@ -274,6 +279,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void History_info(){
+
+
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
         linearLayout.destroyDrawingCache();
@@ -298,26 +305,17 @@ public class MainActivity extends AppCompatActivity {
         // Now you can use the alarmList as needed
         for (AlarmDetails alarmDetails : alarmList) {
 
-          //  Log.d("AlarmDetails", "AlarmDetails:" + alarmDetails.toString());
             int alarmId = alarmDetails.getAlarmId();
 
            // long timeInMillis = alarmDetails.getTimeInMillis();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
 
-            // Create a Date object and set it using the time in milliseconds
-         //   Date date = new Date(timeInMillis);
 
             // Format the date and print the result
             String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
             String formattedDateEnd = sdf.format(alarmDetails.getFormattedDateEnd());
             String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
-            Log.d("AlarmDetails",
-                    "ID: " + alarmId
-                    + "\n Start: "+ formattedDateStart
-                    +"\n End: "+ formattedDateEnd
-                    +"\n Time: "+ formattedClockTime
-                    +"\n More comming soon!");
 
             TextView dynamicTextView = new TextView(this);
 
@@ -333,6 +331,7 @@ public class MainActivity extends AppCompatActivity {
             dynamicTextView.setHintTextColor(R.color.md_theme_dark_onPrimary);
 
             linearLayout.addView(dynamicTextView);
+
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -341,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
                         + "\n Start: "+ formattedDateStart
                         +"\n  End: "+formattedDateEnd
                         +"\n Time: " + formattedClockTime
+                        +"\n Repeat evry:"
                         +"\n More comming soon!",alarmId);
                 }
             });
@@ -428,67 +428,75 @@ public class MainActivity extends AppCompatActivity {
 
 //date  Dialog (ends)
 
-    private void scheduleSMS(String phonenumber, String message){
-
+    private void scheduleSMS(String phonenumber, String message) {
         String DateStart = (String) SetDateStartText.getText();
         String DateEnd = (String) SetDateEndsText.getText();
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-        //String ost = "aLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient.";
-           AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-           Intent intent = new Intent(this, AlarmReceiver.class);
+        String repeatSmS = (String) selectedOptionText.getText();
 
-           int alarmId = UUID.randomUUID().hashCode();
+        day = getString(R.string.data_CheckBox_every_day_text);
+        week = getString(R.string.data_CheckBox_every_week_text);
+        month = getString(R.string.data_CheckBox_every_month_text);
+        year = getString(R.string.data_CheckBox_every_year_text);
 
-           intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-           intent.putExtra("EXTRA_MESSAGES", message);
-          intent.putExtra("EXTRA_ALARMID", alarmId);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        Intent intent = new Intent(this, AlarmReceiver.class);
+
+        int alarmId = UUID.randomUUID().hashCode();
+
+        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+        intent.putExtra("EXTRA_MESSAGES", message);
+        intent.putExtra("EXTRA_ALARMID", alarmId);
         intent.putExtra("EXTRA_DATESTART", DateStart);
-        if (checkBoxisChecked == true){
-            try {
-                Calendar calendar = Calendar.getInstance();
-                Date date = sdf2.parse(DateEnd);
-                calendar.setTime(date);
-
-                // Add 100 years to the date
-                calendar.add(Calendar.YEAR, 100);
-
-                // Get the new date after adding 100 years
-                Date neverEndDate = calendar.getTime();
-             //  String DateEnd = neverEndDate;
-                // Format the new date as a string
-               String neverEndDateStr = sdf2.format(neverEndDate);
-                intent.putExtra("EXTRA_DATEEND", neverEndDateStr);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }else {
-            intent.putExtra("EXTRA_DATEEND", DateEnd);
-        }
-
+        intent.putExtra("EXTRA_DATEEND", DateEnd);
+        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent);
         } else {
             startService(intent);
         }
-           PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, 0);
-           try {
-               Date date = sdf.parse(dateTimeString);
-               Date date2 = sdf2.parse(DateEnd);
-               long triggerTime = date.getTime();
-                   long releaseTime = date2.getTime();
-                   alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent);
-                   saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
 
-           } catch (ParseException e) {
-               e.printStackTrace();
-           }
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, 0);
+        try {
+            Date date = sdf.parse(dateTimeString);
+            Date date2 = sdf2.parse(DateEnd);
+            long triggerTime = date.getTime();
+            long releaseTime = date2.getTime();
+
+            long intervalMillis = 0;
+
+            if (repeatSmS.equalsIgnoreCase(day)) {
+                intervalMillis = AlarmManager.INTERVAL_DAY;
+            } else if (repeatSmS.equalsIgnoreCase(week)) {
+                intervalMillis = AlarmManager.INTERVAL_DAY * 7;
+            } else if (repeatSmS.equalsIgnoreCase(month)) {
+                intervalMillis = AlarmManager.INTERVAL_DAY * 30;
+            } else if (repeatSmS.equalsIgnoreCase(year)) {
+                intervalMillis = AlarmManager.INTERVAL_DAY * 365;
+            }
+
+
+
+            alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    intervalMillis,
+                    pendingIntent
+            );
+
+            saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
+
 
     // Save alarm details in shared preferences
     private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, long releaseTime) {
