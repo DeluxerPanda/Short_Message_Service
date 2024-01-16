@@ -462,7 +462,8 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_IMMUTABLE);
+
         try {
             Date date = sdf.parse(dateTimeString);
             Date date2 = sdf2.parse(DateEnd);
@@ -577,7 +578,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,0);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_IMMUTABLE);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);

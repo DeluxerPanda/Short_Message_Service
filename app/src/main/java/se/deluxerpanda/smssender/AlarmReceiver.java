@@ -88,7 +88,8 @@ private  String repeatSmS;
         int notificationId = random.nextInt();
         // Create an intent for the notification
         Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
         builder.setContentIntent(pendingIntent);
 
         // Show the notification
