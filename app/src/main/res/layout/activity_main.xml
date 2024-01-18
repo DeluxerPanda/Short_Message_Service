@@ -103,37 +103,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/pickDateEndsBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/pickDateEnds"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/data_button_ends_text"
-            android:visibility="visible"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/SetDateEndsText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:importantForAutofill="no"
-            android:minHeight="48dp"
-            android:text="@string/logding_data"
-            android:textAlignment="textStart"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:typeface="normal"
-            tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
-
-    </LinearLayout>
-    <LinearLayout
         android:id="@+id/chooseOptionEndsBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

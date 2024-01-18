@@ -23,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -36,18 +35,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static TextView SetTimeText;
     private static TextView SetDateStartText;
-    private static TextView SetDateEndsText;
     private static TextView selectedOptionText;
     private LinearLayout pickDateEndsBox;
     public static int timeHourSaved = -1;
@@ -110,20 +104,15 @@ public class MainActivity extends AppCompatActivity {
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         messageEditText = findViewById(R.id.messageEditText);
 
-        pickDateEndsBox = findViewById(R.id.pickDateEndsBox);
-
         SetTimeText = findViewById(R.id.SetTimeText);
 
         SetDateStartText = findViewById(R.id.SetDateStartText);
-
-        SetDateEndsText = findViewById(R.id.SetDateEndsText);
 
         selectedOptionText = findViewById(R.id.selectedOptionText);
 
 
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
-        SetDateEndsText.setText(" " + formattedDate);
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
@@ -142,10 +131,12 @@ public class MainActivity extends AppCompatActivity {
 
             String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
+            String repeatSmS = (String) selectedOptionText.getText();
             if (hasSendSmsPermission()) {
             if (!phonenumber.isEmpty() && !message.isEmpty() || !phonenumber.isEmpty() || !message.isEmpty()) {
             if (message.length() <= 160) {
                 if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
+                    if (!repeatSmS.equalsIgnoreCase(getResources().getString(R.string.logding_data))) {
                     scheduleSMS(phonenumber,message);
                     hideKeyboard();
                     History_info();
@@ -153,6 +144,18 @@ public class MainActivity extends AppCompatActivity {
                     messageEditText.setText("");
 
                 } else {
+                        // Inside your activity or fragment
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle(getResources().getString(R.string.sms_repeates_titel));
+                        builder.setMessage(getResources().getString(R.string.sms_repeates_Text));
+                        builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                        builder.show();
+                    }
+
+                }  else {
                         // Inside your activity or fragment
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle("\uD83D\uDEA8 You cannot go back in time \uD83D\uDEA8");
@@ -216,14 +219,9 @@ public class MainActivity extends AppCompatActivity {
 
         Button pickDateStartButton = findViewById(R.id.pickDateStarts);
         pickDateStartButton.setOnClickListener(view -> {
-            showDatePicker(true);
+            showDatePicker();
         });
 
-
-        Button pickDateEndsButton = findViewById(R.id.pickDateEnds);
-        pickDateEndsButton.setOnClickListener(view -> {
-                showDatePicker(false);
-        });
 
         Button chooseOptionButton = findViewById(R.id.chooseOptionButton);
         chooseOptionButton.setOnClickListener(new View.OnClickListener() {
@@ -316,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
             String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
             String formattedDateEnd = sdf.format(alarmDetails.getFormattedDateEnd());
             String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
+            String getRepeatSmS = alarmDetails.getRepeatSmS();
 
             TextView dynamicTextView = new TextView(this);
 
@@ -340,7 +339,7 @@ public class MainActivity extends AppCompatActivity {
                         + "\n Start: "+ formattedDateStart
                         +"\n  End: "+formattedDateEnd
                         +"\n Time: " + formattedClockTime
-                        +"\n Repeat evry:"
+                        +"\n Repeat evry: " + getRepeatSmS
                         +"\n More comming soon!",alarmId);
                 }
             });
@@ -349,11 +348,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void showDatePicker(boolean isStartDate) {
+    private void showDatePicker() {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
-        Bundle args = new Bundle();
-        args.putBoolean("isStartDate", isStartDate);
-        datePickerFragment.setArguments(args);
+
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
@@ -401,8 +398,7 @@ public class MainActivity extends AppCompatActivity {
             Date date = new Date();
             datePickerDialog.getDatePicker().setMinDate(date.getTime()); // Set minimum date to now
 
-            // If it's the "end" date picker, set the minimum date to the "start" date
-            if (!getArguments().getBoolean("isStartDate")) {
+
                 try {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
@@ -410,19 +406,14 @@ public class MainActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            }
+
             return datePickerDialog;
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-            boolean isStartDate = getArguments().getBoolean("isStartDate");
 
-            if (isStartDate) {
                 SetDateStartText.setText(" " + formattedDate);
-            } else {
-                SetDateEndsText.setText(" " + formattedDate);
-            }
         }
     }
 
@@ -430,11 +421,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void scheduleSMS(String phonenumber, String message) {
         String DateStart = (String) SetDateStartText.getText();
-        String DateEnd = (String) SetDateEndsText.getText();
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
+        if (!dateTimeString.matches(".*:\\d{2}$")) {
+            dateTimeString += ":00";
+        }
+
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
 
         String repeatSmS = (String) selectedOptionText.getText();
 
@@ -453,7 +447,6 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("EXTRA_MESSAGES", message);
         intent.putExtra("EXTRA_ALARMID", alarmId);
         intent.putExtra("EXTRA_DATESTART", DateStart);
-        intent.putExtra("EXTRA_DATEEND", DateEnd);
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -462,13 +455,11 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE);
 
         try {
             Date date = sdf.parse(dateTimeString);
-            Date date2 = sdf2.parse(DateEnd);
             long triggerTime = date.getTime();
-            long releaseTime = date2.getTime();
 
             long intervalMillis = 0;
 
@@ -483,15 +474,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-
             alarmManager.setRepeating(
                     AlarmManager.RTC_WAKEUP,
                     triggerTime,
                     intervalMillis,
                     pendingIntent
             );
-
-            saveAlarmDetails(this, alarmId, triggerTime, releaseTime);
+            saveAlarmDetails(this, alarmId, triggerTime,repeatSmS);
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -500,17 +489,17 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Save alarm details in shared preferences
-    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, long releaseTime) {
+    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, String repeatSmS) {
         SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         // Use unique keys for each alarm and each value
         String triggerTimeKey = "triggerTime_" + alarmId;
-        String releaseTimeKey = "releaseTime_" + alarmId;
+        String getRepeatSmSKey = "getRepeatSmSKey_"+ alarmId;
 
         // Save the triggerTime and releaseTime using their respective keys
         editor.putLong(triggerTimeKey, triggerTime);
-        editor.putLong(releaseTimeKey, releaseTime);
+        editor.putString(getRepeatSmSKey,repeatSmS);
 
         editor.apply();
     }
@@ -521,11 +510,14 @@ public class MainActivity extends AppCompatActivity {
 
         private long releaseTime;
 
+        private String repeatSmS;
 
-        public AlarmDetails(int alarmId, long triggerTime, long releaseTime) {
+
+        public AlarmDetails(int alarmId, long triggerTime, long releaseTime, String repeatSmS) {
             this.alarmId = alarmId;
             this.triggerTime = triggerTime;
             this.releaseTime = releaseTime;
+            this.repeatSmS = repeatSmS;
         }
 
         public int getAlarmId() {
@@ -538,6 +530,8 @@ public class MainActivity extends AppCompatActivity {
         public long getFormattedDateEnd(){
             return  releaseTime;
         }
+
+        public String getRepeatSmS(){return repeatSmS;}
 
     }
 
@@ -557,13 +551,17 @@ public class MainActivity extends AppCompatActivity {
             String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
             String releaseTimeKey = "releaseTime_" + key.substring(key.lastIndexOf("_") + 1);
 
+            String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
+
+            String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
+
             long triggerTime = preferences.getLong(triggerTimeKey, 0);
             long releaseTime = preferences.getLong(releaseTimeKey, 0);
 
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
             if (!uniqueAlarmIds.contains(alarmId)) {
 
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime);
+                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime,getRepeatSmS);
                 alarmList.add(alarmDetails);
 
                 // Lägg till alarmId i set för att undvika dubbletter
@@ -578,7 +576,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_MUTABLE);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);
@@ -590,9 +588,11 @@ public class MainActivity extends AppCompatActivity {
         // Remove entries for the specified alarmId
         String triggerTimeKey = "triggerTime_" + alarmId;
         String releaseTimeKey = "releaseTime_" + alarmId;
+        String getRepeatSmSKey = "getRepeatSmSKey_" + alarmId;
 
         editor.remove(triggerTimeKey);
         editor.remove(releaseTimeKey);
+        editor.remove(getRepeatSmSKey);
 
         editor.apply();
     }

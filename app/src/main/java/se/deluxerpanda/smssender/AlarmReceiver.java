@@ -31,7 +31,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 private String number;
 private String message;
 private String dateStart;
-private String dateEnd;
 private  String repeatSmS;
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
@@ -45,7 +44,6 @@ private  String repeatSmS;
         String alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0));
 
         dateStart = intent.getStringExtra("EXTRA_DATESTART");
-        dateEnd = intent.getStringExtra("EXTRA_DATEEND");
 
         repeatSmS = intent.getStringExtra("EXTRA_REPEATSMS");
 
@@ -53,7 +51,6 @@ private  String repeatSmS;
         Log.d("AlarmDetails",
                 "ID: " + alarmId
                         + "\n Start: " + dateStart
-                        + "\n End: " + dateEnd
                         + "\n Repeat evry: "+ repeatSmS);
 
         smsManager.sendTextMessage(number, null, message, null, null);
@@ -88,7 +85,7 @@ private  String repeatSmS;
         int notificationId = random.nextInt();
         // Create an intent for the notification
         Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
 
         builder.setContentIntent(pendingIntent);
 
