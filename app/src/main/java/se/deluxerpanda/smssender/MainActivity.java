@@ -313,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Format the date and print the result
             String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
-            String formattedDateEnd = sdf.format(alarmDetails.getFormattedDateEnd());
             String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
             String getRepeatSmS = alarmDetails.getRepeatSmS();
 
@@ -338,7 +337,6 @@ public class MainActivity extends AppCompatActivity {
                 AlertCreator.showAlertBox_for_History_info(v.getContext(),
                         "ID: " + alarmId, "ID: " + alarmId
                         + "\n Start: "+ formattedDateStart
-                        +"\n  End: "+formattedDateEnd
                         +"\n Time: " + formattedClockTime
                         +"\n Repeat evry: " + getRepeatSmS
                         +"\n More comming soon!",alarmId);
@@ -473,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-            alarmManager.setRepeating(
+            alarmManager.setInexactRepeating(
                     AlarmManager.RTC_WAKEUP,
                     triggerTime,
                     intervalMillis,
@@ -514,15 +512,12 @@ public class MainActivity extends AppCompatActivity {
         private int alarmId;
         private long triggerTime;
 
-        private long releaseTime;
-
         private String repeatSmS;
 
 
-        public AlarmDetails(int alarmId, long triggerTime, long releaseTime, String repeatSmS) {
+        public AlarmDetails(int alarmId, long triggerTime, String repeatSmS) {
             this.alarmId = alarmId;
             this.triggerTime = triggerTime;
-            this.releaseTime = releaseTime;
             this.repeatSmS = repeatSmS;
         }
 
@@ -532,9 +527,6 @@ public class MainActivity extends AppCompatActivity {
 
         public long getTimeInMillis() {
             return triggerTime;
-        }
-        public long getFormattedDateEnd(){
-            return  releaseTime;
         }
 
         public String getRepeatSmS(){return repeatSmS;}
@@ -567,7 +559,7 @@ public class MainActivity extends AppCompatActivity {
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
             if (!uniqueAlarmIds.contains(alarmId)) {
 
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime, releaseTime,getRepeatSmS);
+                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime,getRepeatSmS);
                 alarmList.add(alarmDetails);
 
                 // Lägg till alarmId i set för att undvika dubbletter
@@ -582,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_NO_CREATE);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);
