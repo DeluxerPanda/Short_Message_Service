@@ -78,7 +78,7 @@ private  String repeatSmS;
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(R.string.message_sent+" "+number)
+                .setContentTitle(context.getResources().getString(R.string.message_sent)+" "+number)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         Random random = new Random();

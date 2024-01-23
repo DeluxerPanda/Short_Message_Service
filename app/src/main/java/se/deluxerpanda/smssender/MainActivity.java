@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -423,9 +424,7 @@ public class MainActivity extends AppCompatActivity {
         String DateStart = (String) SetDateStartText.getText();
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
-        if (!dateTimeString.matches(".*:\\d{2}$")) {
-            dateTimeString += ":00";
-        }
+
 
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
@@ -446,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         intent.putExtra("EXTRA_MESSAGES", message);
         intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_DATESTART", DateStart);
+        intent.putExtra("EXTRA_DATESTART", dateTimeString);
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -455,8 +454,8 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE);
-
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE
+        );
         try {
             Date date = sdf.parse(dateTimeString);
             long triggerTime = date.getTime();
@@ -481,7 +480,14 @@ public class MainActivity extends AppCompatActivity {
                     pendingIntent
             );
             saveAlarmDetails(this, alarmId, triggerTime,repeatSmS);
-
+            Log.d("AlarmDetails",
+                    "ID: " + alarmId
+                            + "\n triggerTime: " + triggerTime
+                            + "\n intervalMillis: "+ intervalMillis
+                            +  "\n pendingIntent"+ pendingIntent
+                            + "\n DateStart"+ DateStart
+                            + "\n Clock_Time"+ Clock_Time
+                            + "\n dateTimeString"+ dateTimeString);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -576,7 +582,7 @@ public class MainActivity extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_MUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);
