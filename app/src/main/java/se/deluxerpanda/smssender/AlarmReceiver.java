@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import kotlin.random.URandomKt;
 
@@ -33,6 +34,10 @@ private String message;
 private String dateStart;
 private  String repeatSmS;
 
+    private String day;
+    private String week;
+    private String month;
+    private String year;
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -41,12 +46,12 @@ private  String repeatSmS;
         number = intent.getStringExtra("EXTRA_PHONE_NUMBER");
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
-        String alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0));
+     String   alarmId = String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0));
 
         dateStart = intent.getStringExtra("EXTRA_DATESTART");
 
         repeatSmS = intent.getStringExtra("EXTRA_REPEATSMS");
-
+        rescheduleAlarm(context, repeatSmS);
 
         Log.d("AlarmDetails",
                 "ID: " + alarmId
@@ -55,14 +60,54 @@ private  String repeatSmS;
 
         smsManager.sendTextMessage(number, null, message, null, null);
         Toast.makeText(context, "SMS sent to " + number + " message: " + message + " Alarmid: " + alarmId, Toast.LENGTH_LONG).show();
-
         sendNotification(context);
-        NotificationManager manager2 = context.getSystemService(NotificationManager.class);
-        if (manager2.getNotificationChannel(MainActivity.CHANNEL_ID) != null) {
-      //      MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
+        MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
+    }
+
+    private void rescheduleAlarm(Context context, String repeatSmS) {
+        // Get the information from the intent
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+
+        // Schedule the alarm for the next occurrence based on the repeatSmS value
+        // You can modify this logic to suit your requirements
+        long intervalMillis = 0;
+        day = context.getString(R.string.data_CheckBox_every_day_text);
+        week = context.getString(R.string.data_CheckBox_every_week_text);
+        month = context.getString(R.string.data_CheckBox_every_month_text);
+        year = context.getString(R.string.data_CheckBox_every_year_text);
+        if (repeatSmS.equalsIgnoreCase(day)) {
+            intervalMillis = AlarmManager.INTERVAL_DAY;
+        } else if (repeatSmS.equalsIgnoreCase(week)) {
+            intervalMillis = AlarmManager.INTERVAL_DAY * 7;
+        } else if (repeatSmS.equalsIgnoreCase(month)) {
+            intervalMillis = AlarmManager.INTERVAL_DAY * 30;
+        } else if (repeatSmS.equalsIgnoreCase(year)) {
+            intervalMillis = AlarmManager.INTERVAL_DAY * 365;
         }
+        int alarmId = UUID.randomUUID().hashCode();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
 
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
+            Date date = sdf.parse(dateStart);
+            long triggerTime = date.getTime() + intervalMillis;
 
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+            );
+            Log.d("AlarmDetails",
+                    "day: " + triggerTime
+                            + "\n Start: " + dateStart
+                            + "\n Repeat evry: "+ repeatSmS);
+
+            MainActivity.saveAlarmDetails(context, alarmId, triggerTime,repeatSmS);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendNotification(Context context) {

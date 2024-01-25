@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private String week;
     private String month;
     private String year;
-
+    private int selectedOptionIndex;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         return permissionCheck == PackageManager.PERMISSION_GRANTED;
@@ -239,47 +238,34 @@ public class MainActivity extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.options_dialog, null);
 
-        final String[] options = {
+        String[] choices = {
                 getString(R.string.data_CheckBox_every_year_text),
                 getString(R.string.data_CheckBox_every_month_text),
                 getString(R.string.data_CheckBox_every_week_text),
-                getString(R.string.data_CheckBox_every_day_text)};
-
-        RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
-
-        for (int i = 0; i < options.length; i++) {
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setText(options[i]);
-            radioGroup.addView(radioButton);
-
-            // Set a tag to identify the selected option
-            radioButton.setTag(i);
-        }
+                getString(R.string.data_CheckBox_every_day_text)
+        };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.send_every_text))
-                .setView(dialogView)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int selectedOptionIndex = radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId()));
-                        if (selectedOptionIndex != -1) {
-                            String selectedOption = options[selectedOptionIndex];
-                            selectedOptionText.setText(selectedOption);
-                        }
-                    }
+        builder
+                .setTitle(getString(R.string.send_every_text))
+                .setPositiveButton(getString(R.string.text_ok), (dialog, which) -> {
+                    selectedOptionText.setText(choices[selectedOptionIndex]);
                 })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton(getString(R.string.text_Cancel), (dialog, which) -> {
+
+                })
+                .setSingleChoiceItems(choices, 0, (dialog, which) -> {
+                    selectedOptionIndex = which;
+                });
 
         AlertDialog dialog = builder.create();
         dialog.show();
+
     }
 
 
 
     public void History_info(){
-
-
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
         linearLayout.destroyDrawingCache();
@@ -334,13 +320,16 @@ public class MainActivity extends AppCompatActivity {
             dynamicTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                AlertCreator.showAlertBox_for_History_info(v.getContext(),
-                        "ID: " + alarmId, "ID: " + alarmId
-                        + "\n Start: "+ formattedDateStart
-                        +"\n Time: " + formattedClockTime
-                        +"\n Repeat evry: " + getRepeatSmS
-                        +"\n More comming soon!",alarmId);
+                    AlertCreator.showAlertBox_for_History_info(v.getContext(),
+                            "ID: " + alarmId,
+                            "ID: " + alarmId +
+                                    "\n Date: " + formattedDateStart +
+                                    "\n Time: " + formattedClockTime +
+                                    "\n Repeat every: " + getRepeatSmS +
+                                    "\n More coming soon!",
+                            alarmId);
                 }
+
             });
         }
     }
@@ -452,8 +441,7 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
         }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE);
         try {
             Date date = sdf.parse(dateTimeString);
             long triggerTime = date.getTime();
@@ -470,13 +458,12 @@ public class MainActivity extends AppCompatActivity {
                 intervalMillis = AlarmManager.INTERVAL_DAY * 365;
             }
 
+                alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        triggerTime,
+                        pendingIntent
+                );
 
-            alarmManager.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerTime,
-                    intervalMillis,
-                    pendingIntent
-            );
             saveAlarmDetails(this, alarmId, triggerTime,repeatSmS);
             Log.d("AlarmDetails",
                     "ID: " + alarmId
@@ -493,7 +480,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Save alarm details in shared preferences
-    private void saveAlarmDetails(MainActivity mainActivity, int alarmId, long triggerTime, String repeatSmS) {
+    static void saveAlarmDetails(Context mainActivity, int alarmId, long triggerTime, String repeatSmS) {
         SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
@@ -572,9 +559,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static void removeAlarm(Context context,int alarmId){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
         Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_NO_CREATE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
 
         // Cancel the alarm
         alarmManager.cancel(pendingIntent);
