@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
                         builder.setTitle(getResources().getString(R.string.sms_repeates_titel));
                         builder.setMessage(getResources().getString(R.string.sms_repeates_Text));
-                        builder.setPositiveButton("OK!", new DialogInterface.OnClickListener() {
+                        builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         });
@@ -156,11 +156,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }  else {
-                        // Inside your activity or fragment
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("\uD83D\uDEA8 You cannot go back in time \uD83D\uDEA8");
-                        builder.setMessage("This time has passed. Choose different time");
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
+                    builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
+                        builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         });
@@ -169,9 +168,10 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Inside your activity or fragment
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("\uD83D\uDEA8 Max characters reached \uD83D\uDEA8");
-                builder.setMessage("The maximum character limit is 160"+ "\n not "+message.length());
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setTitle(getResources().getString(R.string.sms_Max_characters_titel));
+                builder.setMessage(getResources().getString(R.string.sms_Max_characters_Text)+ "\n"+
+                        getResources().getString(R.string.sms_Max_characters_Text_int)+" "+message.length());
+                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("\uD83D\uDEA8 Number and message are required \uD83D\uDEA8");
                 builder.setMessage("Please provide both phone number and message.");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 });
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("\uD83D\uDEA8 The app don't have permission \uD83D\uDEA8");
                 builder.setMessage("You must allow the app to send SMS");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         requestPermission();
                     }
