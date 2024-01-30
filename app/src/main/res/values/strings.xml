@@ -1,26 +1,35 @@
 <resources>
     <string name="app_name">Short Message Service</string>
-    <string name="app_tab_name">Sms Scheduler</string>
-    <string name="phone_hint">Enter Phone Number</string>
-    <string name="message_Text_hint">Enter message\n(max 160 characters)</string>
-    <string name="send_sms_text">Schedule sms</string>
-    <string name="time_button_text">Set time:</string>
-    <string name="data_button_start_text">sms starts at:</string>
-    <string name="data_CheckBox_every_day_text">Day</string>
-    <string name="data_CheckBox_every_week_text">Week</string>
-    <string name="data_CheckBox_every_month_text">Month</string>
-    <string name="data_CheckBox_every_year_text">Year</string>
-    <string name="send_every_text">send sms every:</string>
+    <string name="app_screen_name">Sms Scheduler</string>
+
+    <string name="text_hint_phone_number">Enter Phone Number</string>
+    <string name="text_hint_message">Enter message\n(max 160 characters)</string>
+
+    <string name="schedule_sms_button_text">Schedule sms</string>
+
+    <string name="set_time_button_text">Set time</string>
+    <string name="set_time_clock">00:00</string>
+
+    <string name="set_date_start_button_text">sms starts at</string>
+    <string name="set_date_start_date">0000-00-00</string>
+
+    <string name="send_sms_every_text">send sms every</string>
+    <string name="send_sms_every_day_text">Day</string>
+    <string name="send_sms_every_week_text">Week</string>
+    <string name="send_sms_every_month_text">Month</string>
+    <string name="send_sms_every_year_text">Year</string>
+
+
     <string name="history_name">History</string>
-    <string name="logding_data">Loading data from code</string>
     <string name="message_sent">sent to:</string>
-    <string name="sms_repeates_titel">🚨 how often should the message repeates 🚨</string>
-    <string name="sms_repeates_Text">You must choose how often the message should be repeated</string>
+
     <string name="sms_time_travel_titel">🚨 You cannot go back in time 🚨</string>
     <string name="sms_time_travel_Text">This time has passed. Choose different time</string>
+
     <string name="sms_Max_characters_titel">🚨 Max characters reached 🚨</string>
     <string name="sms_Max_characters_Text">The maximum character limit is 160</string>
     <string name="sms_Max_characters_Text_int">not</string>
+
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">Cancel</string>
 </resources>

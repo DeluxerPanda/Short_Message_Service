@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -73,21 +74,32 @@ public class MainActivity extends AppCompatActivity {
     private String month;
     private String year;
     private int selectedOptionIndex;
+    private  int permissionCheck;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        return permissionCheck == PackageManager.PERMISSION_GRANTED;
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+
+        int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        return permissionCheck2 == PackageManager.PERMISSION_GRANTED;
     }
 
+
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
+
 
     // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (!hasSendSmsPermission()) {
+            requestPermission();
+        }
         // Use the current date as the default date in the picker.
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -104,15 +116,23 @@ public class MainActivity extends AppCompatActivity {
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         messageEditText = findViewById(R.id.messageEditText);
 
-        SetTimeText = findViewById(R.id.SetTimeText);
+        SetTimeText = findViewById(R.id.pickTime);
 
         SetDateStartText = findViewById(R.id.SetDateStartText);
 
-        selectedOptionText = findViewById(R.id.selectedOptionText);
+        selectedOptionText = findViewById(R.id.selectedSendEvery);
 
 
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
+
+
+
+        TextView phoneNumberPlusIcon = findViewById(R.id.phoneNumberEditText);
+        phoneNumberPlusIcon.setOnClickListener(view -> {
+            hideKeyboard();
+                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+        });
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
@@ -136,24 +156,11 @@ public class MainActivity extends AppCompatActivity {
             if (!phonenumber.isEmpty() && !message.isEmpty() || !phonenumber.isEmpty() || !message.isEmpty()) {
             if (message.length() <= 160) {
                 if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
-                    if (!repeatSmS.equalsIgnoreCase(getResources().getString(R.string.logding_data))) {
                     scheduleSMS(phonenumber,message);
                     hideKeyboard();
                     History_info();
                     phoneNumberEditText.setText("");
                     messageEditText.setText("");
-
-                } else {
-                        // Inside your activity or fragment
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle(getResources().getString(R.string.sms_repeates_titel));
-                        builder.setMessage(getResources().getString(R.string.sms_repeates_Text));
-                        builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        });
-                        builder.show();
-                    }
 
                 }  else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -166,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
                         builder.show();
                 }
             } else {
-                // Inside your activity or fragment
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getResources().getString(R.string.sms_Max_characters_titel));
                 builder.setMessage(getResources().getString(R.string.sms_Max_characters_Text)+ "\n"+
@@ -179,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
             } else {
-                // Inside your activity or fragment
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("\uD83D\uDEA8 Number and message are required \uD83D\uDEA8");
                 builder.setMessage("Please provide both phone number and message.");
@@ -190,7 +195,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
             } else {
-                // Inside your activity or fragment
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("\uD83D\uDEA8 The app don't have permission \uD83D\uDEA8");
                 builder.setMessage("You must allow the app to send SMS");
@@ -217,13 +221,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        Button pickDateStartButton = findViewById(R.id.pickDateStarts);
+        Button pickDateStartButton = findViewById(R.id.SetDateStartText);
         pickDateStartButton.setOnClickListener(view -> {
             showDatePicker();
         });
 
 
-        Button chooseOptionButton = findViewById(R.id.chooseOptionButton);
+        Button chooseOptionButton = findViewById(R.id.selectedSendEvery);
         chooseOptionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,18 +240,17 @@ public class MainActivity extends AppCompatActivity {
     public void showOptionsDialog() {
         // Get the layout inflater
         LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.options_dialog, null);
 
         String[] choices = {
-                getString(R.string.data_CheckBox_every_year_text),
-                getString(R.string.data_CheckBox_every_month_text),
-                getString(R.string.data_CheckBox_every_week_text),
-                getString(R.string.data_CheckBox_every_day_text)
+                getString(R.string.send_sms_every_year_text),
+                getString(R.string.send_sms_every_month_text),
+                getString(R.string.send_sms_every_week_text),
+                getString(R.string.send_sms_every_day_text)
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder
-                .setTitle(getString(R.string.send_every_text))
+                .setTitle(getString(R.string.send_sms_every_text))
                 .setPositiveButton(getString(R.string.text_ok), (dialog, which) -> {
                     selectedOptionText.setText(choices[selectedOptionIndex]);
                 })
@@ -418,10 +421,10 @@ public class MainActivity extends AppCompatActivity {
 
         String repeatSmS = (String) selectedOptionText.getText();
 
-        day = getString(R.string.data_CheckBox_every_day_text);
-        week = getString(R.string.data_CheckBox_every_week_text);
-        month = getString(R.string.data_CheckBox_every_month_text);
-        year = getString(R.string.data_CheckBox_every_year_text);
+        day = getString(R.string.send_sms_every_day_text);
+        week = getString(R.string.send_sms_every_week_text);
+        month = getString(R.string.send_sms_every_month_text);
+        year = getString(R.string.send_sms_every_year_text);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 

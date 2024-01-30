@@ -73,10 +73,10 @@ private  String repeatSmS;
         // Schedule the alarm for the next occurrence based on the repeatSmS value
         // You can modify this logic to suit your requirements
         long intervalMillis = 0;
-        day = context.getString(R.string.data_CheckBox_every_day_text);
-        week = context.getString(R.string.data_CheckBox_every_week_text);
-        month = context.getString(R.string.data_CheckBox_every_month_text);
-        year = context.getString(R.string.data_CheckBox_every_year_text);
+        day = context.getString(R.string.send_sms_every_day_text);
+        week = context.getString(R.string.send_sms_every_week_text);
+        month = context.getString(R.string.send_sms_every_month_text);
+        year = context.getString(R.string.send_sms_every_year_text);
         if (repeatSmS.equalsIgnoreCase(day)) {
             intervalMillis = AlarmManager.INTERVAL_DAY;
         } else if (repeatSmS.equalsIgnoreCase(week)) {
