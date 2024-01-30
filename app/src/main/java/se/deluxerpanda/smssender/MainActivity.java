@@ -92,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 SMS_PERMISSION_REQUEST_CODE);
     }
 
-
     // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,12 +125,14 @@ public class MainActivity extends AppCompatActivity {
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
 
-
-
         TextView phoneNumberPlusIcon = findViewById(R.id.phoneNumberEditText);
         phoneNumberPlusIcon.setOnClickListener(view -> {
             hideKeyboard();
-                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+
+            // Start PhoneListActivity using Intent
+            Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+            startActivity(intent);
         });
 
         Button sendButton = findViewById(R.id.sendB);
