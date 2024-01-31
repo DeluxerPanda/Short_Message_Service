@@ -39,6 +39,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -305,7 +308,8 @@ public class MainActivity extends AppCompatActivity {
             String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
             String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
             String getRepeatSmS = alarmDetails.getRepeatSmS();
-
+            String phonenumber = alarmDetails.getPhonenumber();
+            String message = alarmDetails.getMessage();
             TextView dynamicTextView = new TextView(this);
 
             // Add your dynamic TextView here
@@ -326,11 +330,12 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     AlertCreator.showAlertBox_for_History_info(v.getContext(),
                             "ID: " + alarmId,
-                            "ID: " + alarmId +
-                                    "\n Date: " + formattedDateStart +
-                                    "\n Time: " + formattedClockTime +
-                                    "\n Repeat every: " + getRepeatSmS +
-                                    "\n More coming soon!",
+                            "Phone number: " + phonenumber +
+                                    "\nMessage: "+message+
+                                    "\nDate: " + formattedDateStart +
+                                    "\nTime: " + formattedClockTime +
+                                    "\nRepeat every: " + getRepeatSmS +
+                                    "\nMore coming soon!",
                             alarmId);
                 }
 
@@ -439,13 +444,11 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("EXTRA_DATESTART", dateTimeString);
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
-        }
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_MUTABLE);
+            startForegroundService(intent);
+
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
         try {
             Date date = sdf.parse(dateTimeString);
             long triggerTime = date.getTime();
@@ -468,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
                         pendingIntent
                 );
 
-            saveAlarmDetails(this, alarmId, triggerTime,repeatSmS);
+            saveAlarmDetails(this, alarmId, triggerTime,repeatSmS,phonenumber,message);
             Log.d("AlarmDetails",
                     "ID: " + alarmId
                             + "\n triggerTime: " + triggerTime
@@ -484,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // Save alarm details in shared preferences
-    static void saveAlarmDetails(Context mainActivity, int alarmId, long triggerTime, String repeatSmS) {
+    static void saveAlarmDetails(Context mainActivity, int alarmId, long triggerTime, String repeatSmS, String phonenumber, String message) {
         SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
@@ -492,24 +495,34 @@ public class MainActivity extends AppCompatActivity {
         String triggerTimeKey = "triggerTime_" + alarmId;
         String getRepeatSmSKey = "getRepeatSmSKey_"+ alarmId;
 
+        String getPhoneNumberKey = "getPhoneNumberKey_"+ alarmId;
+        String getMessageKey = "getMessageKey_"+ alarmId;
+
         // Save the triggerTime and releaseTime using their respective keys
         editor.putLong(triggerTimeKey, triggerTime);
         editor.putString(getRepeatSmSKey,repeatSmS);
 
+        editor.putString(getPhoneNumberKey,phonenumber);
+        editor.putString(getMessageKey,message);
+
         editor.apply();
     }
 
-    public class AlarmDetails {
+    public static class AlarmDetails {
         private int alarmId;
         private long triggerTime;
 
         private String repeatSmS;
+        private String phonenumber;
 
+        private String message;
 
-        public AlarmDetails(int alarmId, long triggerTime, String repeatSmS) {
+        public AlarmDetails(int alarmId, long triggerTime, String repeatSmS, String phonenumber, String message) {
             this.alarmId = alarmId;
             this.triggerTime = triggerTime;
             this.repeatSmS = repeatSmS;
+            this.phonenumber = phonenumber;
+            this.message = message;
         }
 
         public int getAlarmId() {
@@ -521,6 +534,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public String getRepeatSmS(){return repeatSmS;}
+
+        public String getPhonenumber(){return phonenumber;}
+        public  String getMessage(){return message;}
 
     }
 
@@ -538,19 +554,23 @@ public class MainActivity extends AppCompatActivity {
 
             // Separate keys for triggerTime and releaseTime
             String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
-            String releaseTimeKey = "releaseTime_" + key.substring(key.lastIndexOf("_") + 1);
 
             String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
 
             String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
 
+            String getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1);
+            String getPhonenumber = preferences.getString(getPhonenumberKey, String.valueOf(0));
+
+            String getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1);
+            String getMessage = preferences.getString(getMessageKey, String.valueOf(0));
+
             long triggerTime = preferences.getLong(triggerTimeKey, 0);
-            long releaseTime = preferences.getLong(releaseTimeKey, 0);
 
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
             if (!uniqueAlarmIds.contains(alarmId)) {
 
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime,getRepeatSmS);
+                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime,getRepeatSmS,getPhonenumber, getMessage);
                 alarmList.add(alarmDetails);
 
                 // Lägg till alarmId i set för att undvika dubbletter
@@ -577,10 +597,15 @@ public class MainActivity extends AppCompatActivity {
         String triggerTimeKey = "triggerTime_" + alarmId;
         String releaseTimeKey = "releaseTime_" + alarmId;
         String getRepeatSmSKey = "getRepeatSmSKey_" + alarmId;
+        String getPhonenumber = "getPhoneNumberKey_" + alarmId;
+        String getMessage = "getMessageKey_" + alarmId;
+
 
         editor.remove(triggerTimeKey);
         editor.remove(releaseTimeKey);
         editor.remove(getRepeatSmSKey);
+        editor.remove(getPhonenumber);
+        editor.remove(getMessage);
 
         editor.apply();
     }

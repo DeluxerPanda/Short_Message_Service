@@ -35,6 +35,11 @@
         <activity android:name=".PhoneListActivity">
         </activity>
         <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".BootCompleteReceiver" android:exported="false">
+        <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED"/>
+        </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

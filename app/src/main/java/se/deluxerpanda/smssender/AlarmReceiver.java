@@ -65,13 +65,11 @@ private  String repeatSmS;
     }
 
     private void rescheduleAlarm(Context context, String repeatSmS) {
-        // Get the information from the intent
+
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
 
-        // Schedule the alarm for the next occurrence based on the repeatSmS value
-        // You can modify this logic to suit your requirements
         long intervalMillis = 0;
         day = context.getString(R.string.send_sms_every_day_text);
         week = context.getString(R.string.send_sms_every_week_text);
@@ -87,7 +85,8 @@ private  String repeatSmS;
             intervalMillis = AlarmManager.INTERVAL_DAY * 365;
         }
         int alarmId = UUID.randomUUID().hashCode();
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
+        context.startForegroundService(intent);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
@@ -103,8 +102,8 @@ private  String repeatSmS;
                     "day: " + triggerTime
                             + "\n Start: " + dateStart
                             + "\n Repeat evry: "+ repeatSmS);
-
-            MainActivity.saveAlarmDetails(context, alarmId, triggerTime,repeatSmS);
+            String phonenumber = number;
+            MainActivity.saveAlarmDetails(context, alarmId, triggerTime,repeatSmS,phonenumber,message);
         } catch (ParseException e) {
             e.printStackTrace();
         }
