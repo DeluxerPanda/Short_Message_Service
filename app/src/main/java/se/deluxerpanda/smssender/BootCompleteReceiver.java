@@ -40,44 +40,21 @@ public class BootCompleteReceiver extends BroadcastReceiver {
            long triggerTime = alarm.getTimeInMillis();
            String repeatSmS = alarm.getRepeatSmS();
                int alarmId = alarm.getAlarmId();
-                    try {
                         scheduleAlarm(phonenumber,message, context, triggerTime, repeatSmS, alarmId);
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             }
             }
         }
 
-    private void scheduleAlarm(String phonenumber, String message, Context context, long triggerTime, String repeatSmS, int alarmId) throws ParseException {
+    private void scheduleAlarm(String phonenumber, String message, Context context, long triggerTime, String repeatSmS, int alarmId){
 
-
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date date = new Date(triggerTime);
 
         day = context.getString(R.string.send_sms_every_day_text);
         week = context.getString(R.string.send_sms_every_week_text);
         month = context.getString(R.string.send_sms_every_month_text);
         year = context.getString(R.string.send_sms_every_year_text);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(context, AlarmReceiver.class);
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date date = new Date(triggerTime);
-        String dateTimeString = sdf.format(date);
-
-        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-        intent.putExtra("EXTRA_MESSAGES", message);
-        intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_DATESTART", dateTimeString);
-        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
-
-            context.startForegroundService(intent);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-
 
         long intervalMillis = 0;
 
@@ -90,6 +67,21 @@ public class BootCompleteReceiver extends BroadcastReceiver {
         } else if (repeatSmS.equalsIgnoreCase(year)) {
             intervalMillis = AlarmManager.INTERVAL_DAY * 365;
         }
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(context, AlarmReceiver.class);
+
+        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+        intent.putExtra("EXTRA_MESSAGES", message);
+        intent.putExtra("EXTRA_ALARMID", alarmId);
+        intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
+        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
+
+            context.startForegroundService(intent);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+
 
         alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
@@ -113,7 +105,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
             // Separate keys for triggerTime and releaseTime
             String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
-            String releaseTimeKey = "releaseTime_" + key.substring(key.lastIndexOf("_") + 1);
 
             String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
 
@@ -126,7 +117,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
             String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
 
             long triggerTime = preferences.getLong(triggerTimeKey, 0);
-            long releaseTime = preferences.getLong(releaseTimeKey, 0);
 
             int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
             if (!uniqueAlarmIds.contains(alarmId)) {

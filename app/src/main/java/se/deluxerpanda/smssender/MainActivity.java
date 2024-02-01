@@ -421,9 +421,10 @@ public class MainActivity extends AppCompatActivity {
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
 
-
-
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
+        try {
+            Date date = sdf.parse(dateTimeString);
+            long triggerTime = date.getTime();
 
         String repeatSmS = (String) selectedOptionText.getText();
 
@@ -441,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         intent.putExtra("EXTRA_MESSAGES", message);
         intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_DATESTART", dateTimeString);
+        intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
 
@@ -449,9 +450,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-        try {
-            Date date = sdf.parse(dateTimeString);
-            long triggerTime = date.getTime();
+
 
             long intervalMillis = 0;
 
