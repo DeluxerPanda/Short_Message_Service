@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -128,15 +129,20 @@ public class MainActivity extends AppCompatActivity {
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
 
-        TextView phoneNumberPlusIcon = findViewById(R.id.phoneNumberEditText);
-        phoneNumberPlusIcon.setOnClickListener(view -> {
-            hideKeyboard();
-            Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
 
-            // Start PhoneListActivity using Intent
-            Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-            startActivity(intent);
+        ImageView imageView = findViewById(R.id.btnToContacts);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard();
+                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+
+                // Start PhoneListActivity using Intent
+                Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+                startActivity(intent);
+            }
         });
+
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
@@ -269,9 +275,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
 
     }
-
-
-
     public void History_info(){
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
@@ -350,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
+
 
     //time Dialog (start)
     public static class TimePickerFragment extends DialogFragment
@@ -618,9 +622,6 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted
                 Toast.makeText(this, "The app has now permission", Toast.LENGTH_SHORT).show();
-            } else {
-                // Permission denied
-                Toast.makeText(this, "Please grant the app permission to send SMS", Toast.LENGTH_SHORT).show();
             }
         }
     }
