@@ -27,7 +27,7 @@
         <EditText
             android:id="@+id/phoneNumberEditText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:autofillHints="phone"
 
             android:hint="@string/text_hint_phone_number"
@@ -37,10 +37,11 @@
             android:textSize="20sp"
             android:textStyle="bold"
             tools:ignore="VisualLintTextFieldSize" />
+
         <ImageView
             android:id="@+id/btnToContacts"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:backgroundTintMode="src_over"
             android:clickable="true"
             android:contentDescription="To contacts"
