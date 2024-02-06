@@ -8,28 +8,46 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:text="@string/app_screen_name"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"
-        android:typeface="normal"
-        tools:ignore="TextSizeCheck" />
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/App_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/app_screen_name"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:typeface="normal"
+            tools:ignore="TextSizeCheck" />
+        <ImageView
+
+            android:id="@+id/btnToHamburger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/App_Title"
+            android:layout_alignTop="@id/App_Title"
+            android:layout_marginStart="8dp"
+            android:backgroundTintMode="src_over"
+            android:clickable="true"
+            android:contentDescription="To Hamburger"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/phoneNumberEditText"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:autofillHints="phone"
-
             android:hint="@string/text_hint_phone_number"
             android:inputType="phone"
             android:textAlignment="center"
@@ -41,14 +59,19 @@
         <ImageView
             android:id="@+id/btnToContacts"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/phoneNumberEditText"
+            android:layout_alignBottom="@id/phoneNumberEditText"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:backgroundTintMode="src_over"
             android:clickable="true"
             android:contentDescription="To contacts"
             android:src="@android:drawable/ic_menu_add"
             app:tint="@color/md_theme_dark_inversePrimary"
             tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
-    </LinearLayout>
+    </RelativeLayout>
+
 
     <EditText
         android:id="@+id/messageEditText"
@@ -61,7 +84,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="TextFields,VisualLintTextFieldSize"
-        android:importantForAutofill="no" />
+        android:importantForAutofill="no"/>
 
     <LinearLayout
         android:layout_width="match_parent"

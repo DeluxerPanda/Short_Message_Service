@@ -1,14 +1,13 @@
 package se.deluxerpanda.smssender;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.util.Base64;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
@@ -16,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +29,14 @@ public class PhoneListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_list);
+
+        ImageView btnToHamburger = findViewById(R.id.btnToMainSmsSchedulerPage);
+        btnToHamburger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(PhoneListActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         this.contactListView = (ExpandableListView) findViewById(R.id.spinner);
 

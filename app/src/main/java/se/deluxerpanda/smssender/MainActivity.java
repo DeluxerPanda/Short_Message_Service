@@ -19,15 +19,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -35,10 +41,17 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
-
     // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +141,14 @@ public class MainActivity extends AppCompatActivity {
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
 
+        ImageView btnToHamburger = findViewById(R.id.btnToHamburger);
+        btnToHamburger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyboard();
+                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         ImageView imageView = findViewById(R.id.btnToContacts);
         imageView.setOnClickListener(new View.OnClickListener() {
