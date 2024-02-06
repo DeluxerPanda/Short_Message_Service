@@ -34,7 +34,7 @@ public class PhoneListActivity extends AppCompatActivity {
         btnToHamburger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PhoneListActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                    finish();
             }
         });
 

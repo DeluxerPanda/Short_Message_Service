@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
-                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -155,9 +155,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
-                Toast.makeText(MainActivity.this, "Drawable clicked!", Toast.LENGTH_SHORT).show();
-
-                // Start PhoneListActivity using Intent
                 Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
                 startActivity(intent);
             }
