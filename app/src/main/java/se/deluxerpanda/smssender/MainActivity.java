@@ -129,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView((R.layout.activity_main));
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
+        String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
+        if (phoneNumber != null){
+            phoneNumberEditText.setText(phoneNumber);
+        }
+
         messageEditText = findViewById(R.id.messageEditText);
 
         SetTimeText = findViewById(R.id.pickTime);

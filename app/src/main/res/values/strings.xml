@@ -22,10 +22,10 @@
     <string name="history_name">History</string>
     <string name="message_sent">sent to:</string>
 
-    <string name="sms_time_travel_titel">🚨 You cannot go back in time 🚨</string>
+    <string name="sms_time_travel_titel">You cannot go back in time</string>
     <string name="sms_time_travel_Text">This time has passed. Choose different time</string>
 
-    <string name="sms_Max_characters_titel">🚨 Max characters reached 🚨</string>
+    <string name="sms_Max_characters_titel">Max characters reached</string>
     <string name="sms_Max_characters_Text">The maximum character limit is 160</string>
     <string name="sms_Max_characters_Text_int">not</string>
 
