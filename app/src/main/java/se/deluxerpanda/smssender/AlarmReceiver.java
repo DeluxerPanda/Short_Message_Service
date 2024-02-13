@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -114,8 +115,9 @@ private String year;
         // Build the notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(context.getResources().getString(R.string.message_sent)+" "+phonenumber)
-                .setContentText(message)
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),R.mipmap.ic_launcher_foreground))
+                .setContentTitle(context.getResources().getString(R.string.sms_notify_message_sent_number_text)+" "+phonenumber)
+                .setContentText(context.getResources().getString(R.string.sms_notify_message_sent_message_text)+" "+message)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         Random random = new Random();
         int notificationId = random.nextInt();

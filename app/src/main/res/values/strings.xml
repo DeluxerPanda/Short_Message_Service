@@ -20,18 +20,25 @@
     <string name="send_sms_every_year_text">Year</string>
 
     <string name="history_name">History</string>
-    <string name="message_sent">sent to:</string>
+    <string name="sms_notify_message_sent_number_text">Sent to:</string>
+    <string name="sms_notify_message_sent_message_text">Message:</string>
+
 
     <string name="sms_time_travel_titel">You cannot go back in time</string>
     <string name="sms_time_travel_Text">This time has passed. Choose different time</string>
 
-    <string name="sms_Max_characters_titel">Max characters reached</string>
-    <string name="sms_Max_characters_Text">The maximum character limit is 160</string>
-    <string name="sms_Max_characters_Text_int">not</string>
+    <string name="sms_max_characters_titel">Max characters reached</string>
+    <string name="sms_max_characters_Text">The maximum character limit is 160</string>
+    <string name="sms_max_characters_Text_int">not</string>
+
+    <string name="sms_no_permission_titel">The app dont have permission</string>
+    <string name="sms_no_permission_text">You must allow the app to send SMS</string>
+
+    <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
+    <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
 
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">Cancel</string>
-    <string name="todo">TODO</string>
 
     <string name="open_nav">open_nav</string>
     <string name="close_nav">close_nav</string>

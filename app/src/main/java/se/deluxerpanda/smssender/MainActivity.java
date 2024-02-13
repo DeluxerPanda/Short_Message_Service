@@ -15,46 +15,29 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
-
-import com.google.android.material.navigation.NavigationView;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -94,18 +77,17 @@ public class MainActivity extends AppCompatActivity {
     private  int permissionCheck;
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+        int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED && permissionCheck2 == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
-
-        int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        return permissionCheck2 == PackageManager.PERMISSION_GRANTED;
+        return false;
     }
 
 
     private void requestPermission() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS},
+                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS, Manifest.permission.POST_NOTIFICATIONS},
                 SMS_PERMISSION_REQUEST_CODE);
     }
     // SetTimeText
@@ -185,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             String message = messageEditText.getText().toString();
             String repeatSmS = (String) selectedOptionText.getText();
             if (hasSendSmsPermission()) {
-            if (!phonenumber.isEmpty() && !message.isEmpty() || !phonenumber.isEmpty() || !message.isEmpty()) {
+                if (!phonenumber.isEmpty() && !message.isEmpty()) {
             if (message.length() <= 160) {
                 if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
                     scheduleSMS(phonenumber,message);
@@ -206,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getResources().getString(R.string.sms_Max_characters_titel));
-                builder.setMessage(getResources().getString(R.string.sms_Max_characters_Text)+ "\n"+
-                        getResources().getString(R.string.sms_Max_characters_Text_int)+" "+message.length());
+                builder.setTitle(getResources().getString(R.string.sms_max_characters_titel));
+                builder.setMessage(getResources().getString(R.string.sms_max_characters_Text)+ "\n"+
+                        getResources().getString(R.string.sms_max_characters_Text_int)+" "+message.length());
                 builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -218,8 +200,8 @@ public class MainActivity extends AppCompatActivity {
             }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("\uD83D\uDEA8 Number and message are required \uD83D\uDEA8");
-                builder.setMessage("Please provide both phone number and message.");
+                builder.setTitle(getResources().getString(R.string.sms_number_or_masage_are_empty_titel));
+                builder.setMessage(getResources().getString(R.string.sms_number_or_masage_are_empty_text));
                 builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                     }
@@ -228,11 +210,15 @@ public class MainActivity extends AppCompatActivity {
             }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("\uD83D\uDEA8 The app don't have permission \uD83D\uDEA8");
-                builder.setMessage("You must allow the app to send SMS");
+                builder.setTitle(getResources().getString(R.string.sms_no_permission_titel));
+                builder.setMessage(getResources().getString(R.string.sms_no_permission_text));
                 builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        requestPermission();
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivity(intent);
                     }
                 });
                 builder.show();
@@ -308,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
         if (alarmList.isEmpty()) {
             TextView AlarmListIsEmptyTextView = new TextView(this);
 
+
             // Add your dynamic TextView here
             AlarmListIsEmptyTextView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -368,7 +355,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     }
-
 
     private void showDatePicker() {
         DatePickerFragment datePickerFragment = new DatePickerFragment();
@@ -605,8 +591,7 @@ public class MainActivity extends AppCompatActivity {
 
         return alarmList;
     }
-
-    public static void removeAlarm(Context context,int alarmId){
+    public static void deleteAlarm(int alarmId, Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
@@ -633,34 +618,19 @@ public class MainActivity extends AppCompatActivity {
         editor.remove(getMessage);
 
         editor.apply();
-    }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == SMS_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
-                Toast.makeText(this, "The app has now permission", Toast.LENGTH_SHORT).show();
-            }
-        }
+        Intent intenta = new Intent(context, MainActivity.class);
+        intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intenta);
     }
+
     public void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         View view = getCurrentFocus();
 
         if (view != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-    public void showKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        View view = getCurrentFocus();
-
-        if (view == null) {
-            imm.showSoftInput((View) view.getWindowToken(), 1);
         }
     }
 
