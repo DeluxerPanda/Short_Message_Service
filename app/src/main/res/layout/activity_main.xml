@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,139 +8,166 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:text="@string/app_tab_name"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold|italic"
-        android:typeface="normal"
-        tools:ignore="TextSizeCheck" />
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/phoneNumberEditText"
+        <TextView
+            android:id="@+id/App_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/app_screen_name"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:typeface="normal"
+            tools:ignore="TextSizeCheck" />
+        <ImageView
+
+            android:id="@+id/btnToHamburger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/App_Title"
+            android:layout_alignTop="@id/App_Title"
+            android:layout_marginStart="8dp"
+            android:backgroundTintMode="src_over"
+            android:clickable="true"
+            android:contentDescription="To Hamburger"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/phone_hint"
-        android:importantForAutofill="no"
-        android:inputType="phone"
-        android:textAlignment="center"
-        android:textColorHint="#A1887F"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:ignore="VisualLintTextFieldSize" />
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/phoneNumberEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="phone"
+            android:hint="@string/text_hint_phone_number"
+            android:inputType="phone"
+            android:textAlignment="center"
+            android:textColorHint="#A1887F"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:ignore="VisualLintTextFieldSize" />
+
+        <ImageView
+            android:id="@+id/btnToContacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/phoneNumberEditText"
+            android:layout_alignBottom="@id/phoneNumberEditText"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTintMode="src_over"
+            android:clickable="true"
+            android:contentDescription="To contacts"
+            android:src="@android:drawable/ic_menu_add"
+            app:tint="@color/md_theme_dark_inversePrimary"
+            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+    </RelativeLayout>
+
 
     <EditText
         android:id="@+id/messageEditText"
         android:layout_width="match_parent"
         android:layout_height="79dp"
-        android:hint="@string/message_Text_hint"
-        android:importantForAutofill="no"
+        android:hint="@string/text_hint_message"
         android:inputType="textImeMultiLine"
         android:textAlignment="center"
         android:textColorHint="#A1887F"
         android:textSize="20sp"
         android:textStyle="bold"
-        tools:ignore="TextFields,VisualLintTextFieldSize" />
+        tools:ignore="TextFields,VisualLintTextFieldSize"
+        android:importantForAutofill="no"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/pickTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/time_button_text"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/SetTimeText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:importantForAutofill="no"
-            android:minHeight="48dp"
-            android:text="@string/logding_data"
-            android:textAlignment="textStart"
+            android:text="@string/set_time_button_text"
+            android:textAlignment="center"
+            android:textAllCaps="false"
             android:textSize="20sp"
-            android:textStyle="bold"
-            tools:ignore="DuplicateSpeakableTextCheck,VisualLintTextFieldSize,VisualLintBounds" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
+            android:textStyle="bold" />
         <Button
-            android:id="@+id/pickDateStarts"
-            android:layout_width="wrap_content"
+            android:id="@+id/pickTime"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/data_button_start_text"
-            tools:ignore="TouchTargetSizeCheck,VisualLintBounds" />
-
-        <TextView
-            android:id="@+id/SetDateStartText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:importantForAutofill="no"
-            android:minHeight="48dp"
-            android:text="@string/logding_data"
-            android:textAlignment="textStart"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:typeface="normal"
-            tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
-
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            android:text="@string/set_time_clock" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/chooseOptionEndsBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-    <Button
-        android:id="@+id/chooseOptionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/send_every_text" />
+        android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/selectedOptionText"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:importantForAutofill="no"
-            android:minHeight="48dp"
-            android:text="@string/logding_data"
-            android:textAlignment="textStart"
+            android:text="@string/set_date_start_button_text"
+            android:textAlignment="center"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:typeface="normal"
-            tools:ignore="VisualLintTextFieldSize,VisualLintBounds" />
-
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/SetDateStartText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            android:text="@string/set_date_start_date"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/send_sms_every_text"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/selectedSendEvery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck,VisualLintBounds"
+            android:text="@string/send_sms_every_year_text"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="12pt"
+        android:orientation="vertical"
+        tools:ignore="UselessLeaf">
+    </LinearLayout>
+
     <Button
         android:id="@+id/sendB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/send_sms_text"
+        android:text="@string/schedule_sms_button_text"
         android:textAlignment="center"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="VisualLintButtonSize" />
+
 
     <TextView
         android:layout_width="match_parent"
@@ -165,5 +193,4 @@
 
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>
