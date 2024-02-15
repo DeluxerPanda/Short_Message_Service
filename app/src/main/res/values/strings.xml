@@ -42,4 +42,5 @@
 
     <string name="open_nav">open_nav</string>
     <string name="close_nav">close_nav</string>
+    <string name="todo">TODO</string>
 </resources>

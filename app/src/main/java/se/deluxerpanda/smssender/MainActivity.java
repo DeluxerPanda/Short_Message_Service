@@ -322,22 +322,22 @@ public class MainActivity extends AppCompatActivity {
             String getRepeatSmS = alarmDetails.getRepeatSmS();
             String phonenumber = alarmDetails.getPhonenumber();
             String message = alarmDetails.getMessage();
-            TextView dynamicTextView = new TextView(this);
+            View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
 
-            // Add your dynamic TextView here
-            dynamicTextView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
 
-            dynamicTextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
-            dynamicTextView.setTextSize(20);
-            dynamicTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
-            dynamicTextView.setGravity(Gravity.CENTER);
-            dynamicTextView.setHintTextColor(R.color.md_theme_dark_onPrimary);
+            TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
+            history_info_contact_name_TextView.setText(phonenumber);
 
-            linearLayout.addView(dynamicTextView);
+            TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
+            history_info_message_TextView.setText(message);
 
-            dynamicTextView.setOnClickListener(new View.OnClickListener() {
+            TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
+            history_info_date_and_time_TextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
+
+            linearLayout.addView(dynamicTextViewLayout);
+
+            dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     AlertCreator.showAlertBox_for_History_info(v.getContext(),

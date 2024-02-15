@@ -60,20 +60,6 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Edit comming soon!", Toast.LENGTH_LONG).show();
-
-                        List<MainActivity.AlarmDetails> alarmList = getAllAlarms(context);
-
-                        for (MainActivity.AlarmDetails alarm : alarmList) {
-                            if (alarm != null) {
-                                String phonenumber = alarm.getPhonenumber();
-                                String message = alarm.getMessage();
-                                long triggerTime = alarm.getTimeInMillis();
-                                String repeatSmS = alarm.getRepeatSmS();
-                                int alarmId = alarm.getAlarmId();
-                                phoneNumberEditText.setText(phonenumber);
-                                messageEditText.setText(message);
-                            }
-                        }
                     }
                 })
 
