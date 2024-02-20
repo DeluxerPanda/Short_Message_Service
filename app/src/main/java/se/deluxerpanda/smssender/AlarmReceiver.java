@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
@@ -37,7 +38,7 @@ private String year;
     public void onReceive(Context context, Intent intent) {
         SmsManager smsManager = SmsManager.getDefault();
 
-        phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
+     //   phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
         triggerTime = intent.getLongExtra("EXTRA_TRIGGERTIME",0);
@@ -48,9 +49,16 @@ private String year;
 
 
             rescheduleAlarm(phonenumber,message, context, triggerTime, repeatSmS, alarmId);
+        ArrayList<String> parts = smsManager.divideMessage(message);
 
+        String strnum="123,1234,12345,123456";
 
-        smsManager.sendTextMessage(phonenumber, null, message, null, null);
+        String[] phoneNumbersArray = strnum.split(",\\s*");
+
+        for (String phoneNumber : phoneNumbersArray) {
+
+        smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+        }
 
         Toast.makeText(context, "SMS sent to " + phonenumber + "\nmessage: " + message + "\nAlarmid: " + alarmId, Toast.LENGTH_LONG).show();
 

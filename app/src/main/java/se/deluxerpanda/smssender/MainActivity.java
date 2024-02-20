@@ -29,6 +29,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -58,13 +59,14 @@ public class MainActivity extends AppCompatActivity {
     private static TextView SetTimeText;
     private static TextView SetDateStartText;
     private static TextView selectedOptionText;
+
+    private static TextView addNumbers;
     private LinearLayout pickDateEndsBox;
     public static int timeHourSaved = -1;
     public static int timeMinuteSaved = -1;
 
     private static String startDate;
     private static String endDate;
-    boolean checkBoxisChecked = false;
     public static String CHANNEL_ID = String.valueOf(UUID.randomUUID().hashCode());
 
     public static String CHANNEL_NAME = String.valueOf(R.string.app_name);
@@ -137,8 +139,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageView imageView = findViewById(R.id.btnToContacts);
-        imageView.setOnClickListener(new View.OnClickListener() {
+        ImageView btnToContacts = findViewById(R.id.btnToContacts);
+        btnToContacts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
@@ -146,6 +148,45 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+
+        final int[] counterLeft = {0};
+        int counterMax = 4;
+        TextView addNumbers = findViewById(R.id.addNumbers);
+        addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
+        addNumbers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (counterLeft[0] != counterMax){
+                    counterLeft[0]++;
+                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
+                    LinearLayout parentLayout = findViewById(R.id.numbersContainer);
+                    hideKeyboard();
+                    View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.textview_number, null);
+
+                    ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
+                    contactButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+
+                    ImageView deleteButton = dynamicTextViewLayout.findViewById(R.id.btnToDeleteNumber);
+                    deleteButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            parentLayout.removeView(dynamicTextViewLayout);
+                            counterLeft[0]--;
+                            addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
+                        }
+                    });
+                    parentLayout.addView(dynamicTextViewLayout);
+                }
+            }
+        });
+
 
 
         Button sendButton = findViewById(R.id.sendB);

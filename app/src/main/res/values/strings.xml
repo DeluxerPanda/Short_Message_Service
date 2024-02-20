@@ -3,6 +3,7 @@
     <string name="app_screen_name">Sms Scheduler</string>
 
     <string name="text_hint_phone_number">Enter Phone Number</string>
+    <string name="text_add_phone_number">Add more numbers:</string>
     <string name="text_hint_message">Enter message\n(max 160 characters)</string>
 
     <string name="schedule_sms_button_text">Schedule sms</string>
