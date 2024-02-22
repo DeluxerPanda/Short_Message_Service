@@ -1,6 +1,7 @@
 package se.deluxerpanda.smssender;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -191,13 +192,12 @@ public class PhoneListActivity extends AppCompatActivity {
             }
         });
     }
-
+    private EditText phoneNumberEditText;
     public void setPhoneNumber(String phoneNumber){
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("PHONE_NUMBER_FROM_CONTACTS", phoneNumber);
-        startActivity(intent);
-
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("PHONE_NUMBER_FROM_CONTACTS", phoneNumber);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 
 }

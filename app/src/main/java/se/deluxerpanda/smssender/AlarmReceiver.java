@@ -23,6 +23,7 @@ import java.util.Random;
 public class AlarmReceiver extends BroadcastReceiver {
 
 private String phonenumber;
+private String Phonenumber_Multi;
 private String message;
 private long triggerTime;
 private  String repeatSmS;
@@ -38,7 +39,10 @@ private String year;
     public void onReceive(Context context, Intent intent) {
         SmsManager smsManager = SmsManager.getDefault();
 
-     //   phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
+        phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
+
+        Phonenumber_Multi = intent.getStringExtra("EXTRA_PHONE_NUMBER_MULTI");
+
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
         triggerTime = intent.getLongExtra("EXTRA_TRIGGERTIME",0);
@@ -47,29 +51,22 @@ private String year;
 
         alarmId = Integer.parseInt(String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0)));
 
-
-            rescheduleAlarm(phonenumber,message, context, triggerTime, repeatSmS, alarmId);
-        ArrayList<String> parts = smsManager.divideMessage(message);
-
-        String strnum="123,1234,12345,123456";
-
-        String[] phoneNumbersArray = strnum.split(",\\s*");
-
-        for (String phoneNumber : phoneNumbersArray) {
-
-        smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+        if (Phonenumber_Multi != null){
+            String strnum=Phonenumber_Multi + phonenumber;
+            String[] phoneNumbersArray = strnum.split(",\\s*");
+            for (String phoneNumber : phoneNumbersArray) {
+                ArrayList<String> parts = smsManager.divideMessage(message);
+                smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+            }
+        }else {
+            Phonenumber_Multi = "false";
+            smsManager.sendTextMessage(phonenumber, null, message, null, null);
         }
-
-        Toast.makeText(context, "SMS sent to " + phonenumber + "\nmessage: " + message + "\nAlarmid: " + alarmId, Toast.LENGTH_LONG).show();
-
+        rescheduleAlarm(phonenumber,Phonenumber_Multi,message, context, triggerTime, repeatSmS, alarmId);
         sendNotification(context);
-
-   //     MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
-        Log.d("AlarmDetails",
-                "alarmReceiver done!");
     }
 
-    private void rescheduleAlarm(String phonenumber, String message, Context context, long triggerTime, String repeatSmS, int alarmId) {
+    private void rescheduleAlarm(String phonenumber,String Phonenumber_Multi, String message, Context context, long triggerTime, String repeatSmS, int alarmId) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date date = new Date(triggerTime);
@@ -96,6 +93,10 @@ private String year;
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, AlarmReceiver.class);
+
+        if (Phonenumber_Multi != "false"){
+            intent.putExtra("EXTRA_PHONE_NUMBER_MULTI", Phonenumber_Multi);
+        }
 
         intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         intent.putExtra("EXTRA_MESSAGES", message);

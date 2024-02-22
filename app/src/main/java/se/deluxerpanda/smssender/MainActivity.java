@@ -1,6 +1,7 @@
 package se.deluxerpanda.smssender;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -45,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
     private String year;
     private int selectedOptionIndex;
     private  int permissionCheck;
+
+    private final int[] counterLeft = {0};
+    private int counterMax = 4;
+    HashMap<Integer, EditText> editTextMap = new HashMap<>();
+
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
         int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
@@ -114,7 +121,10 @@ public class MainActivity extends AppCompatActivity {
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
-        if (phoneNumber != null){
+
+        // Check if phone number is not null
+        if (phoneNumber != null) {
+            // Set the text of phoneNumberEditText to the retrieved phone number
             phoneNumberEditText.setText(phoneNumber);
         }
 
@@ -145,31 +155,38 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 hideKeyboard();
                 Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                startActivity(intent);
+             int phoneNumberEditTextID = phoneNumberEditText.getId();
+                startActivityForResult(intent, phoneNumberEditTextID);
             }
         });
 
 
-        final int[] counterLeft = {0};
-        int counterMax = 4;
         TextView addNumbers = findViewById(R.id.addNumbers);
         addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
         addNumbers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (counterLeft[0] != counterMax){
+                if (counterLeft[0] != counterMax) {
                     counterLeft[0]++;
-                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
+                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
                     LinearLayout parentLayout = findViewById(R.id.numbersContainer);
                     hideKeyboard();
+
                     View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.textview_number, null);
 
+                    // Generate a unique ID for the TextView
+                    int dynamicTextViewId = View.generateViewId();
+
+                    EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
+                    dynamicEditText.setId(dynamicTextViewId);
+                    editTextMap.put(dynamicTextViewId, dynamicEditText);
                     ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
                     contactButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            hideKeyboard();
                             Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                            startActivity(intent);
+                            startActivityForResult(intent, dynamicTextViewId);
                         }
                     });
 
@@ -179,12 +196,15 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             parentLayout.removeView(dynamicTextViewLayout);
                             counterLeft[0]--;
-                            addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
+                            addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
                         }
                     });
+
+                    // Add the dynamic TextView layout to the parent layout
                     parentLayout.addView(dynamicTextViewLayout);
                 }
             }
+
         });
 
 
@@ -492,6 +512,17 @@ public class MainActivity extends AppCompatActivity {
 
         int alarmId = UUID.randomUUID().hashCode();
 
+        if (counterLeft[0] > 0){
+            StringBuilder allText = new StringBuilder();
+
+            for (Map.Entry<Integer, EditText> entry : editTextMap.entrySet()) {
+                EditText editText = entry.getValue();
+                allText.append(editText.getText()).append(",");
+            }
+            intent.putExtra("EXTRA_PHONE_NUMBER_MULTI", allText.toString());
+        }
+
+
         intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         intent.putExtra("EXTRA_MESSAGES", message);
         intent.putExtra("EXTRA_ALARMID", alarmId);
@@ -682,4 +713,22 @@ public class MainActivity extends AppCompatActivity {
             manager.createNotificationChannel(channel);
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            TextView textView = findViewById(requestCode);
+
+            if (textView != null && textView instanceof TextView) {
+                String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
+                textView.setText(phoneNumber);
+            }
+        }
+    }
+
+
+
+
 }
