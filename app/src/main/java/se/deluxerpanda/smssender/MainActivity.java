@@ -77,17 +77,19 @@ public class MainActivity extends AppCompatActivity {
     private String week;
     private String month;
     private String year;
+    private static int hour;
+    private static int minute;
     private int selectedOptionIndex;
     private  int permissionCheck;
 
     private final int[] counterLeft = {0};
-    private int counterMax = 4;
+    private int counterMax = 29;
     HashMap<Integer, EditText> editTextMap = new HashMap<>();
 
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED && permissionCheck2 == PackageManager.PERMISSION_GRANTED) {
+     //   int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
         return false;
@@ -111,11 +113,10 @@ public class MainActivity extends AppCompatActivity {
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE)+ 6;
+         hour = c.get(Calendar.HOUR_OF_DAY);
+         minute = c.get(Calendar.MINUTE)+ 6;
         String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-
-        String timeText = hour + ":" + minute;
+        String timeText = String.format("%02d:%02d", hour, minute);
 
         setContentView((R.layout.activity_main));
 
@@ -234,8 +235,6 @@ public class MainActivity extends AppCompatActivity {
                     scheduleSMS(phonenumber,message);
                     hideKeyboard();
                     History_info();
-                    phoneNumberEditText.setText("");
-                    messageEditText.setText("");
 
                 }  else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -272,14 +271,15 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getResources().getString(R.string.sms_no_permission_titel));
-                builder.setMessage(getResources().getString(R.string.sms_no_permission_text));
-                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
+                builder.setMessage(getResources().getString(R.string.text_list_permisson_sendsms));
+                builder.setPositiveButton(getResources().getString(R.string.text_ask_give_permission), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        onBackPressed();
                         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         Uri uri = Uri.fromParts("package", getPackageName(), null);
                         intent.setData(uri);
                         startActivity(intent);
+
                     }
                 });
                 builder.show();
@@ -397,7 +397,6 @@ public class MainActivity extends AppCompatActivity {
             history_info_date_and_time_TextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
 
             linearLayout.addView(dynamicTextViewLayout);
-
             dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -430,10 +429,6 @@ public class MainActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker.
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE)+ 6;
 
             if (timeHourSaved != -1 && timeMinuteSaved != -1) {
                 return new TimePickerDialog(getActivity(), this, timeHourSaved, timeMinuteSaved, true);
@@ -447,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
             // Do something with the time the user picks.
             timeHourSaved = hour;
             timeMinuteSaved = minute;
-            String timeText = hour  + ":" + minute;
+            String timeText = String.format("%02d:%02d", hour, minute);
             SetTimeText.setText(" "+timeText);
         }
     }
@@ -493,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
         String DateStart = (String) SetDateStartText.getText();
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
-
+        phonenumber = phonenumber.replaceAll("[.,()/#;]", "");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
         try {
             Date date = sdf.parse(dateTimeString);
@@ -519,11 +514,12 @@ public class MainActivity extends AppCompatActivity {
                 EditText editText = entry.getValue();
                 allText.append(editText.getText()).append(",");
             }
-            intent.putExtra("EXTRA_PHONE_NUMBER_MULTI", allText.toString());
+            String strnum = allText.toString() + phonenumber;
+            intent.putExtra("EXTRA_PHONE_NUMBER", strnum);
+             phonenumber = strnum;
+        }else {
+            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         }
-
-
-        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         intent.putExtra("EXTRA_MESSAGES", message);
         intent.putExtra("EXTRA_ALARMID", alarmId);
         intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
@@ -555,14 +551,6 @@ public class MainActivity extends AppCompatActivity {
                 );
 
             saveAlarmDetails(this, alarmId, triggerTime,repeatSmS,phonenumber,message);
-            Log.d("AlarmDetails",
-                    "ID: " + alarmId
-                            + "\n triggerTime: " + triggerTime
-                            + "\n intervalMillis: "+ intervalMillis
-                            +  "\n pendingIntent"+ pendingIntent
-                            + "\n DateStart"+ DateStart
-                            + "\n Clock_Time"+ Clock_Time
-                            + "\n dateTimeString"+ dateTimeString);
         } catch (ParseException e) {
             e.printStackTrace();
         }

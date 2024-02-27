@@ -41,7 +41,7 @@ private String year;
 
         phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
 
-        Phonenumber_Multi = intent.getStringExtra("EXTRA_PHONE_NUMBER_MULTI");
+      //  Phonenumber_Multi = intent.getStringExtra("EXTRA_PHONE_NUMBER_MULTI");
 
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
@@ -51,9 +51,9 @@ private String year;
 
         alarmId = Integer.parseInt(String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0)));
 
-        if (Phonenumber_Multi != null){
-            String strnum=Phonenumber_Multi + phonenumber;
-            String[] phoneNumbersArray = strnum.split(",\\s*");
+        if (phonenumber.contains(",")) {
+            Phonenumber_Multi = phonenumber;
+            String[] phoneNumbersArray = phonenumber.split(",\\s*");
             for (String phoneNumber : phoneNumbersArray) {
                 ArrayList<String> parts = smsManager.divideMessage(message);
                 smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
@@ -79,7 +79,7 @@ private String year;
         long intervalMillis = 0;
 
         if (repeatSmS.equalsIgnoreCase(day)) {
-            intervalMillis = AlarmManager.INTERVAL_DAY;
+            intervalMillis = 10000;
         } else if (repeatSmS.equalsIgnoreCase(week)) {
             intervalMillis = AlarmManager.INTERVAL_DAY * 7;
         } else if (repeatSmS.equalsIgnoreCase(month)) {
@@ -95,14 +95,16 @@ private String year;
         Intent intent = new Intent(context, AlarmReceiver.class);
 
         if (Phonenumber_Multi != "false"){
-            intent.putExtra("EXTRA_PHONE_NUMBER_MULTI", Phonenumber_Multi);
+            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+        }else {
+            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
         }
+            intent.putExtra("EXTRA_MESSAGES", message);
+            intent.putExtra("EXTRA_ALARMID", alarmId);
+            intent.putExtra("EXTRA_TRIGGERTIME", newtriggerTime);
+            intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
-        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-        intent.putExtra("EXTRA_MESSAGES", message);
-        intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_TRIGGERTIME", newtriggerTime);
-        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
+
 
         context.startForegroundService(intent);
 

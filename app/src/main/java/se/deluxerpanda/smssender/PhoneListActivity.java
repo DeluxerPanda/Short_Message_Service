@@ -87,8 +87,8 @@ public class PhoneListActivity extends AppCompatActivity {
     private void showPermissionExplanationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.sms_no_permission_titel));
-        builder.setMessage(getResources().getString(R.string.sms_no_permission_text));
-        builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
+        builder.setMessage(getResources().getString(R.string.text_list_permisson_getcontact));
+        builder.setPositiveButton(getResources().getString(R.string.text_ask_give_permission), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 onBackPressed();
                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -97,7 +97,7 @@ public class PhoneListActivity extends AppCompatActivity {
                 startActivity(intent);
 
             }
-        }).setNegativeButton(getResources().getString(R.string.text_Cancel), new DialogInterface.OnClickListener() {
+        }).setNegativeButton(getResources().getString(R.string.text_ask_NO_permisson), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 onBackPressed();
             };
@@ -181,7 +181,6 @@ public class PhoneListActivity extends AppCompatActivity {
                 if (childCount == 0) {
                     String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
                     if (phoneNumber != null) {
-                        Toast.makeText(PhoneListActivity.this, "Phone number: " + phoneNumber, Toast.LENGTH_SHORT).show();
                     setPhoneNumber(phoneNumber);
                     } else {
                         Toast.makeText(PhoneListActivity.this, "No phone number available for this contact", Toast.LENGTH_SHORT).show();

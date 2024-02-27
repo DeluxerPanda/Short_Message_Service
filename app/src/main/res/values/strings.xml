@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Short Message Service</string>
     <string name="app_screen_name">Sms Scheduler</string>
+    <string name="app_contacts_name">Contacts</string>
 
     <string name="text_hint_phone_number">Enter Phone Number</string>
     <string name="text_add_phone_number">Add more numbers:</string>
@@ -33,13 +34,20 @@
     <string name="sms_max_characters_Text_int">not</string>
 
     <string name="sms_no_permission_titel">The app dont have permission</string>
-    <string name="sms_no_permission_text">You must allow the app to send SMS</string>
+    <string name="sms_no_permission_text">You must give the app permission</string>
 
     <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
     <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
 
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">Cancel</string>
+
+    <string name="text_ask_give_permission">Give permission</string>
+    <string name="text_ask_NO_permisson">NO!</string>
+
+    <string name="text_list_permisson_sendsms">* SMS</string>
+
+    <string name="text_list_permisson_getcontact">* Contacts</string>
 
     <string name="open_nav">open_nav</string>
     <string name="close_nav">close_nav</string>
