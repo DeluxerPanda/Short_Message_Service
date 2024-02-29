@@ -3,11 +3,14 @@ package se.deluxerpanda.smssender;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,10 +33,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class PhoneListActivity extends AppCompatActivity {
 
@@ -76,13 +81,14 @@ public class PhoneListActivity extends AppCompatActivity {
 
         if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadContacts();
+                    loadContacts();
+                Toast.makeText(PhoneListActivity.this,  "1", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 // Permission denied, ask again
                 showPermissionExplanationDialog();
             }
         }
-    }
 
     private void showPermissionExplanationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -105,12 +111,16 @@ public class PhoneListActivity extends AppCompatActivity {
         builder.show();
     }
     private void loadContacts() {
+        Toast.makeText(PhoneListActivity.this,  "2", Toast.LENGTH_SHORT).show();
         List<Map<String, String>> groupData = new ArrayList<>();
         List<List<Map<String, String>>> childData = new ArrayList<>();
 
         Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-
+        if (cursor.getCount() == 0) {
+            Toast.makeText(PhoneListActivity.this,  "no found", Toast.LENGTH_SHORT).show();
+        }
         while (cursor.moveToNext()) {
+            Toast.makeText(PhoneListActivity.this,  "3", Toast.LENGTH_SHORT).show();
             String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
@@ -168,7 +178,6 @@ public class PhoneListActivity extends AppCompatActivity {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
-                    Toast.makeText(PhoneListActivity.this, phoneNumber+ " in Work", Toast.LENGTH_SHORT).show();
                setPhoneNumber(phoneNumber);
                     return true;
                 }
@@ -191,6 +200,7 @@ public class PhoneListActivity extends AppCompatActivity {
             }
         });
     }
+
     private EditText phoneNumberEditText;
     public void setPhoneNumber(String phoneNumber){
         Intent resultIntent = new Intent();

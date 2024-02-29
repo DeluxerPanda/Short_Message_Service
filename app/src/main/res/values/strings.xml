@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Short Message Service</string>
+    <string name="app_name_short">SMS app</string>
     <string name="app_screen_name">Sms Scheduler</string>
     <string name="app_contacts_name">Contacts</string>
 
@@ -49,7 +50,14 @@
 
     <string name="text_list_permisson_getcontact">* Contacts</string>
 
-    <string name="open_nav">open_nav</string>
-    <string name="close_nav">close_nav</string>
     <string name="todo">TODO</string>
+
+    <string name="history_info_no_SMS_scheduled">There are no SMS scheduled</string>
+
+    <string name="history_info_PhoneNumber_name">Phone number:</string>
+    <string name="history_info_Message_name">Message:</string>
+    <string name="history_info_Date_name">Date:</string>
+    <string name="history_info_Time_name">Time:</string>
+    <string name="history_info_Repeat_name">Repeat every:</string>
+    <string name="history_info_MoreSoon_name">More coming soon!</string>
 </resources>

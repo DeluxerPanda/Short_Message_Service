@@ -10,15 +10,18 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
@@ -167,6 +170,8 @@ public class MainActivity extends AppCompatActivity {
         addNumbers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            //    while (counterLeft[0] != counterMax){
+
                 if (counterLeft[0] != counterMax) {
                     counterLeft[0]++;
                     addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
@@ -179,6 +184,9 @@ public class MainActivity extends AppCompatActivity {
                     int dynamicTextViewId = View.generateViewId();
 
                     EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
+
+                //    dynamicEditText.setText("+" + counterLeft[0]);
+
                     dynamicEditText.setId(dynamicTextViewId);
                     editTextMap.put(dynamicTextViewId, dynamicEditText);
                     ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
@@ -205,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                     parentLayout.addView(dynamicTextViewLayout);
                 }
             }
-
+        //    }
         });
 
 
@@ -361,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
 
-            AlarmListIsEmptyTextView.setText("There are no SMS scheduled");
+            AlarmListIsEmptyTextView.setText(getResources().getString(R.string.history_info_no_SMS_scheduled));
             AlarmListIsEmptyTextView.setTextSize(20);
             AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
             AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
@@ -388,26 +396,52 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
 
             TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
-            history_info_contact_name_TextView.setText(phonenumber);
+
+
+            ContentResolver contentResolver = getContentResolver();
+
+            String contactName = getContactName(contentResolver, phonenumber);
+           String title;
+            if (contactName != null) {
+                history_info_contact_name_TextView.setText(contactName);
+                title = contactName;
+            } else {
+                history_info_contact_name_TextView.setText(phonenumber);
+                title = String.valueOf(phonenumber);
+            }
+
+
+
+
+            String[] words = phonenumber.split(",");
+
+            StringBuilder output = new StringBuilder();
+            for (String word : words) {
+                output.append(getResources().getString(R.string.history_info_PhoneNumber_name)).append(word.trim()).append("\n");
+            }
+
+            String phonenumber_result = output.toString();
 
             TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
             history_info_message_TextView.setText(message);
 
             TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
-            history_info_date_and_time_TextView.setText("Date: " + formattedDateStart + ", Time: " + formattedClockTime);
+            history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) + formattedDateStart + ", "+getResources().getString(R.string.history_info_Time_name) + formattedClockTime);
 
             linearLayout.addView(dynamicTextViewLayout);
             dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     AlertCreator.showAlertBox_for_History_info(v.getContext(),
-                            "ID: " + alarmId,
-                            "Phone number: " + phonenumber +
-                                    "\nMessage: "+message+
-                                    "\nDate: " + formattedDateStart +
-                                    "\nTime: " + formattedClockTime +
-                                    "\nRepeat every: " + getRepeatSmS +
-                                    "\nMore coming soon!",
+                            title,
+                            "\n" +
+                                    phonenumber_result +
+                                    "\n"+getResources().getString(R.string.history_info_Message_name)+" "+message+
+                                    "\n\n"+getResources().getString(R.string.history_info_Date_name)+" "+formattedDateStart +
+                                    "\n"+getResources().getString(R.string.history_info_Time_name)+" "+formattedClockTime +
+                                    "\n"+getResources().getString(R.string.history_info_Repeat_name)+" "+getRepeatSmS +
+                                    "\n\nID: " + alarmId +
+                                    "\n\n"+getResources().getString(R.string.history_info_MoreSoon_name),
                             alarmId);
                 }
 
@@ -488,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
         String DateStart = (String) SetDateStartText.getText();
         String Clock_Time = (String) SetTimeText.getText();
         String dateTimeString = DateStart + " " + Clock_Time;
-        phonenumber = phonenumber.replaceAll("[.,()/#;]", "");
+        phonenumber = phonenumber.replaceAll("[/N.,'*;#]", "");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
         try {
             Date date = sdf.parse(dateTimeString);
@@ -716,7 +750,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static String getContactName(ContentResolver contentResolver, String phoneNumber) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
 
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    // Contact exists, return the name
+                    String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                    return contactName;
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        // Contact doesn't exist
+        return null;
+    }
 
 
 }
