@@ -158,13 +158,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
-      //          Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+                Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
              int phoneNumberEditTextID = phoneNumberEditText.getId();
-       //         startActivityForResult(intent, phoneNumberEditTextID);
-
-                Intent i=new Intent(Intent.ACTION_PICK);
-                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-                startActivityForResult(i, phoneNumberEditTextID);
+                startActivityForResult(intent, phoneNumberEditTextID);
             }
         });
 
@@ -199,10 +195,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             hideKeyboard();
                             Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                        //    startActivityForResult(intent, dynamicTextViewId);
-                            Intent i=new Intent(Intent.ACTION_PICK);
-                            i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
-                            startActivityForResult(i, dynamicTextViewId);
+                           startActivityForResult(intent, dynamicTextViewId);
                         }
                     });
 
@@ -751,21 +744,10 @@ public class MainActivity extends AppCompatActivity {
             TextView textView = findViewById(requestCode);
 
             if (textView != null && textView instanceof TextView) {
-                Uri contactUri = data.getData();
-                String phoneNumber = getContactPhoneNumber(contactUri);
+                String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
                 textView.setText(phoneNumber);
             }
         }
-    }
-    private String getContactPhoneNumber(Uri contactUri) {
-        String phoneNumber = null;
-        Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int phoneNumberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-            phoneNumber = cursor.getString(phoneNumberIndex);
-            cursor.close();
-        }
-        return phoneNumber;
     }
 
     public static String getContactName(ContentResolver contentResolver, String phoneNumber) {
@@ -785,7 +767,6 @@ public class MainActivity extends AppCompatActivity {
                 cursor.close();
             }
         }
-
         // Contact doesn't exist
         return null;
     }

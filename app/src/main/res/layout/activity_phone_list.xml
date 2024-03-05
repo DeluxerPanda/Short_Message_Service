@@ -9,9 +9,10 @@
     android:paddingTop="16dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp">
+
     <androidx.gridlayout.widget.GridLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="48dp">
 
 
         <RelativeLayout
@@ -29,6 +30,7 @@
                 android:textStyle="bold|italic"
                 android:typeface="normal"
                 tools:ignore="TextSizeCheck" />
+
             <ImageView
 
                 android:id="@+id/btnToMainSmsSchedulerPage"
@@ -47,11 +49,12 @@
 
     </androidx.gridlayout.widget.GridLayout>
 
+
     <ExpandableListView
         android:id="@+id/Phone_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+        android:groupIndicator="@null" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

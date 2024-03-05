@@ -114,7 +114,7 @@ public class PhoneListActivity extends AppCompatActivity {
 
     }
 
-
+    boolean hasSinglePhoneNumber = false;
 
     private void loadContacts() {
         List<Map<String, String>> groupData = new ArrayList<>();
@@ -139,41 +139,66 @@ public class PhoneListActivity extends AppCompatActivity {
                         new String[]{contactId}, null);
 
                 if (phoneCursor.getCount() == 1) {
-                    if (phoneCursor.moveToFirst()) {
+                    if (phoneCursor.moveToFirst()) { // 1
                         // If there's only one phone number, save it
                         String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         curGroupMap.put("PHONE", phoneNumber);
+                        hasSinglePhoneNumber = true;
                     }
                 }
 
-                while (phoneCursor.moveToNext()) {
+                while (phoneCursor.moveToNext()) { // 2
                     String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     Map<String, String> curChildMap = new HashMap<>();
                     children.add(curChildMap);
                     curChildMap.put("PHONE", phoneNumber);
                 }
+                curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
                 childData.add(children);
                 phoneCursor.close();
-
             }
         }
 
-
         cursor.close();
-
         SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
                 this,
                 groupData,
-                android.R.layout.simple_expandable_list_item_1,
+                R.layout.group_item_layout, // Custom layout for group
                 new String[]{"NAME"},
-                new int[]{android.R.id.text1},
+                new int[]{R.id.group_name},
                 childData,
-                android.R.layout.simple_expandable_list_item_2,
+                R.layout.child_item_layout, // Custom layout for child
                 new String[]{"PHONE"},
-                new int[]{android.R.id.text1}
-        );
+                new int[]{R.id.contact_number}
+        ) {
+            @Override
+            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+                View view = super.getGroupView(groupPosition, isExpanded, convertView, parent);
+                TextView groupNameTextView = view.findViewById(R.id.group_name);
+                ImageView arrowImageView = view.findViewById(R.id.arrow_icon); // Assuming you have an ImageView for the arrow icon
 
+                // Check if it's a single phone number (no arrow icon) or multiple phone numbers (with arrow icon)
+                if (Boolean.parseBoolean(groupData.get(groupPosition).get("SINGLE_PHONE"))) {
+                    // Hide arrow icon
+                    arrowImageView.setVisibility(View.GONE);
+                } else {
+                    // Show arrow icon
+                    arrowImageView.setVisibility(View.VISIBLE);
+                }
+                return view;
+            }
+        };
+
+
+
+
+
+
+
+
+// Set your custom adapter to the ExpandableListView
         contactListView.setAdapter(adapter);
+
         if (contactListView.getAdapter().isEmpty()){
             ExpandableListView Phone_list = findViewById(R.id.Phone_list);
             TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
