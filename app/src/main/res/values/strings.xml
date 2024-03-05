@@ -8,7 +8,7 @@
     <string name="text_add_phone_number">Add more numbers:</string>
     <string name="text_hint_message">Enter message\n(max 160 characters)</string>
 
-    <string name="schedule_sms_button_text">Schedule sms</string>
+    <string name="schedule_sms_button_text">Schedule SMS</string>
 
     <string name="set_time_button_text">Set time</string>
     <string name="set_time_clock">00:00</string>
@@ -34,8 +34,11 @@
     <string name="sms_max_characters_Text">The maximum character limit is 160</string>
     <string name="sms_max_characters_Text_int">not</string>
 
-    <string name="sms_no_permission_titel">The app dont have permission</string>
-    <string name="sms_no_permission_text">You must give the app permission</string>
+    <string name="sms_no_permission_contacts_titel">Give Short Message Service access to Contacts</string>
+    <string name="sms_no_permission_contacts_text">This allows you to see all your contacts in your phone book. and then you can click on one of the contacts to avoid entering the number manually</string>
+
+    <string name="sms_no_permission_sms_titel">Give Short Message Service access to SMS</string>
+    <string name="sms_no_permission_sms_text">This makes your scheduled SMS to be sent</string>
 
     <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
     <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
@@ -46,12 +49,10 @@
     <string name="text_ask_give_permission">Give permission</string>
     <string name="text_ask_NO_permisson">NO!</string>
 
-    <string name="text_list_permisson_sendsms">* SMS</string>
-
-    <string name="text_list_permisson_getcontact">* Contacts</string>
+    <string name="No_contacts_found">No contacts with numbers found</string>
 
     <string name="todo">TODO</string>
-
+    <string name="empty"></string>
     <string name="history_info_no_SMS_scheduled">There are no SMS scheduled</string>
 
     <string name="history_info_PhoneNumber_name">Phone number:</string>

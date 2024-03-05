@@ -25,11 +25,13 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -50,6 +52,11 @@ public class PhoneListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_list);
 
+        TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
+        Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
+
+        TextBox_text.setVisibility(View.GONE);
+        TextBox_button.setVisibility(View.GONE);
         // back button
         ImageView btnToHamburger = findViewById(R.id.btnToMainSmsSchedulerPage);
         btnToHamburger.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +67,7 @@ public class PhoneListActivity extends AppCompatActivity {
         });
 
         // Initialize the ExpandableListView and permission check
-        this.contactListView = (ExpandableListView) findViewById(R.id.spinner);
+        this.contactListView = (ExpandableListView) findViewById(R.id.Phone_list);
         checkPermissionAndLoadContacts();
     }
 
@@ -70,57 +77,51 @@ public class PhoneListActivity extends AppCompatActivity {
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             loadContacts();
         } else {
-            // Request permission if not granted
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_REQUEST_READ_CONTACTS);
+            showPermissionExplanationDialog();
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    loadContacts();
-                Toast.makeText(PhoneListActivity.this,  "1", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Permission denied, ask again
-                showPermissionExplanationDialog();
-            }
-        }
 
     private void showPermissionExplanationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getResources().getString(R.string.sms_no_permission_titel));
-        builder.setMessage(getResources().getString(R.string.text_list_permisson_getcontact));
-        builder.setPositiveButton(getResources().getString(R.string.text_ask_give_permission), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
+
+        ExpandableListView Phone_list = findViewById(R.id.Phone_list);
+        TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
+        TextView TextBox_text2 = findViewById(R.id.Phone_list_TextBox_text2);
+        Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
+
+        Phone_list.setVisibility(View.GONE);
+
+        TextBox_text.setVisibility(View.VISIBLE);
+        TextBox_text.setText(getResources().getString(R.string.sms_no_permission_contacts_titel));
+        TextBox_text.setGravity(Gravity.CENTER);
+
+        TextBox_text2.setVisibility(View.VISIBLE);
+        TextBox_text2.setText(getResources().getString(R.string.sms_no_permission_contacts_text));
+        TextBox_text2.setGravity(Gravity.CENTER);
+
+        TextBox_button.setVisibility(View.VISIBLE);
+        TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission));
+        TextBox_button.setGravity(Gravity.CENTER);
+        TextBox_button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 onBackPressed();
                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), null);
                 intent.setData(uri);
                 startActivity(intent);
-
             }
-        }).setNegativeButton(getResources().getString(R.string.text_ask_NO_permisson), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                onBackPressed();
-            };
-    });
-        builder.show();
+        });
+
     }
+
+
+
     private void loadContacts() {
-        Toast.makeText(PhoneListActivity.this,  "2", Toast.LENGTH_SHORT).show();
         List<Map<String, String>> groupData = new ArrayList<>();
         List<List<Map<String, String>>> childData = new ArrayList<>();
 
         Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if (cursor.getCount() == 0) {
-            Toast.makeText(PhoneListActivity.this,  "no found", Toast.LENGTH_SHORT).show();
-        }
         while (cursor.moveToNext()) {
-            Toast.makeText(PhoneListActivity.this,  "3", Toast.LENGTH_SHORT).show();
             String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
@@ -173,6 +174,31 @@ public class PhoneListActivity extends AppCompatActivity {
         );
 
         contactListView.setAdapter(adapter);
+        if (contactListView.getAdapter().isEmpty()){
+            ExpandableListView Phone_list = findViewById(R.id.Phone_list);
+            TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
+            Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
+
+            Phone_list.setVisibility(View.GONE);
+
+            TextBox_text.setVisibility(View.VISIBLE);
+            TextBox_text.setText(getResources().getString(R.string.No_contacts_found));
+            TextBox_text.setGravity(Gravity.CENTER);
+
+            TextBox_button.setVisibility(View.VISIBLE);
+            TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission));
+            TextBox_button.setGravity(Gravity.CENTER);
+            TextBox_button.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    onBackPressed();
+                    Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                }
+            });
+
+        }
 
         contactListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override

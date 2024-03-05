@@ -79,7 +79,7 @@ private String year;
         long intervalMillis = 0;
 
         if (repeatSmS.equalsIgnoreCase(day)) {
-            intervalMillis = 10000;
+            intervalMillis = AlarmManager.INTERVAL_DAY;
         } else if (repeatSmS.equalsIgnoreCase(week)) {
             intervalMillis = AlarmManager.INTERVAL_DAY * 7;
         } else if (repeatSmS.equalsIgnoreCase(month)) {

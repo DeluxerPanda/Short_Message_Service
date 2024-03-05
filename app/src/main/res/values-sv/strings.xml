@@ -9,7 +9,7 @@
     <string name="text_add_phone_number">Lägg till fler nummer:</string>
     <string name="text_hint_message">Skriv meddelande\n(max 160 tecken)</string>
 
-    <string name="schedule_sms_button_text">Schemalägg sms</string>
+    <string name="schedule_sms_button_text">Schemalägg SMS</string>
 
     <string name="set_time_button_text">Sätt tid</string>
     <string name="set_time_clock">00:00</string>
@@ -35,8 +35,12 @@
     <string name="sms_max_characters_Text">Den maximala teckengränsen är 160</string>
     <string name="sms_max_characters_Text_int">inte</string>
 
-    <string name="sms_no_permission_titel">Appen har inte behörighet</string>
-    <string name="sms_no_permission_text">Du måste ge appen tillåtelse</string>
+    <string name="sms_no_permission_contacts_titel">Ge Short Message Service åtkomst till Kontakter</string>
+    <string name="sms_no_permission_contacts_text">Detta gör att du kan se alla dina kontakter i din telefonbok. och sedan kan du klicka på en av kontakterna för att undvika att ange numret manuellt</string>
+
+    <string name="sms_no_permission_sms_titel">Ge Short Message Service åtkomst till SMS</string>
+    <string name="sms_no_permission_sms_text">Detta gör att ditt schemalagda SMS skickas</string>
+
 
     <string name="sms_number_or_masage_are_empty_titel">Nummer och meddelande krävs</string>
     <string name="sms_number_or_masage_are_empty_text">Ange både telefonnummer och meddelande.</string>
@@ -44,14 +48,13 @@
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">avbryt</string>
 
-    <string name="text_ask_give_permission">Ge tillåtelse</string>
+    <string name="text_ask_give_permission">Öppna inställningar</string>
     <string name="text_ask_NO_permisson">Nej!</string>
 
-    <string name="text_list_permisson_sendsms">* SMS</string>
-
-    <string name="text_list_permisson_getcontact">* Kontakter</string>
+    <string name="No_contacts_found">Inga kontakter med nummer hittades</string>
 
     <string name="todo">TODO</string>
+    <string name="empty"></string>
 
     <string name="history_info_no_SMS_scheduled">Det finns inga schemalagda SMS</string>
 
