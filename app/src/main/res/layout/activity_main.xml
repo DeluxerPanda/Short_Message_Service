@@ -203,7 +203,6 @@
         android:textStyle="bold"
         tools:ignore="VisualLintButtonSize" />
 
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -214,8 +213,6 @@
         android:textStyle="bold|italic"
         android:typeface="normal"
         tools:ignore="TextSizeCheck" />
-
-
 
         <LinearLayout
             android:id="@+id/app_backgrund"
