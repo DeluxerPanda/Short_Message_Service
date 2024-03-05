@@ -158,9 +158,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
-                Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+      //          Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
              int phoneNumberEditTextID = phoneNumberEditText.getId();
-                startActivityForResult(intent, phoneNumberEditTextID);
+       //         startActivityForResult(intent, phoneNumberEditTextID);
+
+                Intent i=new Intent(Intent.ACTION_PICK);
+                i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                startActivityForResult(i, phoneNumberEditTextID);
             }
         });
 
@@ -195,7 +199,10 @@ public class MainActivity extends AppCompatActivity {
                         public void onClick(View v) {
                             hideKeyboard();
                             Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                            startActivityForResult(intent, dynamicTextViewId);
+                        //    startActivityForResult(intent, dynamicTextViewId);
+                            Intent i=new Intent(Intent.ACTION_PICK);
+                            i.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE);
+                            startActivityForResult(i, dynamicTextViewId);
                         }
                     });
 
@@ -278,8 +285,8 @@ public class MainActivity extends AppCompatActivity {
             }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getResources().getString(R.string.sms_no_permission_titel));
-                builder.setMessage(getResources().getString(R.string.text_list_permisson_sendsms));
+                builder.setTitle(getResources().getString(R.string.sms_no_permission_sms_titel));
+                builder.setMessage(getResources().getString(R.string.sms_no_permission_sms_text));
                 builder.setPositiveButton(getResources().getString(R.string.text_ask_give_permission), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         onBackPressed();
@@ -744,10 +751,21 @@ public class MainActivity extends AppCompatActivity {
             TextView textView = findViewById(requestCode);
 
             if (textView != null && textView instanceof TextView) {
-                String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
+                Uri contactUri = data.getData();
+                String phoneNumber = getContactPhoneNumber(contactUri);
                 textView.setText(phoneNumber);
             }
         }
+    }
+    private String getContactPhoneNumber(Uri contactUri) {
+        String phoneNumber = null;
+        Cursor cursor = getContentResolver().query(contactUri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int phoneNumberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+            phoneNumber = cursor.getString(phoneNumberIndex);
+            cursor.close();
+        }
+        return phoneNumber;
     }
 
     public static String getContactName(ContentResolver contentResolver, String phoneNumber) {
