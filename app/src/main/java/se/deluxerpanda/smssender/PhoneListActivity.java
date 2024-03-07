@@ -15,7 +15,9 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +38,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -100,7 +105,7 @@ public class PhoneListActivity extends AppCompatActivity {
         TextBox_text2.setGravity(Gravity.CENTER);
 
         TextBox_button.setVisibility(View.VISIBLE);
-        TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission));
+        TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission_settings));
         TextBox_button.setGravity(Gravity.CENTER);
         TextBox_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -125,6 +130,8 @@ public class PhoneListActivity extends AppCompatActivity {
             String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
+
+
             // Check if the contact has at least one phone number
             if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                 Map<String, String> curGroupMap = new HashMap<>();
@@ -139,21 +146,35 @@ public class PhoneListActivity extends AppCompatActivity {
                         new String[]{contactId}, null);
 
                 if (phoneCursor.getCount() == 1) {
-                    if (phoneCursor.moveToFirst()) { // 1
+                    if (phoneCursor.moveToFirst()) {
                         // If there's only one phone number, save it
                         String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         curGroupMap.put("PHONE", phoneNumber);
                         hasSinglePhoneNumber = true;
+                        curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
                     }
                 }
 
-                while (phoneCursor.moveToNext()) { // 2
+                while (phoneCursor.moveToNext()) {
                     String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     Map<String, String> curChildMap = new HashMap<>();
                     children.add(curChildMap);
+
+                    int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+
+
+
+                        CharSequence phoneTypeLabel = ContactsContract.CommonDataKinds.Phone.getTypeLabel(
+                                getResources(), phoneType, getResources().getString(R.string.Custom_name));
+
+                        String phoneTypeLabelFinl = phoneTypeLabel + ":";
+                        curChildMap.put("CATAGORY",phoneTypeLabelFinl);
+
                     curChildMap.put("PHONE", phoneNumber);
+                    hasSinglePhoneNumber = false;
+                    curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
                 }
-                curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
+
                 childData.add(children);
                 phoneCursor.close();
             }
@@ -168,35 +189,27 @@ public class PhoneListActivity extends AppCompatActivity {
                 new int[]{R.id.group_name},
                 childData,
                 R.layout.child_item_layout, // Custom layout for child
-                new String[]{"PHONE"},
-                new int[]{R.id.contact_number}
-        ) {
+                new String[]{"PHONE","CATAGORY"},
+                new int[]{R.id.contact_number, R.id.contact_category}
+        )
+        {
             @Override
             public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 View view = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-                TextView groupNameTextView = view.findViewById(R.id.group_name);
-                ImageView arrowImageView = view.findViewById(R.id.arrow_icon); // Assuming you have an ImageView for the arrow icon
+                ImageView arrowImageView = view.findViewById(R.id.arrow_icon1);
 
                 // Check if it's a single phone number (no arrow icon) or multiple phone numbers (with arrow icon)
                 if (Boolean.parseBoolean(groupData.get(groupPosition).get("SINGLE_PHONE"))) {
-                    // Hide arrow icon
                     arrowImageView.setVisibility(View.GONE);
                 } else {
-                    // Show arrow icon
                     arrowImageView.setVisibility(View.VISIBLE);
                 }
                 return view;
             }
+
         };
 
 
-
-
-
-
-
-
-// Set your custom adapter to the ExpandableListView
         contactListView.setAdapter(adapter);
 
         if (contactListView.getAdapter().isEmpty()){
@@ -210,9 +223,7 @@ public class PhoneListActivity extends AppCompatActivity {
             TextBox_text.setText(getResources().getString(R.string.No_contacts_found));
             TextBox_text.setGravity(Gravity.CENTER);
 
-            TextBox_button.setVisibility(View.VISIBLE);
-            TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission));
-            TextBox_button.setGravity(Gravity.CENTER);
+            TextBox_button.setVisibility(View.GONE);
             TextBox_button.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     onBackPressed();
@@ -234,22 +245,39 @@ public class PhoneListActivity extends AppCompatActivity {
                 }
         });
         contactListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            int lastExpandedGroupPosition = -1;
+
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                 ExpandableListAdapter adapter = contactListView.getExpandableListAdapter();
                 int childCount = adapter.getChildrenCount(groupPosition);
+
                 if (childCount == 0) {
                     String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
                     if (phoneNumber != null) {
-                    setPhoneNumber(phoneNumber);
+                        setPhoneNumber(phoneNumber);
                     } else {
                         Toast.makeText(PhoneListActivity.this, "No phone number available for this contact", Toast.LENGTH_SHORT).show();
                     }
                     return true;
+                } else {
+
+                    if (contactListView.isGroupExpanded(groupPosition)) {
+                        contactListView.collapseGroup(groupPosition);
+                        lastExpandedGroupPosition = -1;
+                    } else {
+                        if (lastExpandedGroupPosition != -1) {
+                            contactListView.collapseGroup(lastExpandedGroupPosition);
+                        }
+                        contactListView.expandGroup(groupPosition);
+                        lastExpandedGroupPosition = groupPosition;
+                    }
+                    return true;
                 }
-                return false;
             }
         });
+
+
     }
 
     private EditText phoneNumberEditText;

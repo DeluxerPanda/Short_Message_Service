@@ -48,7 +48,9 @@
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">avbryt</string>
 
-    <string name="text_ask_give_permission">Öppna inställningar</string>
+    <string name="text_ask_give_permission_settings">Öppna inställningar</string>
+
+    <string name="text_ask_give_permission">Ge tillåtelse</string>
     <string name="text_ask_NO_permisson">Nej!</string>
 
     <string name="No_contacts_found">Inga kontakter med nummer hittades</string>
@@ -64,4 +66,6 @@
     <string name="history_info_Time_name">Tid:</string>
     <string name="history_info_Repeat_name">Upprepa varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
+
+    <string name="Custom_name">Anpassad</string>
 </resources>

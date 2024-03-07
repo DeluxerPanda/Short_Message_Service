@@ -46,6 +46,8 @@
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">Cancel</string>
 
+    <string name="text_ask_give_permission_settings">Open settings</string>
+
     <string name="text_ask_give_permission">Give permission</string>
     <string name="text_ask_NO_permisson">NO!</string>
 
@@ -61,4 +63,6 @@
     <string name="history_info_Time_name">Time:</string>
     <string name="history_info_Repeat_name">Repeat every:</string>
     <string name="history_info_MoreSoon_name">More coming soon!</string>
+
+    <string name="Custom_name">Custom</string>
 </resources>

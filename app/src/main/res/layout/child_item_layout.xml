@@ -3,15 +3,40 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingStart="8dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="8dp"
     android:orientation="horizontal">
 
     <!-- TextView for group name -->
     <TextView
-        android:id="@+id/contact_number"
+        android:id="@+id/contact_category"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
+        android:layout_height="match_parent"
+        android:alpha="@dimen/material_emphasis_medium"
+        android:lineSpacingExtra="16sp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
         android:singleLine="true"
-        android:textStyle="bold"
-        android:padding="5dp"/>
+        android:text="@string/app_contacts_name"
+        android:textAlignment="viewStart"
+        android:textAllCaps="false"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/contact_number"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        android:singleLine="true"
+        android:text="@string/app_contacts_name"
+        android:textAlignment="viewEnd"
+        android:textAllCaps="false"
+        android:textSize="18sp" />
 </LinearLayout>
