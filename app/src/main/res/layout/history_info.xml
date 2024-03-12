@@ -7,6 +7,7 @@
     android:padding="16dp">
 
     <ImageView
+        android:id="@+id/history_info_contact_profile"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="top"

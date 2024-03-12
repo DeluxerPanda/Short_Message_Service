@@ -18,12 +18,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +33,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -42,11 +41,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.DialogFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     LinearLayout parentLayout = findViewById(R.id.numbersContainer);
                     hideKeyboard();
 
-                    View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.textview_number, null);
+                    View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.add_number_layout, null);
 
                     // Generate a unique ID for the TextView
                     int dynamicTextViewId = View.generateViewId();
@@ -397,19 +399,42 @@ public class MainActivity extends AppCompatActivity {
 
             TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
 
+            String title;
 
+            int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+            if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
+                ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
             ContentResolver contentResolver = getContentResolver();
 
-            String contactName = getContactName(contentResolver, phonenumber);
-           String title;
+                String contactName = getContactName(contentResolver, phonenumber);
+
+
             if (contactName != null) {
                 history_info_contact_name_TextView.setText(contactName);
                 title = contactName;
+                Uri photoUri = getContactPhotoUri(contactName);
+                if (photoUri != null) {
+                    // Load the contact photo into the ImageView
+                    contactImageView.setImageURI(photoUri);
+                    // Create a rounded drawable and set it directly to the ImageView
+                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
+                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
+                    contactImageView.setImageDrawable(roundedDrawable);
+
+                }else {
+                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                }
+
             } else {
                 history_info_contact_name_TextView.setText(phonenumber);
-                title = String.valueOf(phonenumber);
+              //  title = String.valueOf(phonenumber);
+                title = contactName;
             }
 
+            } else {
+                 history_info_contact_name_TextView.setText(phonenumber);
+                title = String.valueOf(phonenumber);
+}
 
 
 
@@ -417,7 +442,7 @@ public class MainActivity extends AppCompatActivity {
 
             StringBuilder output = new StringBuilder();
             for (String word : words) {
-                output.append(getResources().getString(R.string.history_info_PhoneNumber_name)).append(word.trim()).append("\n");
+                output.append(getResources().getString(R.string.history_info_PhoneNumber_name)+" ").append(word.trim()).append("\n");
             }
 
             String phonenumber_result = output.toString();
@@ -770,6 +795,23 @@ public class MainActivity extends AppCompatActivity {
         // Contact doesn't exist
         return null;
     }
+    private Uri getContactPhotoUri(String contactID) {
+        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
+        String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?";
+        String[] selectionArgs = {contactID};
 
+        Cursor cursor = getContentResolver().query(contactUri, projection, selection, selectionArgs, null);
+        Uri photoUri = null;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            if (photoUriString != null) {
+                photoUri = Uri.parse(photoUriString);
+            }
+            cursor.close();
+        }
+        return photoUri;
+    }
 
 }

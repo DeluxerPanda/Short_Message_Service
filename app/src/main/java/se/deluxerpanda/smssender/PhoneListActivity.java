@@ -2,22 +2,18 @@ package se.deluxerpanda.smssender;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.util.Base64;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,26 +22,22 @@ import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class PhoneListActivity extends AppCompatActivity {
 
@@ -120,7 +112,6 @@ public class PhoneListActivity extends AppCompatActivity {
     }
 
     boolean hasSinglePhoneNumber = false;
-
     private void loadContacts() {
         List<Map<String, String>> groupData = new ArrayList<>();
         List<List<Map<String, String>>> childData = new ArrayList<>();
@@ -131,13 +122,12 @@ public class PhoneListActivity extends AppCompatActivity {
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
 
 
-
             // Check if the contact has at least one phone number
             if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                 Map<String, String> curGroupMap = new HashMap<>();
                 groupData.add(curGroupMap);
-                curGroupMap.put("NAME", name);
-
+                curGroupMap.put("NAME", contactId);
+                curGroupMap.put("CONTACTID", contactId);
                 List<Map<String, String>> children = new ArrayList<>();
 
                 Cursor phoneCursor = getContentResolver().query(
@@ -152,6 +142,7 @@ public class PhoneListActivity extends AppCompatActivity {
                         curGroupMap.put("PHONE", phoneNumber);
                         hasSinglePhoneNumber = true;
                         curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
+
                     }
                 }
 
@@ -184,11 +175,11 @@ public class PhoneListActivity extends AppCompatActivity {
         SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
                 this,
                 groupData,
-                R.layout.group_item_layout, // Custom layout for group
+                R.layout.activity_phone_group_layout, // layout for group
                 new String[]{"NAME"},
                 new int[]{R.id.group_name},
                 childData,
-                R.layout.child_item_layout, // Custom layout for child
+                R.layout.activity_phone_item_layout, // layout for child
                 new String[]{"PHONE","CATAGORY"},
                 new int[]{R.id.contact_number, R.id.contact_category}
         )
@@ -196,13 +187,35 @@ public class PhoneListActivity extends AppCompatActivity {
             @Override
             public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
                 View view = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-                ImageView arrowImageView = view.findViewById(R.id.arrow_icon1);
 
+                // Get the contact photo URI
+                Uri photoUri = getContactPhotoUri(groupData.get(groupPosition).get("CONTACTID"));
+                ImageView contactImageView = view.findViewById(R.id.group_image);
+                if (photoUri != null) {
+                   // Load the contact photo into the ImageView
+                    contactImageView.setImageURI(photoUri);
+                    // Create a rounded drawable and set it directly to the ImageView
+                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
+                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
+                    contactImageView.setImageDrawable(roundedDrawable);
+
+                }else {
+                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                }
+
+                ImageView arrowImageView1 = view.findViewById(R.id.arrow_icon1);
+                ImageView arrowImageView2 = view.findViewById(R.id.arrow_icon2);
                 // Check if it's a single phone number (no arrow icon) or multiple phone numbers (with arrow icon)
                 if (Boolean.parseBoolean(groupData.get(groupPosition).get("SINGLE_PHONE"))) {
-                    arrowImageView.setVisibility(View.GONE);
+                    arrowImageView1.setVisibility(View.GONE);
+                    arrowImageView2.setVisibility(View.GONE);
                 } else {
-                    arrowImageView.setVisibility(View.VISIBLE);
+                    arrowImageView1.setVisibility(View.VISIBLE);
+                    arrowImageView2.setVisibility(View.GONE);
+                if (isExpanded){
+                    arrowImageView1.setVisibility(View.GONE);
+                    arrowImageView2.setVisibility(View.VISIBLE);
+                }
                 }
                 return view;
             }
@@ -239,8 +252,8 @@ public class PhoneListActivity extends AppCompatActivity {
         contactListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
-               setPhoneNumber(phoneNumber);
+                String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
+                    setPhoneNumber(phoneNumber);
                     return true;
                 }
         });
@@ -287,5 +300,26 @@ public class PhoneListActivity extends AppCompatActivity {
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
+
+
+    private Uri getContactPhotoUri(String contactID) {
+        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
+        String selection = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?";
+        String[] selectionArgs = {contactID};
+
+        Cursor cursor = getContentResolver().query(contactUri, projection, selection, selectionArgs, null);
+        Uri photoUri = null;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            if (photoUriString != null) {
+                photoUri = Uri.parse(photoUriString);
+            }
+            cursor.close();
+        }
+        return photoUri;
+    }
+
 
 }
