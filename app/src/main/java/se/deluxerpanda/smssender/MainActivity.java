@@ -24,15 +24,18 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -57,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -400,43 +404,64 @@ public class MainActivity extends AppCompatActivity {
             TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
 
             String title;
-
+            String inputString = phonenumber;
+            String contactName = null;
+            StringBuilder concatenatedNames = new StringBuilder();
             int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+            ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
             if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
-                ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
             ContentResolver contentResolver = getContentResolver();
 
-                String contactName = getContactName(contentResolver, phonenumber);
+            if (phonenumber.contains(",")){
+// Creating a StringTokenizer object with delimiter ","
+                StringTokenizer tokenizer = new StringTokenizer(inputString, ",");
 
+                int tokenCount = tokenizer.countTokens();
+                String[] stringArray = new String[tokenCount];
 
-            if (contactName != null) {
-                history_info_contact_name_TextView.setText(contactName);
-                title = contactName;
-                Uri photoUri = getContactPhotoUri(contactName);
-                if (photoUri != null) {
-                    // Load the contact photo into the ImageView
-                    contactImageView.setImageURI(photoUri);
-                    // Create a rounded drawable and set it directly to the ImageView
-                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
-                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
-                    contactImageView.setImageDrawable(roundedDrawable);
-
-                }else {
-                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+// Converting each token to array elements
+                for (int i = 0; i < tokenCount; i++) {
+                    stringArray[i] = tokenizer.nextToken();
                 }
 
-            } else {
-                history_info_contact_name_TextView.setText(phonenumber);
-              //  title = String.valueOf(phonenumber);
-                title = contactName;
+// Printing the output array
+
+                for (String element : stringArray) {
+                    contactName = getContactLastName(contentResolver, element);
+                    concatenatedNames.append(contactName).append(", ");
+                }
+                history_info_contact_name_TextView.setText(concatenatedNames);
+                title = String.valueOf(concatenatedNames);
+            }else {
+
+
+                contactName = getContactName(contentResolver, phonenumber);
+                if (contactName != null) {
+                    history_info_contact_name_TextView.setText(contactName);
+                    title = String.valueOf(contactName);
+                } else {
+                    history_info_contact_name_TextView.setText(phonenumber);
+                    title = String.valueOf(phonenumber);
+                }
             }
 
             } else {
-                 history_info_contact_name_TextView.setText(phonenumber);
+                history_info_contact_name_TextView.setText(phonenumber);
                 title = String.valueOf(phonenumber);
-}
+            }
 
+            Uri photoUri = getContactPhotoUri(contactName);
+            if (photoUri != null) {
+                // Load the contact photo into the ImageView
+                contactImageView.setImageURI(photoUri);
+                // Create a rounded drawable and set it directly to the ImageView
+                RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
+                roundedDrawable.setCircular(true); // Set to true if you want circular corners
+                contactImageView.setImageDrawable(roundedDrawable);
 
+            }else {
+                contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+            }
 
             String[] words = phonenumber.split(",");
 
@@ -451,7 +476,9 @@ public class MainActivity extends AppCompatActivity {
             history_info_message_TextView.setText(message);
 
             TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
-            history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) + formattedDateStart + ", "+getResources().getString(R.string.history_info_Time_name) + formattedClockTime);
+
+            history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
+                    + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
 
             linearLayout.addView(dynamicTextViewLayout);
             dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
@@ -516,20 +543,21 @@ public class MainActivity extends AppCompatActivity {
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
-
+            int weekOfyear = c.get(Calendar.WEEK_OF_YEAR);
             // Create a DatePickerDialog and set the minimum date to the current date
             DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
             Date date = new Date();
             datePickerDialog.getDatePicker().setMinDate(date.getTime()); // Set minimum date to now
 
-
                 try {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
                     datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
+
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+
 
             return datePickerDialog;
         }
@@ -775,6 +803,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static String getContactLastName(ContentResolver contentResolver, String phoneNumber) {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
+
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    // Contact exists, extract the first name from the display name
+                    String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                    String[] parts = contactName.split("\\s+"); // Split by whitespace
+                    return parts[0]; // Return the first part
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+        // Contact doesn't exist
+        return null;
+    }
+
     public static String getContactName(ContentResolver contentResolver, String phoneNumber) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
@@ -795,6 +845,7 @@ public class MainActivity extends AppCompatActivity {
         // Contact doesn't exist
         return null;
     }
+
     private Uri getContactPhotoUri(String contactID) {
         Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};

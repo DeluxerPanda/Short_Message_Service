@@ -126,7 +126,7 @@ public class PhoneListActivity extends AppCompatActivity {
             if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                 Map<String, String> curGroupMap = new HashMap<>();
                 groupData.add(curGroupMap);
-                curGroupMap.put("NAME", contactId);
+                curGroupMap.put("NAME", name);
                 curGroupMap.put("CONTACTID", contactId);
                 List<Map<String, String>> children = new ArrayList<>();
 
@@ -222,7 +222,6 @@ public class PhoneListActivity extends AppCompatActivity {
 
         };
 
-
         contactListView.setAdapter(adapter);
 
         if (contactListView.getAdapter().isEmpty()){
@@ -252,11 +251,12 @@ public class PhoneListActivity extends AppCompatActivity {
         contactListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
-                    setPhoneNumber(phoneNumber);
-                    return true;
-                }
+                String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
+                setPhoneNumber(phoneNumber);
+                return true;
+            }
         });
+
         contactListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             int lastExpandedGroupPosition = -1;
 
