@@ -24,18 +24,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -51,7 +48,6 @@ import androidx.fragment.app.DialogFragment;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -91,10 +87,9 @@ public class MainActivity extends AppCompatActivity {
     private int selectedOptionIndex;
     private  int permissionCheck;
 
-    private final int[] counterLeft = {0};
-    private int counterMax = 29;
-    HashMap<Integer, EditText> editTextMap = new HashMap<>();
-
+    private static final int[] counterLeft = {0};
+    private static int counterMax = 29;
+    static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
      //   int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
@@ -177,47 +172,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             //    while (counterLeft[0] != counterMax){
-
-                if (counterLeft[0] != counterMax) {
-                    counterLeft[0]++;
-                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
-                    LinearLayout parentLayout = findViewById(R.id.numbersContainer);
-                    hideKeyboard();
-
-                    View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.add_number_layout, null);
-
-                    // Generate a unique ID for the TextView
-                    int dynamicTextViewId = View.generateViewId();
-
-                    EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
-
-                //    dynamicEditText.setText("+" + counterLeft[0]);
-
-                    dynamicEditText.setId(dynamicTextViewId);
-                    editTextMap.put(dynamicTextViewId, dynamicEditText);
-                    ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
-                    contactButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            hideKeyboard();
-                            Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                           startActivityForResult(intent, dynamicTextViewId);
-                        }
-                    });
-
-                    ImageView deleteButton = dynamicTextViewLayout.findViewById(R.id.btnToDeleteNumber);
-                    deleteButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            parentLayout.removeView(dynamicTextViewLayout);
-                            counterLeft[0]--;
-                            addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
-                        }
-                    });
-
-                    // Add the dynamic TextView layout to the parent layout
-                    parentLayout.addView(dynamicTextViewLayout);
-                }
+                addMoreNumbers();
             }
         //    }
         });
@@ -316,9 +271,8 @@ public class MainActivity extends AppCompatActivity {
 
         Button pickDateStartButton = findViewById(R.id.SetDateStartText);
         pickDateStartButton.setOnClickListener(view -> {
-            showDatePicker();
+           showDatePicker();
         });
-
 
         Button chooseOptionButton = findViewById(R.id.selectedSendEvery);
         chooseOptionButton.setOnClickListener(new View.OnClickListener() {
@@ -357,6 +311,50 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
 
+    }
+
+    public void addMoreNumbers(){
+        if (counterLeft[0] != counterMax) {
+            TextView addNumbers = findViewById(R.id.addNumbers);
+            counterLeft[0]++;
+            addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
+            LinearLayout parentLayout = findViewById(R.id.numbersContainer);
+            hideKeyboard();
+
+            View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.add_number_layout, null);
+
+            // Generate a unique ID for the TextView
+            int dynamicTextViewId = View.generateViewId();
+
+            EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
+
+            //    dynamicEditText.setText("+" + counterLeft[0]);
+
+            dynamicEditText.setId(dynamicTextViewId);
+            editTextMap.put(dynamicTextViewId, dynamicEditText);
+            ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
+            contactButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    hideKeyboard();
+                    Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
+                    startActivityForResult(intent, dynamicTextViewId);
+                }
+            });
+
+            ImageView deleteButton = dynamicTextViewLayout.findViewById(R.id.btnToDeleteNumber);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    parentLayout.removeView(dynamicTextViewLayout);
+                    counterLeft[0]--;
+                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
+                }
+            });
+
+            // Add the dynamic TextView layout to the parent layout
+            parentLayout.addView(dynamicTextViewLayout);
+        }
     }
     public void History_info(){
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
@@ -484,7 +482,9 @@ public class MainActivity extends AppCompatActivity {
             dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertCreator.showAlertBox_for_History_info(v.getContext(),
+
+                    AlertCreator activity = new AlertCreator();
+                    activity.showAlertBox_for_History_info(v.getContext(),
                             title,
                             "\n" +
                                     phonenumber_result +
@@ -699,7 +699,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Retrieve a list of all alarms
-    public List<AlarmDetails> getAllAlarms(Context context) {
+    public static List<AlarmDetails> getAllAlarms(Context context) {
         List<AlarmDetails> alarmList = new ArrayList<>();
         SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
 
@@ -738,7 +738,7 @@ public class MainActivity extends AppCompatActivity {
 
         return alarmList;
     }
-    public static void deleteAlarm(int alarmId, Context context) {
+    public  void deleteAlarm(int alarmId, Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
@@ -770,6 +770,14 @@ public class MainActivity extends AppCompatActivity {
         Intent intenta = new Intent(context, MainActivity.class);
         intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intenta);
+    }
+
+    private static void hideKeyboard(@NonNull Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = ((Activity) context).getCurrentFocus();
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     public void hideKeyboard() {

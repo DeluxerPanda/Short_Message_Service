@@ -32,7 +32,6 @@
         android:clickable="true"
         android:contentDescription="To contacts"
         app:srcCompat="@drawable/ic_baseline_delete_outline"
-        app:tint="@color/md_theme_dark_error"
         tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
 
     <ImageView
@@ -45,7 +44,6 @@
         android:clickable="true"
         android:contentDescription="To Delete"
         app:srcCompat="@drawable/ic_baseline_import_contacts"
-        app:tint="@color/md_theme_dark_inversePrimary"
         tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
 
 </RelativeLayout>

@@ -44,7 +44,7 @@ public class AlertCreator {
         alertDialog.show();
     }
 
-    public static void showAlertBox_for_History_info(Context context, String title, String message, int alarmId) {
+    public void showAlertBox_for_History_info(Context context, String title, String message, int alarmId) {
         // Create an AlertDialog.Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         // Set the title and message for the dialog
@@ -69,7 +69,8 @@ public class AlertCreator {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(context, "Deleted: " + alarmId, Toast.LENGTH_LONG).show();
-                        MainActivity.deleteAlarm(alarmId, context);
+                        MainActivity mainActivity = new MainActivity();
+                        mainActivity.deleteAlarm(alarmId, context);
                     }
                 });
 
@@ -93,45 +94,4 @@ public class AlertCreator {
         // Create and show the dialog
         alertDialog.show();
     }
-    private static List<MainActivity.AlarmDetails> getAllAlarms(Context context) {
-        List<MainActivity.AlarmDetails> alarmList = new ArrayList<>();
-        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-
-        Set<Integer> uniqueAlarmIds = new HashSet<>();
-
-        // Iterate through all saved alarms and add them to the list
-        Map<String, ?> allEntries = preferences.getAll();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            String key = entry.getKey();
-
-            // Separate keys for triggerTime and releaseTime
-            String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
-
-            String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
-
-            String getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getPhonenumber = preferences.getString(getPhonenumberKey, String.valueOf(0));
-
-            String getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getMessage = preferences.getString(getMessageKey, String.valueOf(0));
-
-            String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
-
-            long triggerTime = preferences.getLong(triggerTimeKey, 0);
-
-            int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
-            if (!uniqueAlarmIds.contains(alarmId)) {
-
-                MainActivity.AlarmDetails alarmDetails = new MainActivity.AlarmDetails(alarmId, triggerTime,getRepeatSmS,getPhonenumber, getMessage);
-                alarmList.add(alarmDetails);
-
-                // Lägg till alarmId i set för att undvika dubbletter
-                uniqueAlarmIds.add(alarmId);
-            }
-        }
-
-        return alarmList;
-    }
-
-
 }
