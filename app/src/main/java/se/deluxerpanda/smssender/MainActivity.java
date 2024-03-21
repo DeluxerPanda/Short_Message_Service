@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         if (!hasSendSmsPermission()) {
             requestPermission();
         }
+        setContentView((R.layout.activity_main));
         // Use the current date as the default date in the picker.
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -121,8 +122,6 @@ public class MainActivity extends AppCompatActivity {
          minute = c.get(Calendar.MINUTE)+ 6;
         String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
         String timeText = String.format("%02d:%02d", hour, minute);
-
-        setContentView((R.layout.activity_main));
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
         String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
@@ -465,7 +464,7 @@ public class MainActivity extends AppCompatActivity {
 
             StringBuilder output = new StringBuilder();
             for (String word : words) {
-                output.append(getResources().getString(R.string.history_info_PhoneNumber_name)+" ").append(word.trim()).append("\n");
+                output.append(word.trim()).append(" "+contactName).append("\n");
             }
 
             String phonenumber_result = output.toString();
@@ -483,18 +482,27 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    AlertCreator activity = new AlertCreator();
-                    activity.showAlertBox_for_History_info(v.getContext(),
-                            title,
-                            "\n" +
-                                    phonenumber_result +
-                                    "\n"+getResources().getString(R.string.history_info_Message_name)+" "+message+
-                                    "\n\n"+getResources().getString(R.string.history_info_Date_name)+" "+formattedDateStart +
-                                    "\n"+getResources().getString(R.string.history_info_Time_name)+" "+formattedClockTime +
-                                    "\n"+getResources().getString(R.string.history_info_Repeat_name)+" "+getRepeatSmS +
-                                    "\n\nID: " + alarmId +
-                                    "\n\n"+getResources().getString(R.string.history_info_MoreSoon_name),
-                            alarmId);
+                    Intent intent = new Intent(MainActivity.this, HistoryProfileActivity.class);
+                    intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
+                    intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
+                    intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
+                    intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
+                    startActivity(intent);
+
+
+//                    AlertCreator activity = new AlertCreator();
+
+//                    activity.showAlertBox_for_History_info(v.getContext(),
+//                            title,
+//                            "\n" +
+//                                    phonenumber_result +
+//                                    "\n"+getResources().getString(R.string.history_info_Message_name)+" "+message+
+//                                    "\n\n"+getResources().getString(R.string.history_info_Date_name)+" "+formattedDateStart +
+//                                    "\n"+getResources().getString(R.string.history_info_Time_name)+" "+formattedClockTime +
+//                                    "\n"+getResources().getString(R.string.history_info_Repeat_name)+" "+getRepeatSmS +
+//                                    "\n\nID: " + alarmId +
+//                                    "\n\n"+getResources().getString(R.string.history_info_MoreSoon_name),
+//                            alarmId);
                 }
 
             });
@@ -770,6 +778,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intenta = new Intent(context, MainActivity.class);
         intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intenta);
+
     }
 
     private static void hideKeyboard(@NonNull Context context) {
@@ -854,7 +863,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private Uri getContactPhotoUri(String contactID) {
+    public Uri getContactPhotoUri(String contactID) {
         Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
         String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?";

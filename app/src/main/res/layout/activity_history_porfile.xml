@@ -42,6 +42,19 @@
                 android:src="@android:drawable/ic_media_rew"
                 tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
 
+            <ImageView
+                android:id="@+id/btnToDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:backgroundTintMode="src_over"
+                android:clickable="true"
+                android:contentDescription="To Delete"
+                app:srcCompat="@drawable/ic_baseline_delete_outline"
+                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+
             <TextView
                 android:id="@+id/Profile_History_ID_Title"
                 android:layout_width="match_parent"
@@ -69,12 +82,14 @@
                 android:layout_marginTop="0dp"
                 android:padding="15dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
+                <ImageView
+                    android:id="@+id/Profile_History_group_image"
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_person_24"
-                    tools:ignore="ImageContrastCheck" />
+                    android:src="@android:drawable/gallery_thumb"
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck"
+                    android:contentDescription="TODO" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -122,79 +137,58 @@
             android:layout_marginTop="10dp"
             app:cardCornerRadius="10dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/contact_name1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:lineSpacingExtra="16sp"
                 android:paddingStart="8dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="8dp"
-                android:orientation="horizontal">
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:singleLine="true"
-                    android:text="@string/app_contacts_name"
-                    android:textAllCaps="false"
-                    android:textSize="15sp" />
-
-                <TextView
-
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:alpha="@dimen/material_emphasis_medium"
-                    android:singleLine="true"
-                    android:text="@string/app_contacts_name"
-                    android:textAlignment="viewEnd"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    tools:ignore="TextContrastCheck" />
-            </LinearLayout>
+                android:text="@string/app_contacts_name"
+                android:textAlignment="viewStart"
+                android:textAllCaps="false"
+                android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/contact_name"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:lineSpacingExtra="16sp"
-                    android:paddingStart="8dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="8dp"
-                    android:singleLine="true"
-                    android:text="@string/app_contacts_name"
-                    android:textAlignment="viewStart"
-                    android:textAllCaps="false"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/contact_number"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:alpha="@dimen/material_emphasis_medium"
                     android:paddingStart="8dp"
                     android:paddingTop="8dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="8dp"
-                    android:singleLine="true"
                     android:text="@string/app_contacts_name"
-                    android:textAlignment="viewEnd"
+                    android:layout_gravity="top|right"
                     android:textAllCaps="false"
                     android:textSize="18sp"
-                    tools:ignore="TextContrastCheck" />
+                    tools:ignore="RtlHardcoded,TextContrastCheck" />
+
+                <ImageView
+                    android:id="@+id/btn_Edit_Contact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTintMode="src_over"
+                    android:clickable="true"
+                    android:paddingBottom="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingLeft="0dp"
+                    android:contentDescription="To Edit"
+                    android:layout_gravity="bottom|right"
+                    app:srcCompat="@drawable/ic_baseline_edit_24"
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
 
         <TextView
             android:id="@+id/App_Title"
@@ -220,17 +214,26 @@
                 android:orientation="vertical"
                 android:padding="15dp">
                     <TextView
-                        android:id="@+id/group_name"
+                        android:id="@+id/Profile_History_Message"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/demo_text_160"
                         android:textSize="18sp"
                         android:textStyle="bold"/>
+                <ImageView
+                    android:id="@+id/btn_Edit_Message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTintMode="src_over"
+                    android:clickable="true"
+                    android:contentDescription="To Edit"
+                    android:layout_gravity="bottom|right"
+                    app:srcCompat="@drawable/ic_baseline_edit_24"
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
-
     </LinearLayout>
 
 </ScrollView>

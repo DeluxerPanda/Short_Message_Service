@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".PhoneListActivity">
         </activity>
+        <activity android:name=".HistoryProfileActivity">
+        </activity>
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".BootCompleteReceiver" android:exported="false">
         <intent-filter>
