@@ -115,7 +115,36 @@
                         android:gravity="center"
                         android:singleLine="true"
                         android:textStyle="bold"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/Profile_History_Date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:text="@string/set_date_start_date"
+                    android:textAlignment="center"
+                    android:layout_gravity="center|top"
+                    android:textSize="14sp"
+                    android:textStyle="bold|italic"
+                    android:typeface="normal"
+                    tools:ignore="TextSizeCheck" />
 
+                    <TextView
+                        android:id="@+id/Profile_History_Time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-black"
+                        android:text="@string/set_time_clock"
+                        android:textAlignment="center"
+                        android:layout_alignEnd="@id/Profile_History_Date"
+                        android:textSize="14sp"
+                        android:layout_gravity="center|top"
+                        android:textStyle="bold|italic"
+                        android:typeface="normal"
+                        tools:ignore="TextSizeCheck" />
+                </RelativeLayout>
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
