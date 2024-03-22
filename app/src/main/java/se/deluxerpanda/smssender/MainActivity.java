@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-     //   int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        //   int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
-         hour = c.get(Calendar.HOUR_OF_DAY);
-         minute = c.get(Calendar.MINUTE)+ 6;
+        hour = c.get(Calendar.HOUR_OF_DAY);
+        minute = c.get(Calendar.MINUTE)+ 6;
         String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
         String timeText = String.format("%02d:%02d", hour, minute);
 
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 hideKeyboard();
                 Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-             int phoneNumberEditTextID = phoneNumberEditText.getId();
+                int phoneNumberEditTextID = phoneNumberEditText.getId();
                 startActivityForResult(intent, phoneNumberEditTextID);
             }
         });
@@ -170,10 +170,10 @@ public class MainActivity extends AppCompatActivity {
         addNumbers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            //    while (counterLeft[0] != counterMax){
+                //    while (counterLeft[0] != counterMax){
                 addMoreNumbers();
             }
-        //    }
+            //    }
         });
 
 
@@ -198,44 +198,44 @@ public class MainActivity extends AppCompatActivity {
             String repeatSmS = (String) selectedOptionText.getText();
             if (hasSendSmsPermission()) {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
-            if (message.length() <= 160) {
-                if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
-                    scheduleSMS(phonenumber,message);
-                    hideKeyboard();
-                    History_info();
+                    if (message.length() <= 160) {
+                        if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
+                            scheduleSMS(phonenumber,message);
+                            hideKeyboard();
+                            History_info();
 
-                }  else {
+                        }  else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                            builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
+                            builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
+                            builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            });
+                            builder.show();
+                        }
+                    } else {
                         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
-                    builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
+                        builder.setTitle(getResources().getString(R.string.sms_max_characters_titel));
+                        builder.setMessage(getResources().getString(R.string.sms_max_characters_Text)+ "\n"+
+                                getResources().getString(R.string.sms_max_characters_Text_int)+" "+message.length());
                         builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
                         });
-                        builder.show();
-                }
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getResources().getString(R.string.sms_max_characters_titel));
-                builder.setMessage(getResources().getString(R.string.sms_max_characters_Text)+ "\n"+
-                        getResources().getString(R.string.sms_max_characters_Text_int)+" "+message.length());
-                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
 
-                builder.show();
-            }
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getResources().getString(R.string.sms_number_or_masage_are_empty_titel));
-                builder.setMessage(getResources().getString(R.string.sms_number_or_masage_are_empty_text));
-                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+                        builder.show();
                     }
-                });
-                builder.show();
-            }
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle(getResources().getString(R.string.sms_number_or_masage_are_empty_titel));
+                    builder.setMessage(getResources().getString(R.string.sms_number_or_masage_are_empty_text));
+                    builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    builder.show();
+                }
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getResources().getString(R.string.sms_no_permission_sms_titel));
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button pickDateStartButton = findViewById(R.id.SetDateStartText);
         pickDateStartButton.setOnClickListener(view -> {
-           showDatePicker();
+            showDatePicker();
         });
 
         Button chooseOptionButton = findViewById(R.id.selectedSendEvery);
@@ -378,116 +378,116 @@ public class MainActivity extends AppCompatActivity {
             AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
             linearLayout.addView(AlarmListIsEmptyTextView);
         } else {
-        // Now you can use the alarmList as needed
-        for (AlarmDetails alarmDetails : alarmList) {
+            // Now you can use the alarmList as needed
+            for (AlarmDetails alarmDetails : alarmList) {
 
-            int alarmId = alarmDetails.getAlarmId();
+                int alarmId = alarmDetails.getAlarmId();
 
-           // long timeInMillis = alarmDetails.getTimeInMillis();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
+                // long timeInMillis = alarmDetails.getTimeInMillis();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
 
 
-            // Format the date and print the result
-            String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
-            String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
-            String getRepeatSmS = alarmDetails.getRepeatSmS();
-            String phonenumber = alarmDetails.getPhonenumber();
-            String message = alarmDetails.getMessage();
-            View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
+                // Format the date and print the result
+                String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
+                String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
+                String getRepeatSmS = alarmDetails.getRepeatSmS();
+                String phonenumber = alarmDetails.getPhonenumber();
+                String message = alarmDetails.getMessage();
+                View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
 
-            LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
+                LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
 
-            TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
+                TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
 
-            String title;
-            String inputString = phonenumber;
-            String contactName = null;
-            StringBuilder concatenatedNames = new StringBuilder();
-            int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-            ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
-            if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
-            ContentResolver contentResolver = getContentResolver();
+                String title;
+                String inputString = phonenumber;
+                String contactName = null;
+                StringBuilder concatenatedNames = new StringBuilder();
+                int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+                ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
+                if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
+                    ContentResolver contentResolver = getContentResolver();
 
-            if (phonenumber.contains(",")){
+                    if (phonenumber.contains(",")){
 // Creating a StringTokenizer object with delimiter ","
-                StringTokenizer tokenizer = new StringTokenizer(inputString, ",");
+                        StringTokenizer tokenizer = new StringTokenizer(inputString, ",");
 
-                int tokenCount = tokenizer.countTokens();
-                String[] stringArray = new String[tokenCount];
+                        int tokenCount = tokenizer.countTokens();
+                        String[] stringArray = new String[tokenCount];
 
 // Converting each token to array elements
-                for (int i = 0; i < tokenCount; i++) {
-                    stringArray[i] = tokenizer.nextToken();
-                }
+                        for (int i = 0; i < tokenCount; i++) {
+                            stringArray[i] = tokenizer.nextToken();
+                        }
 
 // Printing the output array
 
-                for (String element : stringArray) {
-                    contactName = getContactLastName(contentResolver, element);
-                    concatenatedNames.append(contactName).append(", ");
-                }
-                history_info_contact_name_TextView.setText(concatenatedNames);
-                title = String.valueOf(concatenatedNames);
-            }else {
+                        for (String element : stringArray) {
+                            contactName = getContactLastName(contentResolver, element);
+                            concatenatedNames.append(contactName).append(", ");
+                        }
+                        history_info_contact_name_TextView.setText(concatenatedNames);
+                        title = String.valueOf(concatenatedNames);
+                    }else {
 
 
-                contactName = getContactName(contentResolver, phonenumber);
-                if (contactName != null) {
-                    history_info_contact_name_TextView.setText(contactName);
-                    title = String.valueOf(contactName);
+                        contactName = getContactName(contentResolver, phonenumber);
+                        if (contactName != null) {
+                            history_info_contact_name_TextView.setText(contactName);
+                            title = String.valueOf(contactName);
+                        } else {
+                            history_info_contact_name_TextView.setText(phonenumber);
+                            title = String.valueOf(phonenumber);
+                        }
+                    }
+
                 } else {
                     history_info_contact_name_TextView.setText(phonenumber);
                     title = String.valueOf(phonenumber);
                 }
-            }
 
-            } else {
-                history_info_contact_name_TextView.setText(phonenumber);
-                title = String.valueOf(phonenumber);
-            }
+                Uri photoUri = getContactPhotoUri(contactName);
+                if (photoUri != null) {
+                    // Load the contact photo into the ImageView
+                    contactImageView.setImageURI(photoUri);
+                    // Create a rounded drawable and set it directly to the ImageView
+                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
+                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
+                    contactImageView.setImageDrawable(roundedDrawable);
 
-            Uri photoUri = getContactPhotoUri(contactName);
-            if (photoUri != null) {
-                // Load the contact photo into the ImageView
-                contactImageView.setImageURI(photoUri);
-                // Create a rounded drawable and set it directly to the ImageView
-                RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
-                roundedDrawable.setCircular(true); // Set to true if you want circular corners
-                contactImageView.setImageDrawable(roundedDrawable);
+                }else {
+                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                }
 
-            }else {
-                contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
-            }
+                String[] words = phonenumber.split(",");
 
-            String[] words = phonenumber.split(",");
+                StringBuilder output = new StringBuilder();
+                for (String word : words) {
+                    output.append(word.trim()).append(" "+contactName).append("\n");
+                }
 
-            StringBuilder output = new StringBuilder();
-            for (String word : words) {
-                output.append(word.trim()).append(" "+contactName).append("\n");
-            }
+                String phonenumber_result = output.toString();
 
-            String phonenumber_result = output.toString();
+                TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
+                history_info_message_TextView.setText(message);
 
-            TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
-            history_info_message_TextView.setText(message);
+                TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
 
-            TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
+                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
+                        + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
 
-            history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
-                    + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
+                linearLayout.addView(dynamicTextViewLayout);
+                dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
-            linearLayout.addView(dynamicTextViewLayout);
-            dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Intent intent = new Intent(MainActivity.this, HistoryProfileActivity.class);
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
-                    startActivity(intent);
+                        Intent intent = new Intent(MainActivity.this, HistoryProfileActivity.class);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
+                        startActivity(intent);
 
 
 //                    AlertCreator activity = new AlertCreator();
@@ -503,11 +503,11 @@ public class MainActivity extends AppCompatActivity {
 //                                    "\n\nID: " + alarmId +
 //                                    "\n\n"+getResources().getString(R.string.history_info_MoreSoon_name),
 //                            alarmId);
-                }
+                    }
 
-            });
+                });
+            }
         }
-    }
     }
 
     private void showDatePicker() {
@@ -540,7 +540,7 @@ public class MainActivity extends AppCompatActivity {
             SetTimeText.setText(" "+timeText);
         }
     }
-//time  Dialog (ends)
+    //time  Dialog (ends)
 //date  Dialog (starts)
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
@@ -557,14 +557,14 @@ public class MainActivity extends AppCompatActivity {
             Date date = new Date();
             datePickerDialog.getDatePicker().setMinDate(date.getTime()); // Set minimum date to now
 
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
-                    datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
+                datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
 
             return datePickerDialog;
@@ -573,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
 
-                SetDateStartText.setText(" " + formattedDate);
+            SetDateStartText.setText(" " + formattedDate);
         }
     }
 
@@ -589,42 +589,42 @@ public class MainActivity extends AppCompatActivity {
             Date date = sdf.parse(dateTimeString);
             long triggerTime = date.getTime();
 
-        String repeatSmS = (String) selectedOptionText.getText();
+            String repeatSmS = (String) selectedOptionText.getText();
 
-        day = getString(R.string.send_sms_every_day_text);
-        week = getString(R.string.send_sms_every_week_text);
-        month = getString(R.string.send_sms_every_month_text);
-        year = getString(R.string.send_sms_every_year_text);
+            day = getString(R.string.send_sms_every_day_text);
+            week = getString(R.string.send_sms_every_week_text);
+            month = getString(R.string.send_sms_every_month_text);
+            year = getString(R.string.send_sms_every_year_text);
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(this, AlarmReceiver.class);
+            Intent intent = new Intent(this, AlarmReceiver.class);
 
-        int alarmId = UUID.randomUUID().hashCode();
+            int alarmId = UUID.randomUUID().hashCode();
 
-        if (counterLeft[0] > 0){
-            StringBuilder allText = new StringBuilder();
+            if (counterLeft[0] > 0){
+                StringBuilder allText = new StringBuilder();
 
-            for (Map.Entry<Integer, EditText> entry : editTextMap.entrySet()) {
-                EditText editText = entry.getValue();
-                allText.append(editText.getText()).append(",");
+                for (Map.Entry<Integer, EditText> entry : editTextMap.entrySet()) {
+                    EditText editText = entry.getValue();
+                    allText.append(editText.getText()).append(",");
+                }
+                String strnum = allText.toString() + phonenumber;
+                intent.putExtra("EXTRA_PHONE_NUMBER", strnum);
+                phonenumber = strnum;
+            }else {
+                intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
             }
-            String strnum = allText.toString() + phonenumber;
-            intent.putExtra("EXTRA_PHONE_NUMBER", strnum);
-             phonenumber = strnum;
-        }else {
-            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-        }
-        intent.putExtra("EXTRA_MESSAGES", message);
-        intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
-        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
+            intent.putExtra("EXTRA_MESSAGES", message);
+            intent.putExtra("EXTRA_ALARMID", alarmId);
+            intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
+            intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
 
             startForegroundService(intent);
 
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
 
             long intervalMillis = 0;
@@ -639,11 +639,11 @@ public class MainActivity extends AppCompatActivity {
                 intervalMillis = AlarmManager.INTERVAL_DAY * 365;
             }
 
-                alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        pendingIntent
-                );
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerTime,
+                    pendingIntent
+            );
 
             saveAlarmDetails(this, alarmId, triggerTime,repeatSmS,phonenumber,message);
         } catch (ParseException e) {
