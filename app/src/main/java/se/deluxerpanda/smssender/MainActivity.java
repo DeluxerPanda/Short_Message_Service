@@ -864,6 +864,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Uri getContactPhotoUri(String contactID) {
+        if (contactID == null) {
+            return null;
+        }
         Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
         String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?";
