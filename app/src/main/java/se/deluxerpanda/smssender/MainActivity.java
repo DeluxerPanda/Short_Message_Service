@@ -403,6 +403,7 @@ public class MainActivity extends AppCompatActivity {
                 String title;
                 String inputString = phonenumber;
                 String contactName = null;
+                String photoUri_result = null;
                 StringBuilder concatenatedNames = new StringBuilder();
                 int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
                 ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
@@ -455,54 +456,61 @@ public class MainActivity extends AppCompatActivity {
                     RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
                     roundedDrawable.setCircular(true); // Set to true if you want circular corners
                     contactImageView.setImageDrawable(roundedDrawable);
+                    photoUri_result = photoUri.toString();
 
                 }else {
                     contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                    photoUri_result = null;
                 }
 
                 String[] words = phonenumber.split(",");
 
                 StringBuilder output = new StringBuilder();
                 for (String word : words) {
-                    output.append(word.trim()).append(" "+contactName).append("\n");
+                    if (contactName == null){
+                        contactName = " ";
+                    }
+                    output.append(word.trim()).append(" |&name|"+contactName).append("\n");
                 }
 
                 String phonenumber_result = output.toString();
+
+
+
+
 
                 TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
                 history_info_message_TextView.setText(message);
 
                 TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
 
-                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
-                        + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
+                String TimeAndDate = formattedDateStart +" | "+ formattedClockTime;
+
+             history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
+                     + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
 
                 linearLayout.addView(dynamicTextViewLayout);
+                String finalPhotoUri_result;
+
+                if (photoUri_result == null){
+                    finalPhotoUri_result = null;
+                }else {
+                    finalPhotoUri_result = photoUri_result;
+                }
+
                 dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
                         Intent intent = new Intent(MainActivity.this, HistoryProfileActivity.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
+
                         startActivity(intent);
-
-
-//                    AlertCreator activity = new AlertCreator();
-
-//                    activity.showAlertBox_for_History_info(v.getContext(),
-//                            title,
-//                            "\n" +
-//                                    phonenumber_result +
-//                                    "\n"+getResources().getString(R.string.history_info_Message_name)+" "+message+
-//                                    "\n\n"+getResources().getString(R.string.history_info_Date_name)+" "+formattedDateStart +
-//                                    "\n"+getResources().getString(R.string.history_info_Time_name)+" "+formattedClockTime +
-//                                    "\n"+getResources().getString(R.string.history_info_Repeat_name)+" "+getRepeatSmS +
-//                                    "\n\nID: " + alarmId +
-//                                    "\n\n"+getResources().getString(R.string.history_info_MoreSoon_name),
-//                            alarmId);
                     }
 
                 });

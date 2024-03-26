@@ -64,7 +64,11 @@
     <string name="history_info_Repeat_name">Repeat every:</string>
     <string name="history_info_MoreSoon_name">More coming soon!</string>
 
+    <string name="history_info_Profile_Send_to">Sends to:</string>
+
     <string name="Custom_name">Custom</string>
 
     <string name="demo_text_160">The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz,.</string>
+    <string name="puse">Pause</string>
+    <string name="send_now">Send now!</string>
 </resources>

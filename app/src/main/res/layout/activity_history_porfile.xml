@@ -70,16 +70,17 @@
         </RelativeLayout>
 
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             app:cardCornerRadius="10dp"
             android:layout_marginTop="20dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="0dp"
+                android:background="#333"
                 android:padding="15dp">
 
                 <ImageView
@@ -97,7 +98,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="10sp"
             app:cardCornerRadius="10dp">
 
             <LinearLayout
@@ -106,45 +107,44 @@
                 android:orientation="vertical"
                 android:padding="15dp">
 
-                    <TextView
-                        android:id="@+id/Profile_History_group_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/Custom_name"
-                        android:textSize="18sp"
-                        android:gravity="center"
-                        android:singleLine="true"
-                        android:textStyle="bold"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
                 <TextView
-                    android:id="@+id/Profile_History_Date"
+                    android:id="@+id/Profile_History_group_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-black"
-                    android:text="@string/set_date_start_date"
-                    android:textAlignment="center"
-                    android:layout_gravity="center|top"
-                    android:textSize="14sp"
-                    android:textStyle="bold|italic"
-                    android:typeface="normal"
-                    tools:ignore="TextSizeCheck" />
+                    android:gravity="center"
+                    android:singleLine="true"
+                    android:text="@string/Custom_name"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10sp"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/Profile_History_Time"
-                        android:layout_width="match_parent"
+                        android:id="@+id/history_info_date_and_time"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:text="@string/set_time_clock"
-                        android:textAlignment="center"
-                        android:layout_alignEnd="@id/Profile_History_Date"
-                        android:textSize="14sp"
-                        android:layout_gravity="center|top"
-                        android:textStyle="bold|italic"
-                        android:typeface="normal"
-                        tools:ignore="TextSizeCheck" />
-                </RelativeLayout>
+                        android:text="@string/set_date_start_date"
+                        android:textSize="15sp"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+                <ImageView
+                    android:id="@+id/btn_Edit_Date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:backgroundTintMode="src_over"
+                    android:clickable="true"
+                    android:contentDescription="To Edit"
+                    app:srcCompat="@drawable/ic_baseline_edit_24"
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -153,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-black"
-            android:text="@string/history_info_PhoneNumber_name"
+            android:text="@string/history_info_Profile_Send_to"
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold|italic"
@@ -163,18 +163,18 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            app:cardCornerRadius="10dp">
+            android:layout_marginTop="10sp"
+            app:cardCornerRadius="10sp">
 
             <TextView
-                android:id="@+id/contact_name1"
+                android:id="@+id/contact_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="16sp"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp"
+                android:paddingStart="8sp"
+                android:paddingTop="8sp"
+                android:paddingEnd="8sp"
+                android:paddingBottom="8sp"
                 android:text="@string/app_contacts_name"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
@@ -186,14 +186,14 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/contact_name"
+                    android:id="@+id/contact_name2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:alpha="@dimen/material_emphasis_medium"
-                    android:paddingStart="8dp"
-                    android:paddingTop="8dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="8dp"
+                    android:paddingStart="8sp"
+                    android:paddingTop="8sp"
+                    android:paddingEnd="8sp"
+                    android:paddingBottom="8sp"
                     android:text="@string/app_contacts_name"
                     android:layout_gravity="top|right"
                     android:textAllCaps="false"
@@ -206,8 +206,8 @@
                     android:layout_height="wrap_content"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
-                    android:paddingBottom="15dp"
-                    android:paddingRight="15dp"
+                    android:paddingBottom="15sp"
+                    android:paddingRight="15sp"
                     android:paddingLeft="0dp"
                     android:contentDescription="To Edit"
                     android:layout_gravity="bottom|right"
@@ -234,7 +234,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="10sp"
             app:cardCornerRadius="10dp">
 
             <LinearLayout
@@ -263,6 +263,40 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:padding="15dp">
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/puse"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <Button
+                android:id="@+id/button2"
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send_now"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
     </LinearLayout>
+
 
 </ScrollView>

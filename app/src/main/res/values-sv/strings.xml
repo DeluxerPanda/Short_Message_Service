@@ -67,6 +67,10 @@
     <string name="history_info_Repeat_name">Upprepa varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
 
+    <string name="history_info_Profile_Send_to">Skickas till:</string>
+
     <string name="Custom_name">Anpassad</string>
+    <string name="puse">Pausa</string>
+    <string name="send_now">Skicka nu!</string>
 
 </resources>
