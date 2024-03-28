@@ -33,20 +33,18 @@ public class ScheduledList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scheduled_list_layout);
-        History_info(ScheduledList.this);
+        ScheduledSMSList(ScheduledList.this);
         Intent intent = getIntent();
         // back button
         ImageView btnBack = findViewById(R.id.btnToMainSmsSchedulerPage);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ScheduledList.this, se.deluxerpanda.smssender.MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
+                finish();
             }
         });
     }
-    public void History_info(Context context){
+    public void ScheduledSMSList(Context context){
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
         linearLayout.destroyDrawingCache();

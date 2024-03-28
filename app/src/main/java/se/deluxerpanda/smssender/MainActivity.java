@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        //   int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             return true;
         }
@@ -176,18 +175,7 @@ public class MainActivity extends AppCompatActivity {
         addNumbers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //    while (counterLeft[0] != counterMax){
                 addMoreNumbers();
-            }
-            //    }
-        });
-
-        Button sendC = findViewById(R.id.sendC);
-        sendC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, se.deluxerpanda.scheduled.ScheduledList.class);
-                startActivity(intent);
             }
         });
 
@@ -326,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMoreNumbers(){
-        while (counterLeft[0] != counterMax) {
+        if (counterLeft[0] != counterMax) {
             TextView addNumbers = findViewById(R.id.addNumbers);
             counterLeft[0]++;
             addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
@@ -340,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
 
             EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
 
-                dynamicEditText.setText("+" + counterLeft[0] +"123");
+           //     dynamicEditText.setText("+" + counterLeft[0] +"123");
 
             dynamicEditText.setId(dynamicTextViewId);
             editTextMap.put(dynamicTextViewId, dynamicEditText);
@@ -377,9 +365,6 @@ public class MainActivity extends AppCompatActivity {
 
     //time Dialog (start)
     public void History_info(){
-        Snackbar.make(findViewById(R.id.app_backgrund), "A SMS has been Scheduled. "+"\n"+" View it in \"Scheduled SMS\"",
-                        Snackbar.LENGTH_LONG).show();
-
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
         linearLayout.destroyDrawingCache();

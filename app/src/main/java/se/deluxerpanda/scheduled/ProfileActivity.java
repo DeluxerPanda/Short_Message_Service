@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,7 +20,7 @@ public class ProfileActivity extends AppCompatActivity{
     private String title;
     private String PhoneNumber;
     private String contactName;
-    private String TimeAndDate;
+    private String timeAndDate;
     private Uri photoUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +33,7 @@ public class ProfileActivity extends AppCompatActivity{
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, se.deluxerpanda.scheduled.ScheduledList.class);
-                startActivity(intent);
+          finish();
             }
         });
 
@@ -65,33 +65,43 @@ public class ProfileActivity extends AppCompatActivity{
         TextView testTitle = findViewById(R.id.Profile_History_group_name);
         testTitle.setText(title);
 
-        TimeAndDate = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE");
-        TextView testTimeAndDate = findViewById(R.id.history_info_date_and_time);
-        testTimeAndDate.setText(TimeAndDate);
+        timeAndDate = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE");
+        TextView TimeAndDate = findViewById(R.id.history_info_date_and_time);
+        TimeAndDate.setText(timeAndDate);
 
-
+        ImageView btnTimeAndDate = findViewById(R.id.btn_Edit_Date);
+        btnTimeAndDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         PhoneNumber = intent.getStringExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER");
         TextView testPhoneNumber = findViewById(R.id.contact_name);
         testPhoneNumber.setText(PhoneNumber);
 
-        // back button
         ImageView btnPhoneNumber = findViewById(R.id.btn_Edit_Contacts);
         btnPhoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, se.deluxerpanda.scheduled.ProfileEditorActivity.class);
-                startActivity(intent);
-
+                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
             }
         });
 
 
 
         message = intent.getStringExtra("EXTRA_HISTORY_PROFILE_MESSAGE");
-        TextView testMessage = findViewById(R.id.Profile_History_Message);
-        testMessage.setText(message);
+        TextView Message = findViewById(R.id.Profile_History_Message);
+        Message.setText(message);
 
+        ImageView btnMessage = findViewById(R.id.btn_Edit_Message);
+        btnMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         }
 
