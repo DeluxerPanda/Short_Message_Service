@@ -18,13 +18,14 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/Profile_History_App_Title"
+                android:id="@+id/Profile_History_group_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:text="@string/history_name"
                 android:textAlignment="center"
                 android:textSize="24sp"
+                android:singleLine="true"
                 android:textStyle="bold|italic"
                 android:typeface="normal"
                 tools:ignore="TextSizeCheck" />
@@ -33,8 +34,8 @@
                 android:id="@+id/btnToMainSmsSchedulerPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@id/Profile_History_App_Title"
-                android:layout_alignTop="@id/Profile_History_App_Title"
+                android:layout_alignStart="@id/Profile_History_group_name"
+                android:layout_alignTop="@id/Profile_History_group_name"
                 android:layout_marginStart="8dp"
                 android:backgroundTintMode="src_over"
                 android:clickable="true"
@@ -60,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:layout_below="@id/Profile_History_App_Title"
+                android:layout_below="@id/Profile_History_group_name"
                 android:text="@string/Custom_name"
                 android:textAlignment="center"
                 android:textSize="14sp"
@@ -107,16 +108,6 @@
                 android:orientation="vertical"
                 android:padding="15dp">
 
-                <TextView
-                    android:id="@+id/Profile_History_group_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:singleLine="true"
-                    android:text="@string/Custom_name"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -165,10 +156,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10sp"
             app:cardCornerRadius="10sp">
-
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="15dp">
             <TextView
                 android:id="@+id/contact_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="16sp"
                 android:paddingStart="8sp"
@@ -180,39 +175,17 @@
                 android:textAllCaps="false"
                 android:textSize="15sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/contact_name2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:alpha="@dimen/material_emphasis_medium"
-                    android:paddingStart="8sp"
-                    android:paddingTop="8sp"
-                    android:paddingEnd="8sp"
-                    android:paddingBottom="8sp"
-                    android:text="@string/app_contacts_name"
-                    android:layout_gravity="top|right"
-                    android:textAllCaps="false"
-                    android:textSize="18sp"
-                    tools:ignore="RtlHardcoded,TextContrastCheck" />
-
                 <ImageView
-                    android:id="@+id/btn_Edit_Contact"
+                    android:id="@+id/btn_Edit_Contacts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
-                    android:paddingBottom="15sp"
-                    android:paddingRight="15sp"
-                    android:paddingLeft="0dp"
                     android:contentDescription="To Edit"
                     android:layout_gravity="bottom|right"
                     app:srcCompat="@drawable/ic_baseline_edit_24"
                     tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+
 
             </LinearLayout>
 

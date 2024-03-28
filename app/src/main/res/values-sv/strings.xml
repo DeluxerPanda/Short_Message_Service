@@ -23,7 +23,7 @@
     <string name="send_sms_every_month_text">Månad</string>
     <string name="send_sms_every_year_text">År</string>
 
-    <string name="history_name">Historik</string>
+    <string name="history_name">Schemalagda SMS</string>
     <string name="sms_notify_message_sent_number_text">Skicka till:</string>
     <string name="sms_notify_message_sent_message_text">Meddelande:</string>
 

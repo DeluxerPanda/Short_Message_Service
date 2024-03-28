@@ -1,23 +1,18 @@
-package se.deluxerpanda.smssender;
+package se.deluxerpanda.scheduled;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
-public class HistoryProfileActivity extends AppCompatActivity {
+import se.deluxerpanda.smssender.MainActivity;
+import se.deluxerpanda.smssender.R;
+
+public class ProfileActivity extends AppCompatActivity{
 
     private int alarmId;
     private String message;
@@ -30,13 +25,15 @@ public class HistoryProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_porfile);
+
         Intent intent = getIntent();
         // back button
         ImageView btnBack = findViewById(R.id.btnToMainSmsSchedulerPage);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                Intent intent = new Intent(ProfileActivity.this, se.deluxerpanda.scheduled.ScheduledList.class);
+                startActivity(intent);
             }
         });
 
@@ -46,7 +43,7 @@ public class HistoryProfileActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.deleteAlarm(alarmId, HistoryProfileActivity.this);
+                mainActivity.deleteAlarm(alarmId, ProfileActivity.this);
                 finish();
             }
         });
@@ -75,29 +72,28 @@ public class HistoryProfileActivity extends AppCompatActivity {
 
 
         PhoneNumber = intent.getStringExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER");
-
-        int delimiterIndex = PhoneNumber.indexOf("|&name|");
-        String extractedString = null;
-        if (delimiterIndex != -1) {
-            extractedString = PhoneNumber.substring(delimiterIndex + "|&name|".length());
-            PhoneNumber = PhoneNumber.replace("|&name|" + extractedString, "");
-        } else {
-            extractedString = null;
-        }
-
-
-
         TextView testPhoneNumber = findViewById(R.id.contact_name);
-        TextView testPhoneNumber2 = findViewById(R.id.contact_name2);
         testPhoneNumber.setText(PhoneNumber);
-        if (extractedString != null){
-            testPhoneNumber2.setText(extractedString);
-        }
+
+        // back button
+        ImageView btnPhoneNumber = findViewById(R.id.btn_Edit_Contacts);
+        btnPhoneNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, se.deluxerpanda.scheduled.ProfileEditorActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
 
 
         message = intent.getStringExtra("EXTRA_HISTORY_PROFILE_MESSAGE");
         TextView testMessage = findViewById(R.id.Profile_History_Message);
         testMessage.setText(message);
+
+
         }
+
     }
 

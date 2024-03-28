@@ -1,5 +1,6 @@
 package se.deluxerpanda.smssender;
 
+
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,8 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.telephony.SmsManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -19,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+
+import se.deluxerpanda.scheduled.ProfileActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -37,11 +38,12 @@ private String year;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SmsManager smsManager = SmsManager.getDefault();
+   //     SmsManager smsManager = SmsManager.getDefault();
+
+        SmsManager smsManager = (SmsManager) context.getSystemService(SmsManager.class);
+
 
         phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
-
-      //  Phonenumber_Multi = intent.getStringExtra("EXTRA_PHONE_NUMBER_MULTI");
 
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
@@ -134,7 +136,9 @@ private String year;
         int notificationId = random.nextInt();
 
         // Create an intent for the notification
-        Intent notificationIntent = new Intent(context, MainActivity.class);
+       // Intent notificationIntent = new Intent(context, MainActivity.class);
+        Intent notificationIntent = new Intent(context, ProfileActivity.class);
+        notificationIntent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
 
         builder.setContentIntent(pendingIntent);

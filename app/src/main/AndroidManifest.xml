@@ -35,7 +35,9 @@
         </activity>
         <activity android:name=".PhoneListActivity">
         </activity>
-        <activity android:name=".HistoryProfileActivity">
+        <activity android:name="se.deluxerpanda.scheduled.ProfileActivity">
+        </activity>
+        <activity android:name="se.deluxerpanda.scheduled.ScheduledList">
         </activity>
         <receiver android:name=".AlarmReceiver" />
         <receiver android:name=".BootCompleteReceiver" android:exported="false">

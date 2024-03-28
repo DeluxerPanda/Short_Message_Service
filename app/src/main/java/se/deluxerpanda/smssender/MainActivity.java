@@ -45,6 +45,8 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +60,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
+
+import se.deluxerpanda.scheduled.ProfileActivity;
+import se.deluxerpanda.scheduled.ScheduledList;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
@@ -87,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
     private int selectedOptionIndex;
     private  int permissionCheck;
 
-    private static final int[] counterLeft = {0};
+    private static int[] counterLeft = {0};
     private static int counterMax = 29;
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             requestPermission();
         }
         setContentView((R.layout.activity_main));
+        counterLeft = new int[]{0};
         // Use the current date as the default date in the picker.
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
@@ -176,7 +182,14 @@ public class MainActivity extends AppCompatActivity {
             //    }
         });
 
-
+        Button sendC = findViewById(R.id.sendC);
+        sendC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, se.deluxerpanda.scheduled.ScheduledList.class);
+                startActivity(intent);
+            }
+        });
 
         Button sendButton = findViewById(R.id.sendB);
         sendButton.setOnClickListener(view -> {
@@ -280,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 showOptionsDialog();
             }
         });
-        History_info();
+     //   History_info();
     }
 
     public void showOptionsDialog() {
@@ -313,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMoreNumbers(){
-        if (counterLeft[0] != counterMax) {
+        while (counterLeft[0] != counterMax) {
             TextView addNumbers = findViewById(R.id.addNumbers);
             counterLeft[0]++;
             addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
@@ -327,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
             EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
 
-            //    dynamicEditText.setText("+" + counterLeft[0]);
+                dynamicEditText.setText("+" + counterLeft[0] +"123");
 
             dynamicEditText.setId(dynamicTextViewId);
             editTextMap.put(dynamicTextViewId, dynamicEditText);
@@ -355,23 +368,29 @@ public class MainActivity extends AppCompatActivity {
             parentLayout.addView(dynamicTextViewLayout);
         }
     }
+    private void showDatePicker() {
+        DatePickerFragment datePickerFragment = new DatePickerFragment();
+
+        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+
+    //time Dialog (start)
     public void History_info(){
+        Snackbar.make(findViewById(R.id.app_backgrund), "A SMS has been Scheduled. "+"\n"+" View it in \"Scheduled SMS\"",
+                        Snackbar.LENGTH_LONG).show();
+
         LinearLayout parentLayout = findViewById(R.id.app_backgrund);
         LinearLayout linearLayout = (LinearLayout) parentLayout;
         linearLayout.destroyDrawingCache();
         linearLayout.removeAllViews();
-
         List<AlarmDetails> alarmList = getAllAlarms(this);
-
         if (alarmList.isEmpty()) {
             TextView AlarmListIsEmptyTextView = new TextView(this);
-
-
             // Add your dynamic TextView here
             AlarmListIsEmptyTextView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
-
             AlarmListIsEmptyTextView.setText(getResources().getString(R.string.history_info_no_SMS_scheduled));
             AlarmListIsEmptyTextView.setTextSize(20);
             AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
@@ -380,14 +399,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Now you can use the alarmList as needed
             for (AlarmDetails alarmDetails : alarmList) {
-
                 int alarmId = alarmDetails.getAlarmId();
-
                 // long timeInMillis = alarmDetails.getTimeInMillis();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
-
-
                 // Format the date and print the result
                 String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
                 String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
@@ -395,11 +410,8 @@ public class MainActivity extends AppCompatActivity {
                 String phonenumber = alarmDetails.getPhonenumber();
                 String message = alarmDetails.getMessage();
                 View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
-
                 LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
-
                 TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
-
                 String title;
                 String inputString = phonenumber;
                 String contactName = null;
@@ -409,21 +421,16 @@ public class MainActivity extends AppCompatActivity {
                 ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
                 if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
                     ContentResolver contentResolver = getContentResolver();
-
                     if (phonenumber.contains(",")){
 // Creating a StringTokenizer object with delimiter ","
                         StringTokenizer tokenizer = new StringTokenizer(inputString, ",");
-
                         int tokenCount = tokenizer.countTokens();
                         String[] stringArray = new String[tokenCount];
-
 // Converting each token to array elements
                         for (int i = 0; i < tokenCount; i++) {
                             stringArray[i] = tokenizer.nextToken();
                         }
-
 // Printing the output array
-
                         for (String element : stringArray) {
                             contactName = getContactLastName(contentResolver, element);
                             concatenatedNames.append(contactName).append(", ");
@@ -431,8 +438,6 @@ public class MainActivity extends AppCompatActivity {
                         history_info_contact_name_TextView.setText(concatenatedNames);
                         title = String.valueOf(concatenatedNames);
                     }else {
-
-
                         contactName = getContactName(contentResolver, phonenumber);
                         if (contactName != null) {
                             history_info_contact_name_TextView.setText(contactName);
@@ -442,12 +447,10 @@ public class MainActivity extends AppCompatActivity {
                             title = String.valueOf(phonenumber);
                         }
                     }
-
                 } else {
                     history_info_contact_name_TextView.setText(phonenumber);
                     title = String.valueOf(phonenumber);
                 }
-
                 Uri photoUri = getContactPhotoUri(contactName);
                 if (photoUri != null) {
                     // Load the contact photo into the ImageView
@@ -457,77 +460,48 @@ public class MainActivity extends AppCompatActivity {
                     roundedDrawable.setCircular(true); // Set to true if you want circular corners
                     contactImageView.setImageDrawable(roundedDrawable);
                     photoUri_result = photoUri.toString();
-
                 }else {
                     contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
                     photoUri_result = null;
                 }
-
                 String[] words = phonenumber.split(",");
-
                 StringBuilder output = new StringBuilder();
                 for (String word : words) {
-                    if (contactName == null){
-                        contactName = " ";
-                    }
-                    output.append(word.trim()).append(" |&name|"+contactName).append("\n");
+                    output.append(word.trim()).append("\n");
                 }
-
                 String phonenumber_result = output.toString();
-
-
-
-
-
                 TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
                 history_info_message_TextView.setText(message);
-
                 TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
-
                 String TimeAndDate = formattedDateStart +" | "+ formattedClockTime;
-
-             history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
-                     + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
-
+                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
+                        + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
                 linearLayout.addView(dynamicTextViewLayout);
                 String finalPhotoUri_result;
-
                 if (photoUri_result == null){
                     finalPhotoUri_result = null;
                 }else {
                     finalPhotoUri_result = photoUri_result;
                 }
-
                 dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-
-                        Intent intent = new Intent(MainActivity.this, HistoryProfileActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
-
                         startActivity(intent);
                     }
-
                 });
             }
         }
     }
-
-    private void showDatePicker() {
-        DatePickerFragment datePickerFragment = new DatePickerFragment();
-
-        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-    }
-
-
-    //time Dialog (start)
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
