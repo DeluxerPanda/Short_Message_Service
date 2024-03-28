@@ -6,4 +6,5 @@
 ### - [Features]
 - Users have the ability for SMS scheduling on a daily, weekly, monthly, or yearly basis.
 - Users have the ability to get numbers from contact book
+- User can add multiple numbers
 - More coming soon!
