@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">Short Message Service</string>
+    <string name="app_name_short">SMS app</string>
     <string name="app_screen_name">Sms Scheduler</string>
+    <string name="app_contacts_name">Contacts</string>
 
     <string name="text_hint_phone_number">Enter Phone Number</string>
+    <string name="text_add_phone_number">Add more numbers:</string>
     <string name="text_hint_message">Enter message\n(max 160 characters)</string>
 
-    <string name="schedule_sms_button_text">Schedule sms</string>
+    <string name="schedule_sms_button_text">Schedule SMS</string>
 
     <string name="set_time_button_text">Set time</string>
     <string name="set_time_clock">00:00</string>
@@ -19,7 +22,7 @@
     <string name="send_sms_every_month_text">Month</string>
     <string name="send_sms_every_year_text">Year</string>
 
-    <string name="history_name">History</string>
+    <string name="history_name">Scheduled SMS</string>
     <string name="sms_notify_message_sent_number_text">Sent to:</string>
     <string name="sms_notify_message_sent_message_text">Message:</string>
 
@@ -31,8 +34,11 @@
     <string name="sms_max_characters_Text">The maximum character limit is 160</string>
     <string name="sms_max_characters_Text_int">not</string>
 
-    <string name="sms_no_permission_titel">The app dont have permission</string>
-    <string name="sms_no_permission_text">You must allow the app to send SMS</string>
+    <string name="sms_no_permission_contacts_titel">Give Short Message Service access to Contacts</string>
+    <string name="sms_no_permission_contacts_text">This allows you to see all your contacts in your phone book. and then you can click on one of the contacts to avoid entering the number manually</string>
+
+    <string name="sms_no_permission_sms_titel">Give Short Message Service access to SMS</string>
+    <string name="sms_no_permission_sms_text">This makes your scheduled SMS to be sent</string>
 
     <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
     <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
@@ -40,7 +46,29 @@
     <string name="text_ok">Ok</string>
     <string name="text_Cancel">Cancel</string>
 
-    <string name="open_nav">open_nav</string>
-    <string name="close_nav">close_nav</string>
+    <string name="text_ask_give_permission_settings">Open settings</string>
+
+    <string name="text_ask_give_permission">Give permission</string>
+    <string name="text_ask_NO_permisson">NO!</string>
+
+    <string name="No_contacts_found">No contacts found</string>
+
     <string name="todo">TODO</string>
+    <string name="empty">.</string>
+    <string name="history_info_no_SMS_scheduled">There are no SMS scheduled</string>
+
+    <string name="history_info_PhoneNumber_name">Phone number:</string>
+    <string name="history_info_Message_name">Message:</string>
+    <string name="history_info_Date_name">Date:</string>
+    <string name="history_info_Time_name">Time:</string>
+    <string name="history_info_Repeat_name">Repeat every:</string>
+    <string name="history_info_MoreSoon_name">More coming soon!</string>
+
+    <string name="history_info_Profile_Send_to">Sends to:</string>
+
+    <string name="Custom_name">Custom</string>
+
+    <string name="demo_text_160">The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz,.</string>
+    <string name="puse">Pause</string>
+    <string name="send_now">Send now!</string>
 </resources>

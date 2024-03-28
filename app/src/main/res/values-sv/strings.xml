@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Short Message Service</string>
+    <string name="app_name_short">SMS app</string>
+    <string name="app_screen_name">Sms Schemaläggare</string>
+    <string name="app_contacts_name">Kontakter</string>
+
+    <string name="text_hint_phone_number">Skriv in telefonnummer</string>
+    <string name="text_add_phone_number">Lägg till fler nummer:</string>
+    <string name="text_hint_message">Skriv meddelande\n(max 160 tecken)</string>
+
+    <string name="schedule_sms_button_text">Schemalägg SMS</string>
+
+    <string name="set_time_button_text">Sätt tid</string>
+    <string name="set_time_clock">00:00</string>
+
+    <string name="set_date_start_button_text">sms börjar</string>
+    <string name="set_date_start_date">0000–00–00</string>
+
+    <string name="send_sms_every_text">sms skickas varje</string>
+    <string name="send_sms_every_day_text">Dag</string>
+    <string name="send_sms_every_week_text">Vecka</string>
+    <string name="send_sms_every_month_text">Månad</string>
+    <string name="send_sms_every_year_text">År</string>
+
+    <string name="history_name">Schemalagda SMS</string>
+    <string name="sms_notify_message_sent_number_text">Skicka till:</string>
+    <string name="sms_notify_message_sent_message_text">Meddelande:</string>
+
+
+    <string name="sms_time_travel_titel">Du kan inte gå tillbaka i tiden</string>
+    <string name="sms_time_travel_Text">Den här tiden har passerat. Välj annan tid</string>
+
+    <string name="sms_max_characters_titel">Max antal tecken har uppnåtts</string>
+    <string name="sms_max_characters_Text">Den maximala teckengränsen är 160</string>
+    <string name="sms_max_characters_Text_int">inte</string>
+
+    <string name="sms_no_permission_contacts_titel">Ge Short Message Service åtkomst till Kontakter</string>
+    <string name="sms_no_permission_contacts_text">Detta gör att du kan se alla dina kontakter i din telefonbok. och sedan kan du klicka på en av kontakterna för att undvika att ange numret manuellt</string>
+
+    <string name="sms_no_permission_sms_titel">Ge Short Message Service åtkomst till SMS</string>
+    <string name="sms_no_permission_sms_text">Detta gör att ditt schemalagda SMS skickas</string>
+
+
+    <string name="sms_number_or_masage_are_empty_titel">Nummer och meddelande krävs</string>
+    <string name="sms_number_or_masage_are_empty_text">Ange både telefonnummer och meddelande.</string>
+
+    <string name="text_ok">Ok</string>
+    <string name="text_Cancel">avbryt</string>
+
+    <string name="text_ask_give_permission_settings">Öppna inställningar</string>
+
+    <string name="text_ask_give_permission">Ge tillåtelse</string>
+    <string name="text_ask_NO_permisson">Nej!</string>
+
+    <string name="No_contacts_found">Inga kontakter hittades</string>
+
+    <string name="todo">TODO</string>
+    <string name="empty">.</string>
+
+    <string name="history_info_no_SMS_scheduled">Det finns inga schemalagda SMS</string>
+
+    <string name="history_info_PhoneNumber_name">Telefonnummer:</string>
+    <string name="history_info_Message_name">Meddelande:</string>
+    <string name="history_info_Date_name">Datum:</string>
+    <string name="history_info_Time_name">Tid:</string>
+    <string name="history_info_Repeat_name">Upprepa varje:</string>
+    <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
+
+    <string name="history_info_Profile_Send_to">Skickas till:</string>
+
+    <string name="Custom_name">Anpassad</string>
+    <string name="puse">Pausa</string>
+    <string name="send_now">Skicka nu!</string>
+
+</resources>

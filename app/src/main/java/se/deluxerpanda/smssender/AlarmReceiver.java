@@ -1,5 +1,6 @@
 package se.deluxerpanda.smssender;
 
+
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,19 +10,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.telephony.SmsManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+
+import se.deluxerpanda.scheduled.ProfileActivity;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
 private String phonenumber;
+private String Phonenumber_Multi;
 private String message;
 private long triggerTime;
 private  String repeatSmS;
@@ -35,9 +38,13 @@ private String year;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        SmsManager smsManager = SmsManager.getDefault();
+   //     SmsManager smsManager = SmsManager.getDefault();
+
+        SmsManager smsManager = (SmsManager) context.getSystemService(SmsManager.class);
+
 
         phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
+
         message = intent.getStringExtra("EXTRA_MESSAGES");
 
         triggerTime = intent.getLongExtra("EXTRA_TRIGGERTIME",0);
@@ -46,22 +53,22 @@ private String year;
 
         alarmId = Integer.parseInt(String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0)));
 
-
-            rescheduleAlarm(phonenumber,message, context, triggerTime, repeatSmS, alarmId);
-
-
-        smsManager.sendTextMessage(phonenumber, null, message, null, null);
-
-        Toast.makeText(context, "SMS sent to " + phonenumber + "\nmessage: " + message + "\nAlarmid: " + alarmId, Toast.LENGTH_LONG).show();
-
+        if (phonenumber.contains(",")) {
+            Phonenumber_Multi = phonenumber;
+            String[] phoneNumbersArray = phonenumber.split(",\\s*");
+            for (String phoneNumber : phoneNumbersArray) {
+                ArrayList<String> parts = smsManager.divideMessage(message);
+                smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+            }
+        }else {
+            Phonenumber_Multi = "false";
+            smsManager.sendTextMessage(phonenumber, null, message, null, null);
+        }
+        rescheduleAlarm(phonenumber,Phonenumber_Multi,message, context, triggerTime, repeatSmS, alarmId);
         sendNotification(context);
-
-   //     MainActivity.removeAlarm(context, Integer.parseInt(alarmId));
-        Log.d("AlarmDetails",
-                "alarmReceiver done!");
     }
 
-    private void rescheduleAlarm(String phonenumber, String message, Context context, long triggerTime, String repeatSmS, int alarmId) {
+    private void rescheduleAlarm(String phonenumber,String Phonenumber_Multi, String message, Context context, long triggerTime, String repeatSmS, int alarmId) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date date = new Date(triggerTime);
@@ -89,11 +96,17 @@ private String year;
 
         Intent intent = new Intent(context, AlarmReceiver.class);
 
-        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-        intent.putExtra("EXTRA_MESSAGES", message);
-        intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_TRIGGERTIME", newtriggerTime);
-        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
+        if (Phonenumber_Multi != "false"){
+            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+        }else {
+            intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
+        }
+            intent.putExtra("EXTRA_MESSAGES", message);
+            intent.putExtra("EXTRA_ALARMID", alarmId);
+            intent.putExtra("EXTRA_TRIGGERTIME", newtriggerTime);
+            intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
+
+
 
         context.startForegroundService(intent);
 
@@ -123,7 +136,9 @@ private String year;
         int notificationId = random.nextInt();
 
         // Create an intent for the notification
-        Intent notificationIntent = new Intent(context, MainActivity.class);
+       // Intent notificationIntent = new Intent(context, MainActivity.class);
+        Intent notificationIntent = new Intent(context, ProfileActivity.class);
+        notificationIntent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
 
         builder.setContentIntent(pendingIntent);

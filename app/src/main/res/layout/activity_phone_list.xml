@@ -1,5 +1,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,11 +8,11 @@
     android:paddingLeft="16dp"
     android:paddingTop="16dp"
     android:paddingRight="16dp"
-    android:paddingBottom="16dp"
-    tools:context=".MainActivity">
+    android:paddingBottom="16dp">
+
     <androidx.gridlayout.widget.GridLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="48dp">
 
 
         <RelativeLayout
@@ -23,12 +24,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:text="@string/app_screen_name"
+                android:text="@string/app_contacts_name"
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold|italic"
                 android:typeface="normal"
                 tools:ignore="TextSizeCheck" />
+
             <ImageView
 
                 android:id="@+id/btnToMainSmsSchedulerPage"
@@ -47,8 +49,58 @@
 
     </androidx.gridlayout.widget.GridLayout>
 
+
     <ExpandableListView
-        android:id="@+id/spinner"
+        android:id="@+id/Phone_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:groupIndicator="@null" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/Phone_list_TextBox_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="188dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/empty"
+            android:fontFamily="sans-serif"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/Phone_list_TextBox_text2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UnknownId" />
+
+        <TextView
+            android:id="@+id/Phone_list_TextBox_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="64dp"
+            android:fontFamily="sans-serif"
+            android:text="@string/empty"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/Phone_list_TextBox_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="UnknownId" />
+
+        <Button
+            android:id="@+id/Phone_list_TextBox_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty"
+            app:layout_constraintBottom_toBottomOf="@+id/Phone_list_TextBox_text2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>
+

@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,7 +28,7 @@
             android:typeface="normal"
             tools:ignore="TextSizeCheck" />
         <ImageView
-
+            android:visibility="invisible"
             android:id="@+id/btnToHamburger"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,40 +42,71 @@
             tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
     </RelativeLayout>
 
-
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/numbersContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/phoneNumberEditText"
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/phoneNumberEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="phone"
+                android:hint="@string/text_hint_phone_number"
+                android:inputType="phone"
+                android:textAlignment="center"
+                android:textColorHint="#A1887F"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:ignore="VisualLintTextFieldSize" />
+
+            <ImageView
+                android:id="@+id/btnToContacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/phoneNumberEditText"
+                android:layout_alignBottom="@id/phoneNumberEditText"
+                android:layout_alignParentTop="true"
+
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTintMode="src_over"
+                android:clickable="true"
+                android:contentDescription="To contacts"
+                app:srcCompat="@drawable/ic_baseline_import_contacts"
+                app:tint="@color/md_theme_dark_inversePrimary"
+                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    tools:ignore="UselessLeaf" />
+        </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:ignore="UselessLeaf" />
+
+        <TextView
+
+            android:id="@+id/addNumbers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="phone"
-            android:hint="@string/text_hint_phone_number"
-            android:inputType="phone"
-            android:textAlignment="center"
-            android:textColorHint="#A1887F"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            tools:ignore="VisualLintTextFieldSize" />
+            android:text="@string/text_add_phone_number"
+            android:textAlignment="viewStart"
+            android:textColor="#00BCD4"
+            android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/btnToContacts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@id/phoneNumberEditText"
-            android:layout_alignBottom="@id/phoneNumberEditText"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTintMode="src_over"
-            android:clickable="true"
-            android:contentDescription="To contacts"
-            android:src="@android:drawable/ic_menu_add"
-            app:tint="@color/md_theme_dark_inversePrimary"
-            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
-    </RelativeLayout>
-
+    </LinearLayout>
 
     <EditText
         android:id="@+id/messageEditText"
@@ -168,29 +203,25 @@
         android:textStyle="bold"
         tools:ignore="VisualLintButtonSize" />
 
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:text="@string/history_name"
-        android:textAlignment="center"
-        android:textSize="30sp"
-        android:textStyle="bold|italic"
-        android:typeface="normal"
-        tools:ignore="TextSizeCheck" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:ignore="SpeakableTextPresentCheck">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="12pt"
+            android:orientation="vertical"
+            tools:ignore="UselessLeaf">
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/app_backgrund"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
-
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="12pt"
+            android:orientation="vertical"
+            tools:ignore="UselessLeaf">
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

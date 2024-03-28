@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:id="@+id/addNumbers_page">
+
+    <EditText
+        android:id="@+id/phoneNumberEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:autofillHints="phone"
+        android:hint="@string/text_hint_phone_number"
+        android:inputType="phone"
+        android:textAlignment="center"
+        android:textColorHint="#A1887F"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="VisualLintTextFieldSize" />
+
+    <ImageView
+        android:id="@+id/btnToDeleteNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTintMode="src_over"
+        android:clickable="true"
+        android:contentDescription="To contacts"
+        app:srcCompat="@drawable/ic_baseline_delete_outline"
+        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+
+    <ImageView
+        android:id="@+id/btnToContacts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/btnToDeleteNumber"
+        android:layout_toStartOf="@id/btnToDeleteNumber"
+        android:backgroundTintMode="src_over"
+        android:clickable="true"
+        android:contentDescription="To Delete"
+        app:srcCompat="@drawable/ic_baseline_import_contacts"
+        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+
+</RelativeLayout>
