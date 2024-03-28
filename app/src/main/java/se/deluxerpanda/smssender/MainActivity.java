@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 showOptionsDialog();
             }
         });
-     //   History_info();
+        History_info();
     }
 
     public void showOptionsDialog() {
