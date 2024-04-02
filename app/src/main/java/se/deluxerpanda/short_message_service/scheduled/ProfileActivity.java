@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import se.deluxerpanda.short_message_service.smssender.MainActivity;
 import se.deluxerpanda.short_message_service.R;
+import se.deluxerpanda.short_message_service.smssender.PhoneListActivity;
 
 public class ProfileActivity extends AppCompatActivity{
 
@@ -74,6 +75,8 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -86,6 +89,9 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
+                startActivity(intent);
             }
         });
 

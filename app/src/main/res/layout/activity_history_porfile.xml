@@ -130,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:visibility="invisible"
+                    android:visibility="visible"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
                     android:contentDescription="To Edit"
@@ -182,11 +182,11 @@
                     android:layout_height="wrap_content"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
-                    android:visibility="invisible"
                     android:contentDescription="To Edit"
                     android:layout_gravity="bottom|right"
                     app:srcCompat="@drawable/ic_baseline_edit_24"
-                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck"
+                    android:focusable="true" />
 
 
             </LinearLayout>

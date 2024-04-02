@@ -37,6 +37,8 @@
         </activity>
         <activity android:name=".scheduled.ProfileActivity">
         </activity>
+        <activity android:name=".scheduled.ProfileEditorActivity">
+        </activity>
         <activity android:name=".scheduled.ScheduledList">
         </activity>
         <receiver android:name=".smssender.AlarmReceiver" />
