@@ -1,8 +1,8 @@
 package se.deluxerpanda.short_message_service.scheduled
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,8 +37,8 @@ import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
 
 
 const val Label = "ost"
-var  IsTextField = false
-var  IsDateField = true
+var  IsTextField = true
+var  IsDateField = false
 class ProfileEditorActivity  : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +54,9 @@ class ProfileEditorActivity  : ComponentActivity() {
     @Composable
     fun CenterAlignedTopAppBarExample() {
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
-        Scaffold(
+    Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 
             topBar = {
@@ -72,7 +73,9 @@ class ProfileEditorActivity  : ComponentActivity() {
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { /* do something */ }) {
+                        IconButton(onClick = {
+                                    onBackPressedDispatcher?.onBackPressed()
+                        }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_arrow_back),
                                 contentDescription = "Localized description"
@@ -93,29 +96,33 @@ class ProfileEditorActivity  : ComponentActivity() {
     }
 
 @Composable
-fun TextField(innerPadding: PaddingValues ) {
-
-   // val alarmList: List<MainActivity.AlarmDetails> = MainActivity.getAllAlarms()
+fun TextField(innerPadding: PaddingValues) {
+    val mContext = LocalContext.current
+    val alarmList: List<MainActivity.AlarmDetails> = MainActivity.getAllAlarms(mContext)
     var text by remember { mutableStateOf("") }
- //   for (alarmDetails: MainActivity.AlarmDetails in alarmList) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding),
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            label = { Text(Label,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-            ) }
-
-        )
-   // }
+    ) {
+        for (alarmDetails: MainActivity.AlarmDetails in alarmList) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = {
+                    Text(
+                        text = Label,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                    )
+                }
+            )
+        }
     }
 }
+
 
 
 

@@ -39,7 +39,8 @@
             android:clickable="true"
             android:contentDescription="To Hamburger"
             android:src="@android:drawable/ic_menu_sort_by_size"
-            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+            android:focusable="true" />
     </RelativeLayout>
 
     <LinearLayout
@@ -81,7 +82,8 @@
                 android:contentDescription="To contacts"
                 app:srcCompat="@drawable/ic_baseline_import_contacts"
                 app:tint="@color/md_theme_dark_inversePrimary"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+                android:focusable="true" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
