@@ -37,6 +37,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -96,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static int[] counterLeft = {0};
     private static int counterMax = 29;
+    private int phoneNumberEditTextID;
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
@@ -131,13 +136,6 @@ public class MainActivity extends AppCompatActivity {
         String timeText = String.format("%02d:%02d", hour, minute);
 
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
-        String phoneNumber = getIntent().getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
-
-        // Check if phone number is not null
-        if (phoneNumber != null) {
-            // Set the text of phoneNumberEditText to the retrieved phone number
-            phoneNumberEditText.setText(phoneNumber);
-        }
 
         messageEditText = findViewById(R.id.messageEditText);
 
@@ -165,10 +163,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
+                phoneNumberEditTextID = phoneNumberEditText.getId();
                 Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                int phoneNumberEditTextID = phoneNumberEditText.getId();
-              //  intent.putExtra("EXTRA_phoneNumberEditTextID", phoneNumberEditTextID);
-                startActivityIfNeeded(intent, phoneNumberEditTextID);
+                PhoneListActivityLauncher.launch(intent);
             }
         });
 
@@ -287,6 +284,22 @@ public class MainActivity extends AppCompatActivity {
         History_info();
     }
 
+    private ActivityResultLauncher<Intent> PhoneListActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        TextView textView = findViewById(phoneNumberEditTextID);
+
+                        if (textView != null && textView instanceof TextView) {
+                            Intent data = result.getData();
+                            String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
+                            textView.setText(phoneNumber);
+                        }
+                    }
+                }
+            });
     public void showOptionsDialog() {
         // Get the layout inflater
         LayoutInflater inflater = getLayoutInflater();
@@ -340,8 +353,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     hideKeyboard();
+                    phoneNumberEditTextID = dynamicEditText.getId();
                     Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                    startActivityForResult(intent, dynamicTextViewId);
+                    PhoneListActivityLauncher.launch(intent);
                 }
             });
 
@@ -765,20 +779,6 @@ public class MainActivity extends AppCompatActivity {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == Activity.RESULT_OK) {
-            TextView textView = findViewById(requestCode);
-
-            if (textView != null && textView instanceof TextView) {
-                String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
-                textView.setText(phoneNumber);
-            }
         }
     }
 

@@ -41,72 +41,66 @@ import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
 
 private var message: String? = null
 private var editedMessage: String? = null
-var  IsMessageField = true
-var  IsDateField = false
+private var  IsMessageField: Boolean = true
+private var  IsDateField: Boolean = false
 class ProfileEditorActivity  : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val intent = intent
         setContent {
             Short_Message_ServiceTheme {
-                CenterAlignedTopAppBarExample(intent)
+                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+                val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+                Scaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                titleContentColor = MaterialTheme.colorScheme.primary,
+                            ),
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.history_info_Profile_Edit_Message_name),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    if (IsMessageField){
+                                        val resultIntent = Intent()
+                                        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE_FINAL", editedMessage)
+                                        setResult(Activity.RESULT_OK, resultIntent)
+                                        finish()
+
+                                    }
+                                    onBackPressedDispatcher?.onBackPressed()
+                                }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                                        contentDescription = "Localized description"
+                                    )
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                ) { innerPadding ->
+                    if (IsMessageField){
+                        MessageEditBox(innerPadding,intent)
+                    }else if (IsDateField){
+                        //       DateField(innerPadding)
+                    }
+
+                }
             }
         }
     }
 
 }
-@OptIn(ExperimentalMaterial3Api::class)
-
-    @Composable
-    fun CenterAlignedTopAppBarExample(intent: Intent?) {
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-    Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-
-            topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    title = {
-                            Text(
-                                stringResource(id = R.string.history_info_Profile_Edit_Message_name),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            if (IsMessageField){
-                                val resultIntent = Intent()
-                                resultIntent.putExtra("EDITED_MESSAGE", editedMessage)
-                      //          setResult(Activity.RESULT_OK, resultIntent)
-                        //        finish()
-
-                            }
-                            onBackPressedDispatcher?.onBackPressed()
-                        }) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_arrow_back),
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
-            },
-        ) { innerPadding ->
-            if (IsMessageField){
-                MessageEditBox(innerPadding,intent)
-            }else if (IsDateField){
-         //       DateField(innerPadding)
-            }
-
-        }
-    }
-
 @Composable
 fun MessageEditBox(innerPadding: PaddingValues,intent: Intent?) {
     val mContext = LocalContext.current

@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +28,7 @@ public class ProfileActivity extends AppCompatActivity{
     private String contactName;
     private String timeAndDate;
     private Uri photoUri;
+    private int EditTextID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,27 +106,28 @@ public class ProfileActivity extends AppCompatActivity{
         btnMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditTextID = Message.getId();
                 Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
                 intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE", message);
-                profileEditorLauncher.launch(intent);
-
+                ProfileEditorActivityLauncher.launch(intent);
             }
         });
-
         }
-    private ActivityResultLauncher<Intent> profileEditorLauncher = registerForActivityResult(
+    private ActivityResultLauncher<Intent> ProfileEditorActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null && data.hasExtra("EDITED_MESSAGE")) {
-                        String editedMessage = data.getStringExtra("EDITED_MESSAGE");
-                        TextView Message = findViewById(R.id.Profile_History_Message);
-                        Message.setText(editedMessage);
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        TextView textView = findViewById(EditTextID);
+
+                        if (textView != null && textView instanceof TextView) {
+                            Intent data = result.getData();
+                            String phoneNumber = data.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE_FINAL");
+                            textView.setText(phoneNumber);
+                        }
                     }
                 }
-            }
-    );
-
-    }
+            });
+}
 
