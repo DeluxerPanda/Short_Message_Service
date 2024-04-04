@@ -167,7 +167,8 @@ public class MainActivity extends AppCompatActivity {
                 hideKeyboard();
                 Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
                 int phoneNumberEditTextID = phoneNumberEditText.getId();
-                startActivityForResult(intent, phoneNumberEditTextID);
+              //  intent.putExtra("EXTRA_phoneNumberEditTextID", phoneNumberEditTextID);
+                startActivityIfNeeded(intent, phoneNumberEditTextID);
             }
         });
 
@@ -748,14 +749,6 @@ public class MainActivity extends AppCompatActivity {
         intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intenta);
 
-    }
-
-    private static void hideKeyboard(@NonNull Context context) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        View view = ((Activity) context).getCurrentFocus();
-        if (view != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     public void hideKeyboard() {

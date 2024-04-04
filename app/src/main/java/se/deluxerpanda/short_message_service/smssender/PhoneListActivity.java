@@ -294,7 +294,6 @@ public class PhoneListActivity extends AppCompatActivity {
 
     }
 
-    private EditText phoneNumberEditText;
     public void setPhoneNumber(String phoneNumber){
         Intent resultIntent = new Intent();
         resultIntent.putExtra("PHONE_NUMBER_FROM_CONTACTS", phoneNumber);

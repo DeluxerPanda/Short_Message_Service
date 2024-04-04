@@ -61,13 +61,15 @@
     <string name="history_info_no_SMS_scheduled">Det finns inga schemalagda SMS</string>
 
     <string name="history_info_PhoneNumber_name">Telefonnummer:</string>
-    <string name="history_info_Message_name">Meddelande:</string>
+    <string name="history_info_Message_name">Meddelande</string>
     <string name="history_info_Date_name">Datum:</string>
     <string name="history_info_Time_name">Tid:</string>
     <string name="history_info_Repeat_name">Upprepa varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
 
-    <string name="history_info_Profile_Send_to">Skickas till:</string>
+    <string name="history_info_Profile_Send_to">Skickas till</string>
+
+    <string name="history_info_Profile_Edit_Message_name">Redigera meddelande</string>
 
     <string name="Custom_name">Anpassad</string>
     <string name="puse">Pausa</string>

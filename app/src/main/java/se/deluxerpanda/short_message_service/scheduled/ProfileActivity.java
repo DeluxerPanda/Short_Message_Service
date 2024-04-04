@@ -1,5 +1,6 @@
 package se.deluxerpanda.short_message_service.scheduled;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import se.deluxerpanda.short_message_service.smssender.MainActivity;
@@ -75,8 +78,6 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -89,9 +90,6 @@ public class ProfileActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
-                startActivity(intent);
             }
         });
 
@@ -105,11 +103,27 @@ public class ProfileActivity extends AppCompatActivity{
         btnMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
+                intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE", message);
+                profileEditorLauncher.launch(intent);
+
             }
         });
 
         }
+    private ActivityResultLauncher<Intent> profileEditorLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null && data.hasExtra("EDITED_MESSAGE")) {
+                        String editedMessage = data.getStringExtra("EDITED_MESSAGE");
+                        TextView Message = findViewById(R.id.Profile_History_Message);
+                        Message.setText(editedMessage);
+                    }
+                }
+            }
+    );
 
     }
 
