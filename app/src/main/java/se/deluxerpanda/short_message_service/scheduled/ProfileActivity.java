@@ -24,7 +24,8 @@ public class ProfileActivity extends AppCompatActivity{
     private int alarmId;
     private String message;
     private String title;
-    private String PhoneNumber;
+    private String phoneNumber;
+    private String phoneNumberNew;
     private String contactName;
     private String timeAndDate;
     private Uri photoUri;
@@ -80,19 +81,31 @@ public class ProfileActivity extends AppCompatActivity{
         btnTimeAndDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                EditTextID = TimeAndDate.getId();
+                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
+                intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", timeAndDate);
+                ProfileEditorActivityLauncher.launch(intent);
             }
         });
 
-        PhoneNumber = intent.getStringExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER");
-        TextView testPhoneNumber = findViewById(R.id.contact_name);
-        testPhoneNumber.setText(PhoneNumber);
+        phoneNumber = intent.getStringExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER");
+        TextView PhoneNumber = findViewById(R.id.contact_name);
+        if (phoneNumber.contains(",")) {
+            phoneNumberNew = phoneNumber.replace(",", "\n");
+        }else {
+            phoneNumberNew = phoneNumber;
+        }
+        PhoneNumber.setText(phoneNumberNew);
+
 
         ImageView btnPhoneNumber = findViewById(R.id.btn_Edit_Contacts);
         btnPhoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+                EditTextID = PhoneNumber.getId();
+                Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
+                intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_PHONENUMBER", phoneNumber);
+                ProfileEditorActivityLauncher.launch(intent);
             }
         });
 
@@ -113,6 +126,10 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
         }
+
+
+
+
     private ActivityResultLauncher<Intent> ProfileEditorActivityLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {

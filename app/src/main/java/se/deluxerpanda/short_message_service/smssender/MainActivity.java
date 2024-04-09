@@ -415,7 +415,6 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
                 TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
                 String title;
-                String inputString = phonenumber;
                 String contactName = null;
                 String photoUri_result = null;
                 StringBuilder concatenatedNames = new StringBuilder();
@@ -425,7 +424,7 @@ public class MainActivity extends AppCompatActivity {
                     ContentResolver contentResolver = getContentResolver();
                     if (phonenumber.contains(",")){
 // Creating a StringTokenizer object with delimiter ","
-                        StringTokenizer tokenizer = new StringTokenizer(inputString, ",");
+                        StringTokenizer tokenizer = new StringTokenizer(phonenumber, ",");
                         int tokenCount = tokenizer.countTokens();
                         String[] stringArray = new String[tokenCount];
 // Converting each token to array elements
@@ -466,12 +465,6 @@ public class MainActivity extends AppCompatActivity {
                     contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
                     photoUri_result = null;
                 }
-                String[] words = phonenumber.split(",");
-                StringBuilder output = new StringBuilder();
-                for (String word : words) {
-                    output.append(word.trim()).append("\n");
-                }
-                String phonenumber_result = output.toString();
                 TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
                 history_info_message_TextView.setText(message);
                 TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
@@ -493,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
                         startActivity(intent);
                     }
