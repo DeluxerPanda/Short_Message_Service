@@ -534,13 +534,13 @@ public class MainActivity extends AppCompatActivity {
             Date date = new Date();
 
             // Set the minimum date to today
-            datePickerDialog.getDatePicker().setMinDate(date.getTime());
+        //    datePickerDialog.getDatePicker().setMinDate(date.getTime());
 
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
     //            datePickerDialog.getDatePicker().(startDate.getTime());
-                datePickerDialog.getDatePicker().setMinDate(date.getTime());
+//                datePickerDialog.getDatePicker().setMinDate(date.getTime());
           
 
 
@@ -553,9 +553,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
+            Calendar currentCalendar = Calendar.getInstance();
+            Date selectedDateTime = null;
             String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
+            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            long currentTimeInMillis = currentCalendar.getTimeInMillis();
+            try {
+                selectedDateTime = sdfDateTime.parse(formattedDate);
 
-            SetDateStartText.setText(" " + formattedDate);
+            if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
+                SetDateStartText.setText(" " + formattedDate);
+            }else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
+                builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
+                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                    }
+                });
+                builder.show();
+            }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
