@@ -532,12 +532,17 @@ public class MainActivity extends AppCompatActivity {
             // Create a DatePickerDialog and set the minimum date to the current date
             DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
             Date date = new Date();
-            datePickerDialog.getDatePicker().setMinDate(date.getTime()); // Set minimum date to now
+
+            // Set the minimum date to today
+            datePickerDialog.getDatePicker().setMinDate(date.getTime());
 
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
-                datePickerDialog.getDatePicker().setMinDate(startDate.getTime());
+    //            datePickerDialog.getDatePicker().(startDate.getTime());
+                datePickerDialog.getDatePicker().setMinDate(date.getTime());
+          
+
 
             } catch (ParseException e) {
                 e.printStackTrace();

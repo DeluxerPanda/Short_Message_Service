@@ -69,7 +69,7 @@
 
     <string name="history_info_Profile_Send_to">Skickas till</string>
 
-    <string name="history_info_Profile_Edit_TimeAndDate_name">Redigera datum och tid</string>
+    <string name="history_info_Profile_Edit_TimeAndDate_name">Redigera tid och datum</string>
     <string name="history_info_Profile_Edit_Phone_number_name">Redigera telefonnummer</string>
     <string name="history_info_Profile_Edit_Message_name">Redigera meddelande</string>
 

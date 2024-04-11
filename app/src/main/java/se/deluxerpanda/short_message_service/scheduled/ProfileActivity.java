@@ -140,7 +140,7 @@ public class ProfileActivity extends AppCompatActivity{
 
                         if (textView != null && textView instanceof TextView) {
                             Intent data = result.getData();
-                            String phoneNumber = data.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE_FINAL");
+                            String phoneNumber = data.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL");
                             textView.setText(phoneNumber);
                         }
                     }
