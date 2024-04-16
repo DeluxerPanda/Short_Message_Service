@@ -208,7 +208,7 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
             mContext,
             { _, hour: Int, minute: Int ->
                 mTime.value = "$hour:$minute"
-            }, mHour, mMinute, true
+            }, mHour, mMinute, true,
         )
 
         Text(text = "Time")
