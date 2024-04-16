@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -554,14 +555,20 @@ public class MainActivity extends AppCompatActivity {
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             Calendar currentCalendar = Calendar.getInstance();
-            Date selectedDateTime = null;
+            currentCalendar.set(Calendar.HOUR_OF_DAY, 0);
+            currentCalendar.set(Calendar.MINUTE, 0);
+            currentCalendar.set(Calendar.SECOND, 0);
+            currentCalendar.set(Calendar.MILLISECOND, 0);
+            Date selectedDateTime;
             String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd");
             long currentTimeInMillis = currentCalendar.getTimeInMillis();
+
             try {
                 selectedDateTime = sdfDateTime.parse(formattedDate);
+                long selectedDateTimeInMillis = selectedDateTime.getTime();
 
-            if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
+            if (selectedDateTime != null && selectedDateTimeInMillis >= currentTimeInMillis) {
                 SetDateStartText.setText(" " + formattedDate);
             }else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -569,7 +576,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
                 builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
 
                     }
                 });
@@ -580,7 +586,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 //date  Dialog (ends)
 
     private void scheduleSMS(String phonenumber, String message) {
