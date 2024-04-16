@@ -122,6 +122,7 @@ public class ProfileActivity extends AppCompatActivity{
                 EditTextID = Message.getId();
                 Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
                 intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE", message);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
                 ProfileEditorActivityLauncher.launch(intent);
             }
         });

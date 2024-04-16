@@ -67,6 +67,8 @@ private var  isMessageChanged: Boolean = false
 private var message: String? = null
 private var editedMessage: String? = null
 
+
+
 class ProfileEditorActivity  : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,16 +80,20 @@ class ProfileEditorActivity  : ComponentActivity() {
             message = intent.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE")
 
             if (timeAndDate != null){
+                editedtimeAndDate = timeAndDate
                 isPhoneNumberField = false
                 isTimeAndDateField = true
                 isMessageField = false
 
             }else if (phoneNumber != null){
+                editedphoneNumber = phoneNumber
+                editedphoneNumberNew = phoneNumber
                 isPhoneNumberField = true
                 isTimeAndDateField = false
                 isMessageField = false
 
             }else if (message != null){
+                editedMessage = message
                 isPhoneNumberField = false
                 isTimeAndDateField = false
                 isMessageField = true
@@ -142,7 +148,7 @@ class ProfileEditorActivity  : ComponentActivity() {
                                         if (editedphoneNumber!!.contains(",")) {
                                             editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
                                         } else {
-                                            editedphoneNumberNew = phoneNumber
+                                            editedphoneNumberNew = editedphoneNumber
                                         }
                                         resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedphoneNumberNew)
                                         setResult(Activity.RESULT_OK, resultIntent)
@@ -177,82 +183,73 @@ class ProfileEditorActivity  : ComponentActivity() {
             }
         }
     }
-    @Composable
+@Composable
 fun TimeAndDateEditBox(innerPadding: PaddingValues) {
-        // Fetching local context
-        val mContext = LocalContext.current
-      val Time = timeAndDate!!.substringAfterLast("|")
+    // Fetching local context
+    val mContext = LocalContext.current
+    val Time = timeAndDate!!.substringAfterLast("|")
 
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(innerPadding)
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Parsing hour and minute from the Time string
+        val mHour = try { Time.substringBeforeLast(":").trim().toInt() } catch (e: NumberFormatException) { 0 }
+        val mMinute = try { Time.substringAfterLast(":").trim().toInt() } catch (e: NumberFormatException) { 0 }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
-                .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Declaring and initializing a calendar
-            val mHour = Time.substringBeforeLast(":").trim().toInt()
-            val mMinute = Time.substringAfterLast(":").trim().toInt()
+        // Value for storing time as a string
+        val mTime = remember { mutableStateOf("") }
 
-            // Value for storing time as a string
-            val mTime = remember { mutableStateOf("") }
+        // Creating a TimePicker dialog
+        val mTimePickerDialog = TimePickerDialog(
+            mContext,
+            { _, hour: Int, minute: Int ->
+                mTime.value = "$hour:$minute"
+            }, mHour, mMinute, true
+        )
 
-            // Creating a TimePicker dialod
-            val mTimePickerDialog = TimePickerDialog(
-                mContext,
-                {_, mHour : Int, mMinute: Int ->
-                    mTime.value = timeAndDate!!.substringAfterLast("|")
-                }, mHour, mMinute, true
-            )
-            Text(
-                text = "Time"
-            )
-            OutlinedButton(onClick = { mTimePickerDialog.show()
-                isTimeAndDateChanged == true}) {
-      Text(text = Time)
-            }
-            // Declaring integer values
-            // for year, month and day
-            val mYear: Int
-            val mMonth: Int
-            val mDay: Int
-
-            // Initializing a Calendar
-            val mCalendar = Calendar.getInstance()
-
-            // Fetching current year, month and day
-            mYear = mCalendar.get(Calendar.YEAR)
-            mMonth = mCalendar.get(Calendar.MONTH)
-            mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-
-            mCalendar.time = Date()
-
-            // Declaring a string value to
-            // store date in string format
-            val mDate = remember { mutableStateOf("") }
-
-            // Declaring DatePickerDialog and setting
-            // initial values as current values (present year, month and day)
-            val mDatePickerDialog = DatePickerDialog(
-                mContext,
-                { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-                    mDate.value = "$mDayOfMonth/${mMonth+1}/$mYear"
-                }, mYear, mMonth, mDay
-            )
-            Text(
-                text = "Date"
-            )
-            OutlinedButton(onClick = { mDatePickerDialog.show() }) {
-       Text(text = timeAndDate!!.substringBeforeLast("|"))
-            }
-
+        Text(text = "Time")
+        OutlinedButton(onClick = {
+            mTimePickerDialog.show()
+        }) {
+            Text(text = Time)
         }
 
-        if (!isTimeAndDateChanged){
-            editedtimeAndDate = timeAndDate
+        // Initializing a Calendar
+        val mCalendar = Calendar.getInstance()
+
+        // Fetching current year, month, and day
+        val mYear = mCalendar.get(Calendar.YEAR)
+        val mMonth = mCalendar.get(Calendar.MONTH)
+        val mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+
+        // Value for storing date as a string
+        val mDate = remember { mutableStateOf("") }
+
+        // Creating a DatePickerDialog
+        val mDatePickerDialog = DatePickerDialog(
+            mContext,
+            { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                mDate.value = "$dayOfMonth/${month + 1}/$year"
+            }, mYear, mMonth, mDay
+        )
+
+        Text(text = "Date")
+        OutlinedButton(onClick = {
+            mDatePickerDialog.show()
+        }) {
+            Text(text = timeAndDate!!.substringBeforeLast("|"))
         }
     }
+
+    if (!isTimeAndDateChanged) {
+        editedtimeAndDate = timeAndDate
+    }
+}
+
 
 @Composable
 fun PhoneNumberEditBox(innerPadding: PaddingValues) {
@@ -277,7 +274,7 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
 
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Done,
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -287,7 +284,7 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
 
                 label = {
                     Text(
-                        stringResource(id = R.string.history_info_Message_name),
+                        stringResource(id = R.string.text_hint_phone_number),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                     )
@@ -324,7 +321,7 @@ fun MessageEditBox(innerPadding: PaddingValues) {
                             editedMessage = text
                             isMessageChanged = true
                         }else{
-                            Toast.makeText(mContext, "Cannot be more than 5 Characters", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mContext, "max 160 characters", Toast.LENGTH_SHORT).show()
                             keyboardController?.hide()
                         }
                          },

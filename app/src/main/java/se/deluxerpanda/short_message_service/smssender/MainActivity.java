@@ -55,6 +55,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -400,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
             AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
             linearLayout.addView(AlarmListIsEmptyTextView);
         } else {
+            String title;
             // Now you can use the alarmList as needed
             for (AlarmDetails alarmDetails : alarmList) {
                 int alarmId = alarmDetails.getAlarmId();
@@ -415,32 +417,44 @@ public class MainActivity extends AppCompatActivity {
                 View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
                 LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
                 TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
-                String title;
+
                 String contactName = null;
+                String contactNameAndLast = null;
                 String photoUri_result = null;
                 StringBuilder concatenatedNames = new StringBuilder();
                 int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
                 ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
-                if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED){
+                String contactNamea = null;
+                if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED) {
                     ContentResolver contentResolver = getContentResolver();
-                    if (phonenumber.contains(",")){
-// Creating a StringTokenizer object with delimiter ","
-                        StringTokenizer tokenizer = new StringTokenizer(phonenumber, ",");
-                        int tokenCount = tokenizer.countTokens();
-                        String[] stringArray = new String[tokenCount];
-// Converting each token to array elements
-                        for (int i = 0; i < tokenCount; i++) {
-                            stringArray[i] = tokenizer.nextToken();
+                    if (phonenumber.contains(",")) {
+                        String[] phoneNumbers = phonenumber.split(",");
+
+                        StringBuilder displayedNumbers = new StringBuilder();
+                        StringBuilder titleBuilder = new StringBuilder();
+
+                        for (String number : phoneNumbers) {
+                            contactName = getContactFirstName(contentResolver, number.trim());
+
+                            if (contactName != null) {
+                                displayedNumbers.append(contactName).append(", ");
+                                titleBuilder.append(contactName).append(", ");
+                            } else {
+                                displayedNumbers.append(number).append(", ");
+                                titleBuilder.append(number).append(", ");
+                            }
                         }
-// Printing the output array
-                        for (String element : stringArray) {
-                            contactName = getContactLastName(contentResolver, element);
-                            concatenatedNames.append(contactName).append(", ");
-                        }
-                        history_info_contact_name_TextView.setText(concatenatedNames);
-                        title = String.valueOf(concatenatedNames);
-                    }else {
-                        contactName = getContactName(contentResolver, phonenumber);
+
+// Remove trailing comma and space
+                        String displayedNumbersStr = displayedNumbers.toString().replaceAll(", $", "");
+                        title = titleBuilder.toString().replaceAll(", $", "");
+
+                        history_info_contact_name_TextView.setText(displayedNumbersStr);
+                        title = String.valueOf(title);
+
+                    } else {
+                        contactName = getContactFirstName(contentResolver, phonenumber);
+                        contactNameAndLast = getContactName(contentResolver, phonenumber);
                         if (contactName != null) {
                             history_info_contact_name_TextView.setText(contactName);
                             title = String.valueOf(contactName);
@@ -453,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
                     history_info_contact_name_TextView.setText(phonenumber);
                     title = String.valueOf(phonenumber);
                 }
-                Uri photoUri = getContactPhotoUri(contactName);
+                Uri photoUri = getContactPhotoUri(contactNameAndLast);
                 if (photoUri != null) {
                     // Load the contact photo into the ImageView
                     contactImageView.setImageURI(photoUri);
@@ -462,30 +476,31 @@ public class MainActivity extends AppCompatActivity {
                     roundedDrawable.setCircular(true); // Set to true if you want circular corners
                     contactImageView.setImageDrawable(roundedDrawable);
                     photoUri_result = photoUri.toString();
-                }else {
+                } else {
                     contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
                     photoUri_result = null;
                 }
                 TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
                 history_info_message_TextView.setText(message);
                 TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
-                String TimeAndDate = formattedDateStart +" | "+ formattedClockTime;
-                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) +" "+ formattedDateStart
-                        + ", "+getResources().getString(R.string.history_info_Time_name)  +" "+ formattedClockTime);
+                String TimeAndDate = formattedDateStart + " | " + formattedClockTime;
+                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) + " " + formattedDateStart
+                        + ", " + getResources().getString(R.string.history_info_Time_name) + " " + formattedClockTime);
                 linearLayout.addView(dynamicTextViewLayout);
                 String finalPhotoUri_result;
-                if (photoUri_result == null){
+                if (photoUri_result == null) {
                     finalPhotoUri_result = null;
-                }else {
+                } else {
                     finalPhotoUri_result = photoUri_result;
                 }
+                String finalTitle = title;
                 dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", finalTitle);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
@@ -530,21 +545,11 @@ public class MainActivity extends AppCompatActivity {
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
             int weekOfyear = c.get(Calendar.WEEK_OF_YEAR);
-            // Create a DatePickerDialog and set the minimum date to the current date
             DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
             Date date = new Date();
-
-            // Set the minimum date to today
-        //    datePickerDialog.getDatePicker().setMinDate(date.getTime());
-
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
-    //            datePickerDialog.getDatePicker().(startDate.getTime());
-//                datePickerDialog.getDatePicker().setMinDate(date.getTime());
-          
-
-
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -807,7 +812,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static String getContactLastName(ContentResolver contentResolver, String phoneNumber) {
+    public static String getContactFirstName(ContentResolver contentResolver, String phoneNumber) {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
 

@@ -114,7 +114,7 @@ public class ScheduledList extends AppCompatActivity {
 // Printing the output array
 
                         for (String element : stringArray) {
-                            contactName = MainActivity.getContactLastName(contentResolver, element);
+                            contactName = MainActivity.getContactName(contentResolver, element);
                             concatenatedNames.append(contactName).append(", ");
                         }
                         history_info_contact_name_TextView.setText(concatenatedNames);
