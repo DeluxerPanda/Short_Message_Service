@@ -12,10 +12,13 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
 import java.util.Calendar
-import java.util.Date
 
 private var isTimeAndDateField: Boolean = false
 private var isTimeAndDateChanged: Boolean = false
@@ -58,6 +60,7 @@ private var editedtimeAndDate: String? = null
 public var isPhoneNumberField: Boolean = false
 private var  isPhoneNumberChanged: Boolean = false
 private var phoneNumber: String? = null
+private var phoneNumberNew: String? = null
 private var editedphoneNumber: String? = null
 private var editedphoneNumberNew: String? = null
 
@@ -160,13 +163,24 @@ class ProfileEditorActivity  : ComponentActivity() {
                                         finish()
                                     }
                                     onBackPressedDispatcher?.onBackPressed()
-                                }) {
+                                }
+                                ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                                        contentDescription = "Localized description"
+                                        painter = painterResource(id = R.drawable.baseline_save),
+                                        contentDescription = "Save button"
                                     )
                                 }
                             },
+                            actions = {
+                                IconButton(onClick = {onBackPressedDispatcher?.onBackPressed()})
+                                {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.baseline_close),
+                                        contentDescription = "Close button"
+                                    )
+                                }
+                            },
+
                             scrollBehavior = scrollBehavior,
                         )
                     },
@@ -174,7 +188,7 @@ class ProfileEditorActivity  : ComponentActivity() {
                     if (isTimeAndDateField){
                         TimeAndDateEditBox(innerPadding)
                     }else if (isPhoneNumberField){
-                        PhoneNumberEditBox(innerPadding)
+                      PhoneNumberEditBox(innerPadding)
                     }else if (isMessageField){
                         MessageEditBox(innerPadding)
                     }
@@ -183,6 +197,7 @@ class ProfileEditorActivity  : ComponentActivity() {
             }
         }
     }
+
 @Composable
 fun TimeAndDateEditBox(innerPadding: PaddingValues) {
     // Fetching local context
@@ -250,28 +265,31 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
     }
 }
 
-
 @Composable
 fun PhoneNumberEditBox(innerPadding: PaddingValues) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    var text by remember { mutableStateOf(phoneNumber) }
+    val mContext = LocalContext.current
+    var editedPhoneNumbers by remember { mutableStateOf(phoneNumber?.split(",") ?: listOf()) }
+    var isPhoneNumberChanged by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(innerPadding)
+            .verticalScroll(rememberScrollState())
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        text?.let {
+        editedPhoneNumbers.forEachIndexed { index, phone ->
             OutlinedTextField(
-                value = it,
+                value = phone,
                 onValueChange = {
-                    text = it
-                    editedphoneNumber = text
+                    editedPhoneNumbers = editedPhoneNumbers.toMutableList().also { list ->
+                        list[index] = it
+                    }
+                    editedphoneNumber = editedPhoneNumbers.joinToString(",")
                     isPhoneNumberChanged = true
                 },
-
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Done,
@@ -281,21 +299,54 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
                         keyboardController?.hide()
                     }
                 ),
-
                 label = {
                     Text(
-                        stringResource(id = R.string.text_hint_phone_number),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
+                        text = "Phone number ${index + 1}",
+                        textAlign = TextAlign.Center
                     )
-                }
+                },
+                trailingIcon = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = {
+                            Toast.makeText(mContext, "Coming Soon! - import contacts!", Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
+                                contentDescription = "import contacts button"
+                            )
+                        }
+                        IconButton(onClick = {
+                            Toast.makeText(mContext, "Coming Soon! - delete!", Toast.LENGTH_SHORT).show()
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
+                                contentDescription = "delete button"
+                            )
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
             )
         }
-    }
-    if (!isPhoneNumberChanged){
-        editedphoneNumber = phoneNumber
+        IconButton(onClick = {
+            Toast.makeText(mContext, "Coming Soon! - add!", Toast.LENGTH_SHORT).show()
+        }) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_add),
+                contentDescription = "add button"
+            )
+        }
+        // Update phoneNumber if it's not changed
+        if (!isPhoneNumberChanged) {
+            editedphoneNumber = phoneNumber
+        }
     }
 }
+
 
 @Composable
 fun MessageEditBox(innerPadding: PaddingValues) {
@@ -338,7 +389,6 @@ fun MessageEditBox(innerPadding: PaddingValues) {
                         Text(
                             stringResource(id = R.string.history_info_Message_name),
                             textAlign = TextAlign.Center,
-                            modifier = Modifier
                         )
                     }
                 )
