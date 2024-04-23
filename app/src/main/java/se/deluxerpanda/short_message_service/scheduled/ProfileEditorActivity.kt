@@ -2,10 +2,13 @@ package se.deluxerpanda.short_message_service.scheduled
 
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.widget.DatePicker
+import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -19,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +32,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -47,6 +52,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import androidx.fragment.app.DialogFragment
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
 import java.util.Calendar
@@ -171,14 +178,56 @@ class ProfileEditorActivity  : ComponentActivity() {
                                     )
                                 }
                             },
+
                             actions = {
-                                IconButton(onClick = {onBackPressedDispatcher?.onBackPressed()})
+                                var showDialog by remember { mutableStateOf(false) }
+                                IconButton(onClick = {
+                                    if (editedtimeAndDate != timeAndDate ||
+                                        editedphoneNumber != phoneNumber ||
+                                        editedMessage != message
+                                    ) {
+                                        showDialog = true
+                                    } else {
+                                        onBackPressedDispatcher?.onBackPressed()
+                                    }
+                            })
                                 {
                                     Icon(
                                         painter = painterResource(id = R.drawable.baseline_close),
                                         contentDescription = "Close button"
                                     )
                                 }
+                                UnsavedChangesDialog(
+                                    showDialog = showDialog,
+                                    onDismiss = {
+                                        showDialog = false
+                                        onBackPressedDispatcher?.onBackPressed()},
+                                    onSave = {
+                                        if (isTimeAndDateField){
+                                            val resultIntent = Intent()
+                                            resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedtimeAndDate)
+                                            setResult(Activity.RESULT_OK, resultIntent)
+                                            finish()
+                                        }else if (isPhoneNumberField){
+                                            val resultIntent = Intent()
+                                            if (editedphoneNumber!!.contains(",")) {
+                                                editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
+                                            } else {
+                                                editedphoneNumberNew = editedphoneNumber
+                                            }
+                                            resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedphoneNumberNew)
+                                            setResult(Activity.RESULT_OK, resultIntent)
+                                            finish()
+                                        }else if (isMessageField){
+                                            val resultIntent = Intent()
+                                            resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
+                                            setResult(Activity.RESULT_OK, resultIntent)
+                                            finish()
+                                        }
+                                        onBackPressedDispatcher?.onBackPressed()
+                                        showDialog = false
+                                    }
+                                )
                             },
 
                             scrollBehavior = scrollBehavior,
@@ -197,12 +246,40 @@ class ProfileEditorActivity  : ComponentActivity() {
             }
         }
     }
-
+@Composable
+fun UnsavedChangesDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Unsaved Changes") },
+            text = { Text("You haven't saved your changes. Do you want to save them?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onSave()
+                    onDismiss()
+                }) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismiss() }) {
+                    Text("Don't Save")
+                }
+            },
+            properties = DialogProperties()
+        )
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeAndDateEditBox(innerPadding: PaddingValues) {
     // Fetching local context
     val mContext = LocalContext.current
-    val Time = timeAndDate!!.substringAfterLast("|")
+    var Time by remember { mutableStateOf(timeAndDate!!.substringAfterLast("|")) }
 
     Column(
         modifier = Modifier
@@ -211,44 +288,44 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         // Parsing hour and minute from the Time string
         val mHour = try { Time.substringBeforeLast(":").trim().toInt() } catch (e: NumberFormatException) { 0 }
         val mMinute = try { Time.substringAfterLast(":").trim().toInt() } catch (e: NumberFormatException) { 0 }
-
-        // Value for storing time as a string
-        val mTime = remember { mutableStateOf("") }
 
         // Creating a TimePicker dialog
         val mTimePickerDialog = TimePickerDialog(
             mContext,
             { _, hour: Int, minute: Int ->
-                mTime.value = "$hour:$minute"
-            }, mHour, mMinute, true,
+                val newTime = "$hour:$minute"
+                timeAndDate = timeAndDate!!.replaceAfterLast("|", newTime)
+                Time = newTime
+            }, mHour, mMinute, true
         )
 
         Text(text = "Time")
         OutlinedButton(onClick = {
-            mTimePickerDialog.show()
+           mTimePickerDialog.show()
         }) {
             Text(text = Time)
+
         }
 
-        // Initializing a Calendar
-        val mCalendar = Calendar.getInstance()
 
-        // Fetching current year, month, and day
-        val mYear = mCalendar.get(Calendar.YEAR)
-        val mMonth = mCalendar.get(Calendar.MONTH)
-        val mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
-
-        // Value for storing date as a string
-        val mDate = remember { mutableStateOf("") }
-
+        var Date by remember { mutableStateOf(timeAndDate!!.substringBefore("|")) }
+// Parsing year, month, and day from the Date string
+        val mYear = try { Date.substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 }
+        val mMonth = try { Date.substringAfter("-").substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 } -1
+        val mDay = try { Date.substringAfterLast("-").substringBefore(" | ").trim().toInt() } catch (e: NumberFormatException) { 0 }
         // Creating a DatePickerDialog
         val mDatePickerDialog = DatePickerDialog(
             mContext,
             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                mDate.value = "$dayOfMonth/${month + 1}/$year"
+                val formattedMonth = String.format("%02d", month + 1)
+                val newDate = "$year-$formattedMonth-$dayOfMonth"
+                timeAndDate = timeAndDate!!.replaceBeforeLast(" |", newDate)
+                Date = newDate
+
             }, mYear, mMonth, mDay
         )
 
@@ -256,7 +333,7 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
         OutlinedButton(onClick = {
             mDatePickerDialog.show()
         }) {
-            Text(text = timeAndDate!!.substringBeforeLast("|"))
+            Text(text = Date)
         }
     }
 
@@ -264,6 +341,7 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
         editedtimeAndDate = timeAndDate
     }
 }
+
 
 @Composable
 fun PhoneNumberEditBox(innerPadding: PaddingValues) {
