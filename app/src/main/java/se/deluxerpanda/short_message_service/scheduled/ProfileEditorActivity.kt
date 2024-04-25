@@ -2,13 +2,10 @@ package se.deluxerpanda.short_message_service.scheduled
 
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.widget.DatePicker
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -53,10 +50,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.fragment.app.DialogFragment
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
-import java.util.Calendar
 
 private var isTimeAndDateField: Boolean = false
 private var isTimeAndDateChanged: Boolean = false
@@ -77,6 +73,8 @@ private var  isMessageChanged: Boolean = false
 private var message: String? = null
 private var editedMessage: String? = null
 
+private var contactName: String? = null
+private var contactNameAndLast: String? = null
 
 
 class ProfileEditorActivity  : ComponentActivity() {
@@ -154,20 +152,7 @@ class ProfileEditorActivity  : ComponentActivity() {
                                         setResult(Activity.RESULT_OK, resultIntent)
                                         finish()
                                     }else if (isPhoneNumberField){
-                                        val resultIntent = Intent()
-                                        if (editedphoneNumber!!.contains(",")) {
-                                            editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
-                                        } else {
-                                            editedphoneNumberNew = editedphoneNumber
-                                        }
-                                        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedphoneNumberNew)
-                                        setResult(Activity.RESULT_OK, resultIntent)
-                                        finish()
-                                    }else if (isMessageField){
-                                        val resultIntent = Intent()
-                                        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
-                                        setResult(Activity.RESULT_OK, resultIntent)
-                                        finish()
+                                        it_isPhoneNumberField()
                                     }
                                     onBackPressedDispatcher?.onBackPressed()
                                 }
@@ -209,15 +194,7 @@ class ProfileEditorActivity  : ComponentActivity() {
                                             setResult(Activity.RESULT_OK, resultIntent)
                                             finish()
                                         }else if (isPhoneNumberField){
-                                            val resultIntent = Intent()
-                                            if (editedphoneNumber!!.contains(",")) {
-                                                editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
-                                            } else {
-                                                editedphoneNumberNew = editedphoneNumber
-                                            }
-                                            resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedphoneNumberNew)
-                                            setResult(Activity.RESULT_OK, resultIntent)
-                                            finish()
+                                            it_isPhoneNumberField()
                                         }else if (isMessageField){
                                             val resultIntent = Intent()
                                             resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
@@ -245,6 +222,53 @@ class ProfileEditorActivity  : ComponentActivity() {
                 }
             }
         }
+
+    fun it_isPhoneNumberField(){
+        val resultIntent = Intent()
+
+        if (editedphoneNumber!!.contains(",")) {
+            editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
+
+            val phoneNumbers: Array<String> =
+                editedphoneNumber!!.split(",".toRegex())
+                    .dropLastWhile { it.isEmpty() }
+                    .toTypedArray()
+
+            val titleBuilder = StringBuilder()
+
+            for (number in phoneNumbers) {
+                contactName = MainActivity.getContactFirstName(contentResolver, number.trim { it <= ' ' })
+                contactNameAndLast = MainActivity.getContactName(contentResolver, number.trim { it <= ' ' })
+                if (contactName != null) {
+                    titleBuilder.append(contactName)
+                        .append(", ")
+                } else {
+                    titleBuilder.append(number).append(", ")
+                }
+            }
+
+            title = titleBuilder.toString()
+                .replace(", $".toRegex(), "")
+
+            title = title.toString()
+
+        } else {
+            editedphoneNumberNew = editedphoneNumber
+            contactName = MainActivity.getContactFirstName(contentResolver, editedphoneNumber)
+            contactNameAndLast = MainActivity.getContactName(contentResolver, editedphoneNumber)
+            if (contactName != null) {
+                title = contactName.toString()
+            } else {
+                title = title.toString()
+            }
+        }
+
+        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedphoneNumberNew)
+        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL_TITLE", title)
+        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FIRST_AND_LAST_NAME", contactNameAndLast)
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
+    }
     }
 @Composable
 fun UnsavedChangesDialog(
@@ -342,14 +366,12 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
     }
 }
 
-
 @Composable
 fun PhoneNumberEditBox(innerPadding: PaddingValues) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val mContext = LocalContext.current
     var editedPhoneNumbers by remember { mutableStateOf(phoneNumber?.split(",") ?: listOf()) }
     var isPhoneNumberChanged by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -365,7 +387,7 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
                     editedPhoneNumbers = editedPhoneNumbers.toMutableList().also { list ->
                         list[index] = it
                     }
-                    editedphoneNumber = editedPhoneNumbers.joinToString(",")
+                    editedphoneNumber = editedPhoneNumbers.joinToString(", ")
                     isPhoneNumberChanged = true
                 },
                 keyboardOptions = KeyboardOptions(
@@ -396,7 +418,15 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
                             )
                         }
                         IconButton(onClick = {
-                            Toast.makeText(mContext, "Coming Soon! - delete!", Toast.LENGTH_SHORT).show()
+                            editedPhoneNumbers = editedPhoneNumbers.toMutableList().also { list ->
+                              if  (editedPhoneNumbers.size != 1){
+                                  list.removeAt(index)
+                                }else{
+                                  Toast.makeText(mContext, R.string.history_info_Profile_Edit_Must_have_one_number, Toast.LENGTH_SHORT).show()
+                              }
+                                editedphoneNumber = editedPhoneNumbers.joinToString(", ")
+                                isPhoneNumberChanged = true
+                            }
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
@@ -411,7 +441,11 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
             )
         }
         IconButton(onClick = {
-            Toast.makeText(mContext, "Coming Soon! - add!", Toast.LENGTH_SHORT).show()
+            editedPhoneNumbers = editedPhoneNumbers.toMutableList().also { list ->
+                list.add("")
+                editedphoneNumber = editedPhoneNumbers.joinToString(", ")
+                isPhoneNumberChanged = true
+            }
         }) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_add),
@@ -424,7 +458,6 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
         }
     }
 }
-
 
 @Composable
 fun MessageEditBox(innerPadding: PaddingValues) {
@@ -476,10 +509,6 @@ fun MessageEditBox(innerPadding: PaddingValues) {
         editedMessage = message
     }
 }
-
-
-
-
 
 
 

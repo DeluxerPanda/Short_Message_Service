@@ -72,6 +72,7 @@
     <string name="history_info_Profile_Edit_TimeAndDate_name">Redigera tid och datum</string>
     <string name="history_info_Profile_Edit_Phone_number_name">Redigera telefonnummer</string>
     <string name="history_info_Profile_Edit_Message_name">Redigera meddelande</string>
+    <string name="history_info_Profile_Edit_Must_have_one_number">Du måste ha minst ett nummer!</string>
 
     <string name="Custom_name">Anpassad</string>
     <string name="puse">Pausa</string>

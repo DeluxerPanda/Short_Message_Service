@@ -2,8 +2,11 @@ package se.deluxerpanda.short_message_service.scheduled;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +17,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.drawable.RoundedBitmapDrawable;
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import se.deluxerpanda.short_message_service.smssender.MainActivity;
 import se.deluxerpanda.short_message_service.R;
@@ -140,12 +145,53 @@ public class ProfileActivity extends AppCompatActivity{
                         TextView textView = findViewById(EditTextID);
 
                         if (textView != null && textView instanceof TextView) {
-                            Intent data = result.getData();
-                            String phoneNumber = data.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL");
-                            textView.setText(phoneNumber);
+                            Intent resultIntent = result.getData();
+                            String data = resultIntent.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL");
+                            textView.setText(data);
+
+                            String dataTitel = resultIntent.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL_TITLE");
+                            String data_contactNameAndLast = resultIntent.getStringExtra("EXTRA_HISTORY_PROFILE_EDITOR_FIRST_AND_LAST_NAME");
+
+                            if (dataTitel != null){
+                                TextView textTitle = findViewById(R.id.Profile_History_group_name);
+                                textTitle.setText(dataTitel);
+                            }
+                            String photoUri_result = null;
+                            Uri photoUri = getContactPhotoUri(data_contactNameAndLast);
+
+                            ImageView contactImageView = findViewById(R.id.Profile_History_group_image);
+                            if (photoUri != null) {
+                                // Load the contact photo into the ImageView
+                                contactImageView.setImageURI(photoUri);
+                                photoUri_result = photoUri.toString();
+                            } else {
+                                contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                                photoUri_result = null;
+                            }
                         }
                     }
                 }
             });
+    public Uri getContactPhotoUri(String contactID) {
+        if (contactID == null) {
+            return null;
+        }
+        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
+        String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?";
+        String[] selectionArgs = {contactID};
+
+        Cursor cursor = getContentResolver().query(contactUri, projection, selection, selectionArgs, null);
+        Uri photoUri = null;
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            if (photoUriString != null) {
+                photoUri = Uri.parse(photoUriString);
+            }
+            cursor.close();
+        }
+        return photoUri;
+    }
 }
 
