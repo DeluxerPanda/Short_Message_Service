@@ -39,12 +39,10 @@
                 android:layout_alignStart="@id/App_Title"
                 android:layout_alignTop="@id/App_Title"
                 android:layout_marginStart="8dp"
-                android:backgroundTintMode="src_in"
                 android:clickable="true"
                 android:contentDescription="To Hamburger"
                 android:src="@drawable/ic_arrow_back"
                 tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
-                app:tint="@color/cardview_light_background"
                 android:focusable="true" />
         </RelativeLayout>
 

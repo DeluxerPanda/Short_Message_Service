@@ -21,28 +21,39 @@
                 android:id="@+id/btnToMainSmsSchedulerPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:backgroundTintMode="src_over"
-                android:clickable="true"
-                android:contentDescription="To Hamburger"
+                android:layout_marginStart="10dp"
                 android:src="@drawable/baseline_close"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
-                app:tint="@color/cardview_light_background"
-                android:focusable="true" />
+                android:contentDescription="@string/exit_name" />
 
             <ImageView
-                android:id="@+id/btnToDelete"
+                android:id="@+id/btnToSendScheduledMessageNow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_toStartOf="@id/btnToDelayScheduledMessage"
+                android:layout_marginStart="10dp"
+                app:srcCompat="@drawable/baseline_send"
+                android:contentDescription="@string/send_now"/>
+
+            <ImageView
+                android:id="@+id/btnToDelayScheduledMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_toStartOf="@id/btnToDeleteScheduledMessage"
+                app:srcCompat="@drawable/baseline_pause"
+                android:contentDescription="@string/DelayScheduledMessage" />
+
+            <ImageView
+                android:id="@+id/btnToDeleteScheduledMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_marginStart="10dp"
                 android:layout_alignParentEnd="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTintMode="src_over"
-                android:clickable="true"
-                android:contentDescription="To Delete"
                 app:srcCompat="@drawable/ic_baseline_delete_outline"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
-                android:focusable="true" />
+                android:contentDescription="@string/DeleteScheduledMessage" />
         </RelativeLayout>
         <TextView
             android:id="@+id/Profile_History_group_name"
@@ -78,7 +89,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#333"
                 android:padding="15dp">
 
                 <ImageView
@@ -86,7 +96,7 @@
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/gallery_thumb"
+                    android:src="@drawable/ic_baseline_person_24"
                     tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck"
                     android:contentDescription="TODO" />
             </LinearLayout>
@@ -265,7 +275,4 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
-
-
-
 </ScrollView>

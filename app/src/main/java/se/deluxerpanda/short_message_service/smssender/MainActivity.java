@@ -415,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                 String phonenumber = alarmDetails.getPhonenumber();
                 String message = alarmDetails.getMessage();
                 View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
-                LinearLayout dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.history_info_page);
+                ImageView dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.btnToProfile);
                 TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
 
                 String contactName = null;

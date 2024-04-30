@@ -42,16 +42,34 @@ public class ProfileActivity extends AppCompatActivity{
 
         Intent intent = getIntent();
         // back button
-        ImageView btnBack = findViewById(R.id.btnToMainSmsSchedulerPage);
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        ImageView btnToMainSmsSchedulerPage = findViewById(R.id.btnToMainSmsSchedulerPage);
+        btnToMainSmsSchedulerPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
           finish();
             }
         });
 
+        //Send now button
+        ImageView btnToSendScheduledMessageNow = findViewById(R.id.btnToSendScheduledMessageNow);
+        btnToSendScheduledMessageNow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Delay button
+        ImageView btnToDelayScheduledMessage = findViewById(R.id.btnToDelayScheduledMessage);
+        btnToDelayScheduledMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ProfileActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Delete button
-        ImageView btnDelete = findViewById(R.id.btnToDelete);
+        ImageView btnDelete = findViewById(R.id.btnToDeleteScheduledMessage);
         MainActivity mainActivity = new MainActivity();
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +78,9 @@ public class ProfileActivity extends AppCompatActivity{
                 finish();
             }
         });
+
+
+
 
         String photoUriString = intent.getStringExtra("EXTRA_HISTORY_PROFILE_POTOURL");
         ImageView contactImageView = findViewById(R.id.Profile_History_group_image);
@@ -100,21 +121,18 @@ public class ProfileActivity extends AppCompatActivity{
         }else {
             phoneNumberNew = phoneNumber;
         }
+
         PhoneNumber.setText(phoneNumberNew);
-
-
         ImageView btnPhoneNumber = findViewById(R.id.btn_Edit_Contacts);
         btnPhoneNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditTextID = PhoneNumber.getId();
                 Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
-                intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_PHONENUMBER", phoneNumber);
+                intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_PHONENUMBER", PhoneNumber.getText());
                 ProfileEditorActivityLauncher.launch(intent);
             }
         });
-
-
 
         message = intent.getStringExtra("EXTRA_HISTORY_PROFILE_MESSAGE");
         TextView Message = findViewById(R.id.Profile_History_Message);
@@ -127,7 +145,6 @@ public class ProfileActivity extends AppCompatActivity{
                 EditTextID = Message.getId();
                 Intent intent = new Intent(ProfileActivity.this, ProfileEditorActivity.class);
                 intent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_MESSAGE", Message.getText());
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
                 ProfileEditorActivityLauncher.launch(intent);
             }
         });

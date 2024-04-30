@@ -153,6 +153,11 @@ class ProfileEditorActivity  : ComponentActivity() {
                                         finish()
                                     }else if (isPhoneNumberField){
                                         it_isPhoneNumberField()
+                                    }else if (isMessageField){
+                                        val resultIntent = Intent()
+                                        resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
+                                        setResult(Activity.RESULT_OK, resultIntent)
+                                        finish()
                                     }
                                     onBackPressedDispatcher?.onBackPressed()
                                 }
@@ -370,7 +375,7 @@ fun TimeAndDateEditBox(innerPadding: PaddingValues) {
 fun PhoneNumberEditBox(innerPadding: PaddingValues) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val mContext = LocalContext.current
-    var editedPhoneNumbers by remember { mutableStateOf(phoneNumber?.split(",") ?: listOf()) }
+    var editedPhoneNumbers by remember { mutableStateOf(phoneNumber?.split("\n") ?: listOf()) }
     var isPhoneNumberChanged by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -421,7 +426,7 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
                             editedPhoneNumbers = editedPhoneNumbers.toMutableList().also { list ->
                               if  (editedPhoneNumbers.size != 1){
                                   list.removeAt(index)
-                                }else{
+                              }else{
                                   Toast.makeText(mContext, R.string.history_info_Profile_Edit_Must_have_one_number, Toast.LENGTH_SHORT).show()
                               }
                                 editedphoneNumber = editedPhoneNumbers.joinToString(", ")

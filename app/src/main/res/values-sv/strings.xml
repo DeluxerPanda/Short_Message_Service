@@ -77,5 +77,8 @@
     <string name="Custom_name">Anpassad</string>
     <string name="puse">Pausa</string>
     <string name="send_now">Skicka nu!</string>
+    <string name="exit_name">Exit</string>
+    <string name="DeleteScheduledMessage">Delete Scheduled Message</string>
+    <string name="DelayScheduledMessage">Delay Scheduled Message</string>
 
 </resources>
