@@ -50,9 +50,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.example.compose.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
-import se.deluxerpanda.short_message_service.ui.theme.Short_Message_ServiceTheme
+
 
 private var isTimeAndDateField: Boolean = false
 private var isTimeAndDateChanged: Boolean = false
@@ -109,7 +110,7 @@ class ProfileEditorActivity  : ComponentActivity() {
         }
 
         setContent {
-            Short_Message_ServiceTheme {
+            AppTheme {
                 val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                 val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
                 Scaffold(
