@@ -50,7 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.example.compose.AppTheme
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 
@@ -79,6 +79,7 @@ private var contactNameAndLast: String? = null
 
 
 class ProfileEditorActivity  : ComponentActivity() {
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +121,7 @@ class ProfileEditorActivity  : ComponentActivity() {
                         CenterAlignedTopAppBar(
                             colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                titleContentColor = MaterialTheme.colorScheme.primary,
+                                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                             ),
                             title = {
                                 if (isTimeAndDateField){
@@ -150,14 +151,14 @@ class ProfileEditorActivity  : ComponentActivity() {
                                     if (isTimeAndDateField){
                                         val resultIntent = Intent()
                                         resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedtimeAndDate)
-                                        setResult(Activity.RESULT_OK, resultIntent)
+                                        setResult(RESULT_OK, resultIntent)
                                         finish()
                                     }else if (isPhoneNumberField){
                                         it_isPhoneNumberField()
                                     }else if (isMessageField){
                                         val resultIntent = Intent()
                                         resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
-                                        setResult(Activity.RESULT_OK, resultIntent)
+                                        setResult(RESULT_OK, resultIntent)
                                         finish()
                                     }
                                     onBackPressedDispatcher?.onBackPressed()
@@ -197,14 +198,14 @@ class ProfileEditorActivity  : ComponentActivity() {
                                         if (isTimeAndDateField){
                                             val resultIntent = Intent()
                                             resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedtimeAndDate)
-                                            setResult(Activity.RESULT_OK, resultIntent)
+                                            setResult(RESULT_OK, resultIntent)
                                             finish()
                                         }else if (isPhoneNumberField){
                                             it_isPhoneNumberField()
                                         }else if (isMessageField){
                                             val resultIntent = Intent()
                                             resultIntent.putExtra("EXTRA_HISTORY_PROFILE_EDITOR_FINAL", editedMessage)
-                                            setResult(Activity.RESULT_OK, resultIntent)
+                                            setResult(RESULT_OK, resultIntent)
                                             finish()
                                         }
                                         onBackPressedDispatcher?.onBackPressed()
@@ -304,7 +305,7 @@ fun UnsavedChangesDialog(
         )
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun TimeAndDateEditBox(innerPadding: PaddingValues) {
     // Fetching local context
