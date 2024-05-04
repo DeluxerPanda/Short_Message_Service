@@ -61,7 +61,7 @@ private var timeAndDate: String? = null
 private var editedtimeAndDate: String? = null
 
 
-public var isPhoneNumberField: Boolean = false
+private var isPhoneNumberField: Boolean = false
 private var  isPhoneNumberChanged: Boolean = false
 private var phoneNumber: String? = null
 private var phoneNumberNew: String? = null
@@ -69,7 +69,7 @@ private var editedphoneNumber: String? = null
 private var editedphoneNumberNew: String? = null
 
 
-public var  isMessageField: Boolean = false
+private var  isMessageField: Boolean = false
 private var  isMessageChanged: Boolean = false
 private var message: String? = null
 private var editedMessage: String? = null
@@ -230,7 +230,7 @@ class ProfileEditorActivity  : ComponentActivity() {
             }
         }
 
-    fun it_isPhoneNumberField(){
+     fun it_isPhoneNumberField(){
         val resultIntent = Intent()
 
         if (editedphoneNumber!!.contains(",")) {
@@ -467,7 +467,7 @@ fun PhoneNumberEditBox(innerPadding: PaddingValues) {
 }
 
 @Composable
-fun MessageEditBox(innerPadding: PaddingValues) {
+fun  MessageEditBox(innerPadding: PaddingValues) {
     val mContext = LocalContext.current
 
     val keyboardController = LocalSoftwareKeyboardController.current

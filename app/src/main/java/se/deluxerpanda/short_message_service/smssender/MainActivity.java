@@ -24,7 +24,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,12 +49,9 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,13 +60,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.UUID;
-import se.deluxerpanda.short_message_service.scheduled.ScheduledList;
+
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.scheduled.ProfileActivity;
-import se.deluxerpanda.short_message_service.smssender.AlarmReceiver;
-import se.deluxerpanda.short_message_service.smssender.PhoneListActivity;
+import se.deluxerpanda.short_message_service.profile.ProfileActivityTest;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
@@ -497,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                        Intent intent = new Intent(MainActivity.this, ProfileActivityTest.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", finalTitle);

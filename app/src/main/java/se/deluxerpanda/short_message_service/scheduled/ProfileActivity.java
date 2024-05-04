@@ -3,7 +3,6 @@ package se.deluxerpanda.short_message_service.scheduled;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -17,12 +16,9 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 
 import se.deluxerpanda.short_message_service.smssender.MainActivity;
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.smssender.PhoneListActivity;
 
 public class ProfileActivity extends AppCompatActivity{
 

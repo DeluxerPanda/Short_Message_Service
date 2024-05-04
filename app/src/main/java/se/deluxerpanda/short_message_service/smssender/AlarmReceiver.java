@@ -20,8 +20,7 @@ import java.util.Date;
 import java.util.Random;
 
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.smssender.MainActivity;
-import se.deluxerpanda.short_message_service.scheduled.ProfileActivity;
+import se.deluxerpanda.short_message_service.profile.ProfileActivityTest;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -139,7 +138,7 @@ private String year;
 
         // Create an intent for the notification
        // Intent notificationIntent = new Intent(context, MainActivity.class);
-        Intent notificationIntent = new Intent(context, ProfileActivity.class);
+        Intent notificationIntent = new Intent(context, ProfileActivityTest.class);
         notificationIntent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
 
