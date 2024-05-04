@@ -17,59 +17,67 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/Profile_History_group_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-black"
-                android:text="@string/history_name"
-                android:textAlignment="center"
-                android:textSize="24sp"
-                android:singleLine="true"
-                android:textStyle="bold|italic"
-                android:typeface="normal"
-                tools:ignore="TextSizeCheck" />
-
             <ImageView
                 android:id="@+id/btnToMainSmsSchedulerPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@id/Profile_History_group_name"
-                android:layout_alignTop="@id/Profile_History_group_name"
-                android:layout_marginStart="8dp"
-                android:backgroundTintMode="src_over"
-                android:clickable="true"
-                android:contentDescription="To Hamburger"
-                android:src="@android:drawable/ic_media_rew"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+                android:layout_marginStart="10dp"
+                android:src="@drawable/baseline_close"
+                android:contentDescription="@string/exit_name" />
 
             <ImageView
-                android:id="@+id/btnToDelete"
+                android:id="@+id/btnToSendScheduledMessageNow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:backgroundTintMode="src_over"
-                android:clickable="true"
-                android:contentDescription="To Delete"
-                app:srcCompat="@drawable/ic_baseline_delete_outline"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_toStartOf="@id/btnToDelayScheduledMessage"
+                android:layout_marginStart="10dp"
+                app:srcCompat="@drawable/baseline_send"
+                android:contentDescription="@string/send_now"/>
 
-            <TextView
-                android:id="@+id/Profile_History_ID_Title"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/btnToDelayScheduledMessage"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-black"
-                android:layout_below="@id/Profile_History_group_name"
-                android:text="@string/Custom_name"
-                android:textAlignment="center"
-                android:textSize="14sp"
-                android:textStyle="bold|italic"
-                android:typeface="normal"
-                tools:ignore="TextSizeCheck" />
-        </RelativeLayout>
+                android:layout_marginStart="10dp"
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_toStartOf="@id/btnToDeleteScheduledMessage"
+                app:srcCompat="@drawable/baseline_pause"
+                android:contentDescription="@string/DelayScheduledMessage" />
 
+            <ImageView
+                android:id="@+id/btnToDeleteScheduledMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentEnd="true"
+                app:srcCompat="@drawable/ic_baseline_delete_outline"
+                android:contentDescription="@string/DeleteScheduledMessage" />
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/Profile_History_group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/history_name"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:singleLine="true"
+            android:textStyle="bold|italic"
+            android:typeface="normal"
+            tools:ignore="TextSizeCheck" />
+        <TextView
+            android:id="@+id/Profile_History_ID_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/Custom_name"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold|italic"
+            android:typeface="normal"
+            tools:ignore="TextSizeCheck" />
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -81,7 +89,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#333"
                 android:padding="15dp">
 
                 <ImageView
@@ -89,7 +96,7 @@
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:layout_gravity="center"
-                    android:src="@android:drawable/gallery_thumb"
+                    android:src="@drawable/ic_baseline_person_24"
                     tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck"
                     android:contentDescription="TODO" />
             </LinearLayout>
@@ -130,12 +137,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:visibility="invisible"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
                     android:contentDescription="To Edit"
                     app:srcCompat="@drawable/ic_baseline_edit_24"
-                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck"
+                    android:focusable="true" />
 
             </LinearLayout>
 
@@ -182,11 +189,11 @@
                     android:layout_height="wrap_content"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
-                    android:visibility="invisible"
                     android:contentDescription="To Edit"
                     android:layout_gravity="bottom|right"
                     app:srcCompat="@drawable/ic_baseline_edit_24"
-                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck"
+                    android:focusable="true" />
 
 
             </LinearLayout>
@@ -230,11 +237,11 @@
                     android:layout_height="wrap_content"
                     android:backgroundTintMode="src_over"
                     android:clickable="true"
-                    android:visibility="invisible"
                     android:contentDescription="To Edit"
                     android:layout_gravity="bottom|right"
                     app:srcCompat="@drawable/ic_baseline_edit_24"
-                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck" />
+                    tools:ignore="ContentDescription,HardcodedText,ImageContrastCheck,RtlHardcoded,TouchTargetSizeCheck"
+                    android:focusable="true" />
 
             </LinearLayout>
 
@@ -267,12 +274,5 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-
-
-
     </LinearLayout>
-
-
 </ScrollView>

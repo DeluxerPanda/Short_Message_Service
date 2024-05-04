@@ -42,8 +42,9 @@
                 android:backgroundTintMode="src_over"
                 android:clickable="true"
                 android:contentDescription="To Hamburger"
-                android:src="@android:drawable/ic_media_rew"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+                android:src="@drawable/ic_arrow_back"
+                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+                android:focusable="true" />
         </RelativeLayout>
 
 
