@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,8 +36,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,17 +60,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import se.deluxerpanda.short_message_service.R
-import se.deluxerpanda.short_message_service.scheduled.UnsavedChangesDialog
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 
 
-class ProfileActivityTest  : ComponentActivity() {
+class ProfileActivity  : ComponentActivity() {
 
     private var title: String? = null
     private var alarmId = 0
@@ -177,7 +180,7 @@ class ProfileActivityTest  : ComponentActivity() {
                                     actions = {
                                         IconButton(onClick = {
                                             Toast.makeText(
-                                                this@ProfileActivityTest,
+                                                this@ProfileActivity,
                                                 "Coming Soon!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
@@ -190,7 +193,7 @@ class ProfileActivityTest  : ComponentActivity() {
                                         }
                                         IconButton(onClick = {
                                             Toast.makeText(
-                                                this@ProfileActivityTest,
+                                                this@ProfileActivity,
                                                 "Coming Soon!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
@@ -205,7 +208,7 @@ class ProfileActivityTest  : ComponentActivity() {
                                             val mainActivity = MainActivity()
                                             mainActivity.deleteAlarm(
                                                 alarmId,
-                                                this@ProfileActivityTest
+                                                this@ProfileActivity
                                             )
                                             finish()
                                         })
@@ -942,6 +945,35 @@ class ProfileActivityTest  : ComponentActivity() {
             cursor.close()
         }
         return photoUri
+    }
+
+    @Composable
+    fun UnsavedChangesDialog(
+        showDialog: Boolean,
+        onDismiss: () -> Unit,
+        onSave: () -> Unit
+    ) {
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { onDismiss() },
+                title = { Text("Unsaved Changes") },
+                text = { Text("You haven't saved your changes. Do you want to save them?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onSave()
+                        onDismiss()
+                    }) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onDismiss() }) {
+                        Text("Don't Save")
+                    }
+                },
+                properties = DialogProperties()
+            )
+        }
     }
         }
 

@@ -9,7 +9,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.telephony.SmsManager;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -20,7 +22,8 @@ import java.util.Date;
 import java.util.Random;
 
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.profile.ProfileActivityTest;
+import se.deluxerpanda.short_message_service.profile.ProfileActivity;
+import se.deluxerpanda.short_message_service.scheduled.ScheduledList;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -39,10 +42,6 @@ private String year;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-   //     SmsManager smsManager = SmsManager.getDefault();
-
-        SmsManager smsManager = (SmsManager) context.getSystemService(SmsManager.class);
-
 
         phonenumber = intent.getStringExtra("EXTRA_PHONE_NUMBER");
 
@@ -54,19 +53,40 @@ private String year;
 
         alarmId = Integer.parseInt(String.valueOf(intent.getIntExtra("EXTRA_ALARMID", 0)));
 
-        if (phonenumber.contains(",")) {
-            Phonenumber_Multi = phonenumber;
-            String[] phoneNumbersArray = phonenumber.split(",\\s*");
-            for (String phoneNumber : phoneNumbersArray) {
-                ArrayList<String> parts = smsManager.divideMessage(message);
-                smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            SmsManager smsManager = (SmsManager) context.getSystemService(SmsManager.class);
+            if (phonenumber.contains(",")) {
+                Phonenumber_Multi = phonenumber;
+                String[] phoneNumbersArray = phonenumber.split(",\\s*");
+                for (String phoneNumber : phoneNumbersArray) {
+                    ArrayList<String> parts = smsManager.divideMessage(message);
+                    smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+                }
+            }else {
+                Phonenumber_Multi = "false";
+                Log.d("Hmmmm "," phonenumber: "+phonenumber +" message: "+message);
+                smsManager.sendTextMessage(phonenumber, null, message, null, null);
             }
+            rescheduleAlarm(phonenumber,Phonenumber_Multi,message, context, triggerTime, repeatSmS, alarmId);
+            sendNotification(context);
         }else {
-            Phonenumber_Multi = "false";
-            smsManager.sendTextMessage(phonenumber, null, message, null, null);
+            SmsManager smsManager = SmsManager.getDefault();
+            if (phonenumber.contains(",")) {
+                Phonenumber_Multi = phonenumber;
+                String[] phoneNumbersArray = phonenumber.split(",\\s*");
+                for (String phoneNumber : phoneNumbersArray) {
+                    ArrayList<String> parts = smsManager.divideMessage(message);
+                    smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null);
+                }
+            }else {
+                Phonenumber_Multi = "false";
+                Log.d("Hmmmm "," phonenumber: "+phonenumber +" message: "+message);
+                smsManager.sendTextMessage(phonenumber, null, message, null, null);
+            }
+            rescheduleAlarm(phonenumber,Phonenumber_Multi,message, context, triggerTime, repeatSmS, alarmId);
+            sendNotification(context);
         }
-        rescheduleAlarm(phonenumber,Phonenumber_Multi,message, context, triggerTime, repeatSmS, alarmId);
-        sendNotification(context);
+
     }
 
     private void rescheduleAlarm(String phonenumber,String Phonenumber_Multi, String message, Context context, long triggerTime, String repeatSmS, int alarmId) {
@@ -137,9 +157,8 @@ private String year;
         int notificationId = random.nextInt();
 
         // Create an intent for the notification
-       // Intent notificationIntent = new Intent(context, MainActivity.class);
-        Intent notificationIntent = new Intent(context, ProfileActivityTest.class);
-        notificationIntent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
+        Intent notificationIntent = new Intent(context, ScheduledList.class);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE);
 
         builder.setContentIntent(pendingIntent);

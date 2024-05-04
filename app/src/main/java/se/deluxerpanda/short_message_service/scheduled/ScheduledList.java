@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import se.deluxerpanda.short_message_service.profile.ProfileActivityTest;
+import se.deluxerpanda.short_message_service.profile.ProfileActivity;
 import se.deluxerpanda.short_message_service.smssender.MainActivity;
 import se.deluxerpanda.short_message_service.R;
 
@@ -189,7 +189,7 @@ public class ScheduledList extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Intent intent = new Intent(ScheduledList.this, ProfileActivityTest.class);
+                        Intent intent = new Intent(ScheduledList.this, ProfileActivity.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title);

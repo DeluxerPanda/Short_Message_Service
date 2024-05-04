@@ -33,13 +33,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".profile.ProfileActivityTest">
+        <activity android:name=".profile.ProfileActivity">
         </activity>
         <activity android:name=".smssender.PhoneListActivity">
-        </activity>
-        <activity android:name=".scheduled.ProfileActivity">
-        </activity>
-        <activity android:name=".scheduled.ProfileEditorActivity">
         </activity>
         <activity android:name=".scheduled.ScheduledList">
         </activity>

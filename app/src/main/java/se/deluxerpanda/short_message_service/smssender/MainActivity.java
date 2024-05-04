@@ -63,7 +63,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.profile.ProfileActivityTest;
+import se.deluxerpanda.short_message_service.profile.ProfileActivity;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SMS_PERMISSION_REQUEST_CODE = 1;
@@ -490,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                 dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(MainActivity.this, ProfileActivityTest.class);
+                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", finalTitle);
