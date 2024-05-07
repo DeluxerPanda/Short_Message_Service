@@ -628,7 +628,11 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
 
 
-            startForegroundService(intent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            }else {
+                startService(intent);
+            }
 
 
             PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
@@ -815,7 +819,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (cursor.moveToFirst()) {
                     // Contact exists, extract the first name from the display name
-                    String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                    String contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
                     String[] parts = contactName.split("\\s+"); // Split by whitespace
                     return parts[0]; // Return the first part
                 }
@@ -837,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 if (cursor.moveToFirst()) {
                     // Contact exists, return the name
-                    String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                    String contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
                     return contactName;
                 }
             } finally {
@@ -861,7 +865,7 @@ public class MainActivity extends AppCompatActivity {
         Uri photoUri = null;
 
         if (cursor != null && cursor.moveToFirst()) {
-            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            String photoUriString = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if (photoUriString != null) {
                 photoUri = Uri.parse(photoUriString);
             }

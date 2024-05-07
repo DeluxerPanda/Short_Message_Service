@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class AlertCreator {
-    private static EditText phoneNumberEditText;
-    private static EditText messageEditText;
+    private  EditText phoneNumberEditText;
+    private  EditText messageEditText;
     public static void showAlertBox_only_ok(Context context, String title, String message) {
         // Create an AlertDialog.Builder
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

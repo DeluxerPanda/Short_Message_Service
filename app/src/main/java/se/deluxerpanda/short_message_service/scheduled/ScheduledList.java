@@ -217,7 +217,7 @@ public class ScheduledList extends AppCompatActivity {
         Uri photoUri = null;
 
         if (cursor != null && cursor.moveToFirst()) {
-            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            String photoUriString = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if (photoUriString != null) {
                 photoUri = Uri.parse(photoUriString);
             }

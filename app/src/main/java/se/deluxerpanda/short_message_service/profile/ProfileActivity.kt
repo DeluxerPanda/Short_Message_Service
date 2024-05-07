@@ -47,7 +47,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -68,6 +67,11 @@ import coil.compose.rememberAsyncImagePainter
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 
 class ProfileActivity  : ComponentActivity() {
@@ -362,7 +366,6 @@ class ProfileActivity  : ComponentActivity() {
                                                         navController.navigate("PhoneNumberField")
                                                     }
                                                     .padding(bottom = 10.dp)
-                                                    .layoutId("01_PhoneNumber")
                                             )
                                         }
                                     }
@@ -398,7 +401,6 @@ class ProfileActivity  : ComponentActivity() {
 
                                                 modifier = Modifier
                                                     .padding(top = 10.dp, bottom = 10.dp)
-                                                    .layoutId("text")
                                             )
 
                                             Image(
@@ -419,6 +421,7 @@ class ProfileActivity  : ComponentActivity() {
                         }
                     }
                     composable("TimeAndDateField") {
+                        var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                         val scrollBehavior =
                             TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                         Scaffold(
@@ -439,6 +442,19 @@ class ProfileActivity  : ComponentActivity() {
                                     },
                                     navigationIcon = {
                                         IconButton(onClick = {
+                                            var selectedDateTime: Date? = null
+                                            val currentCalendar = Calendar.getInstance()
+                                            val currentTimeInMillis: Long = currentCalendar.getTimeInMillis()
+                                            val sdfDateTime = SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault())
+                                            val timeStr: String = timeAndDate!!.substringAfter("|")
+                                            val dateStr: String = timeAndDate!!.substringBefore(" |")
+                                            try {
+                                                selectedDateTime = sdfDateTime.parse(dateStr + " " + timeStr)
+                                            } catch (e: ParseException) {
+                                                e.printStackTrace()
+                                            }
+                                            if (selectedDateTime != null && selectedDateTime.time > currentTimeInMillis) {
+
                                             navController.previousBackStackEntry
                                                 ?.savedStateHandle
                                                 ?.set(
@@ -446,6 +462,9 @@ class ProfileActivity  : ComponentActivity() {
                                                     editedtimeAndDate
                                                 )
                                             navController.popBackStack()
+                                            }else{
+                                                showNoBackInTimeDialog = true
+                                            }
                                         }
                                         ) {
                                             Icon(
@@ -457,8 +476,22 @@ class ProfileActivity  : ComponentActivity() {
 
                                     actions = {
                                         var showDialog by remember { mutableStateOf(false) }
+
                                         IconButton(onClick = {
-                                            if (editedtimeAndDate != timeAndDate) {
+                                            var selectedDateTime: Date? = null
+                                            val currentCalendar = Calendar.getInstance()
+                                            val currentTimeInMillis: Long = currentCalendar.getTimeInMillis()
+                                            val sdfDateTime = SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault())
+                                            val timeStr: String = timeAndDate!!.substringAfter("|")
+                                            val dateStr: String = timeAndDate!!.substringBefore(" |")
+                                            try {
+                                                selectedDateTime = sdfDateTime.parse(dateStr + " " + timeStr)
+                                            } catch (e: ParseException) {
+                                                e.printStackTrace()
+                                            }
+                                            if (selectedDateTime != null && selectedDateTime!!.time > currentTimeInMillis){
+
+                                            if (editedtimeAndDate == timeAndDate) {
                                                 showDialog = true
                                             } else {
                                                 showDialog = false
@@ -469,6 +502,9 @@ class ProfileActivity  : ComponentActivity() {
                                                         editedtimeAndDate
                                                     )
                                                 navController.popBackStack()
+                                            }
+                                        }else{
+                                                showNoBackInTimeDialog = true
                                             }
                                         })
                                         {
@@ -485,6 +521,20 @@ class ProfileActivity  : ComponentActivity() {
                                             },
                                             onSave = {
                                                 showDialog = false
+                                                navController.previousBackStackEntry
+                                                    ?.savedStateHandle
+                                                    ?.set(
+                                                        "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
+                                                        editedtimeAndDate
+                                                    )
+                                            }
+                                        )
+                                        NoBackInTimeDialog(
+                                            showNoBackInTimeDialog = showNoBackInTimeDialog,
+                                            onDismiss = {
+                                            },
+                                            onSave = {
+                                                showNoBackInTimeDialog = false
                                                 navController.previousBackStackEntry
                                                     ?.savedStateHandle
                                                     ?.set(
@@ -535,7 +585,7 @@ class ProfileActivity  : ComponentActivity() {
 
 
                                 var Date by remember { mutableStateOf(timeAndDate!!.substringBefore("|")) }
-// Parsing year, month, and day from the Date string
+                                // Parsing year, month, and day from the Date string
                                 val mYear = try { Date.substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 }
                                 val mMonth = try { Date.substringAfter("-").substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 } -1
                                 val mDay = try { Date.substringAfterLast("-").substringBefore(" | ").trim().toInt() } catch (e: NumberFormatException) { 0 }
@@ -884,6 +934,7 @@ class ProfileActivity  : ComponentActivity() {
                 }
             }
 
+
     fun it_isPhoneNumberField(){
         if (editedphoneNumber!!.contains(",")) {
             editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
@@ -971,6 +1022,31 @@ class ProfileActivity  : ComponentActivity() {
                         Text("Don't Save")
                     }
                 },
+                properties = DialogProperties()
+            )
+        }
+    }
+    @Composable
+    fun NoBackInTimeDialog(
+        showNoBackInTimeDialog: Boolean,
+        onDismiss: () -> Unit,
+        onSave: () -> Unit
+    ) {
+        if (showNoBackInTimeDialog) {
+            AlertDialog(
+                onDismissRequest = { onDismiss() },
+                title = { Text(getString(R.string.sms_time_travel_titel))},
+                text = { Text(getString(R.string.sms_time_travel_Text))},
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                        onSave()
+                    }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+                dismissButton = {},
                 properties = DialogProperties()
             )
         }

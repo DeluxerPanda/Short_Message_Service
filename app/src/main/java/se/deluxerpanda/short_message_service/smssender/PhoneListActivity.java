@@ -119,12 +119,12 @@ public class PhoneListActivity extends AppCompatActivity {
 
         Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
         while (cursor.moveToNext()) {
-            String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            String contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
 
 
             // Check if the contact has at least one phone number
-            if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
+            if (Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                 Map<String, String> curGroupMap = new HashMap<>();
                 groupData.add(curGroupMap);
                 curGroupMap.put("NAME", name);
@@ -139,7 +139,7 @@ public class PhoneListActivity extends AppCompatActivity {
                 if (phoneCursor.getCount() == 1) {
                     if (phoneCursor.moveToFirst()) {
                         // If there's only one phone number, save it
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         curGroupMap.put("PHONE", phoneNumber);
                         hasSinglePhoneNumber = true;
                         curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
@@ -148,11 +148,11 @@ public class PhoneListActivity extends AppCompatActivity {
                 }
 
                 while (phoneCursor.moveToNext()) {
-                    String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     Map<String, String> curChildMap = new HashMap<>();
                     children.add(curChildMap);
 
-                    int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE));
+                    int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.TYPE));
 
 
 
@@ -312,7 +312,7 @@ public class PhoneListActivity extends AppCompatActivity {
         Uri photoUri = null;
 
         if (cursor != null && cursor.moveToFirst()) {
-            String photoUriString = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            String photoUriString = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if (photoUriString != null) {
                 photoUri = Uri.parse(photoUriString);
             }
