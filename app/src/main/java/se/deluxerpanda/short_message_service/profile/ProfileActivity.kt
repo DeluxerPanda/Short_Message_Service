@@ -4,13 +4,16 @@ import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -69,6 +72,9 @@ import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -83,7 +89,6 @@ class ProfileActivity  : ComponentActivity() {
 
     private var photoUriString: String? = null
 
-    private var isTimeAndDateChanged: Boolean = false
     private var timeAndDate: String? = null
     private var editedtimeAndDate: String? = null
 
@@ -100,6 +105,7 @@ class ProfileActivity  : ComponentActivity() {
 
     private var contactName: String? = null
     private var contactNameAndLast: String? = null
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("DefaultLocale")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -442,28 +448,26 @@ class ProfileActivity  : ComponentActivity() {
                                     },
                                     navigationIcon = {
                                         IconButton(onClick = {
-                                            var selectedDateTime: Date? = null
-                                            val currentCalendar = Calendar.getInstance()
-                                            val currentTimeInMillis: Long = currentCalendar.getTimeInMillis()
-                                            val sdfDateTime = SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault())
-                                            val timeStr: String = timeAndDate!!.substringAfter("|")
+                                            val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                            val timeStr: String = timeAndDate!!.substringAfter("| ")
                                             val dateStr: String = timeAndDate!!.substringBefore(" |")
                                             try {
-                                                selectedDateTime = sdfDateTime.parse(dateStr + " " + timeStr)
+                                                val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
+                                                val currentDateTime = LocalDateTime.now()
+
+                                                if (selectedDateTime.isAfter(currentDateTime)) {
+                                                    navController.previousBackStackEntry
+                                                        ?.savedStateHandle
+                                                        ?.set(
+                                                            "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
+                                                            editedtimeAndDate
+                                                        )
+                                                    navController.popBackStack()
+                                                } else {
+                                                    showNoBackInTimeDialog = true
+                                                }
                                             } catch (e: ParseException) {
                                                 e.printStackTrace()
-                                            }
-                                            if (selectedDateTime != null && selectedDateTime.time > currentTimeInMillis) {
-
-                                            navController.previousBackStackEntry
-                                                ?.savedStateHandle
-                                                ?.set(
-                                                    "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                    editedtimeAndDate
-                                                )
-                                            navController.popBackStack()
-                                            }else{
-                                                showNoBackInTimeDialog = true
                                             }
                                         }
                                         ) {
@@ -478,18 +482,6 @@ class ProfileActivity  : ComponentActivity() {
                                         var showDialog by remember { mutableStateOf(false) }
 
                                         IconButton(onClick = {
-                                            var selectedDateTime: Date? = null
-                                            val currentCalendar = Calendar.getInstance()
-                                            val currentTimeInMillis: Long = currentCalendar.getTimeInMillis()
-                                            val sdfDateTime = SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault())
-                                            val timeStr: String = timeAndDate!!.substringAfter("|")
-                                            val dateStr: String = timeAndDate!!.substringBefore(" |")
-                                            try {
-                                                selectedDateTime = sdfDateTime.parse(dateStr + " " + timeStr)
-                                            } catch (e: ParseException) {
-                                                e.printStackTrace()
-                                            }
-                                            if (selectedDateTime != null && selectedDateTime!!.time > currentTimeInMillis){
 
                                             if (editedtimeAndDate == timeAndDate) {
                                                 showDialog = true
@@ -503,9 +495,6 @@ class ProfileActivity  : ComponentActivity() {
                                                     )
                                                 navController.popBackStack()
                                             }
-                                        }else{
-                                                showNoBackInTimeDialog = true
-                                            }
                                         })
                                         {
                                             Icon(
@@ -517,30 +506,37 @@ class ProfileActivity  : ComponentActivity() {
                                             showDialog = showDialog,
                                             onDismiss = {
                                                 showDialog = false
-                                                navController.popBackStack()
+                                              navController.popBackStack()
                                             },
                                             onSave = {
                                                 showDialog = false
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set(
-                                                        "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                        editedtimeAndDate
-                                                    )
+                                                val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                                val timeStr: String = timeAndDate!!.substringAfter("| ")
+                                                val dateStr: String = timeAndDate!!.substringBefore(" |")
+                                                try {
+                                                    val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
+                                                    val currentDateTime = LocalDateTime.now()
+
+                                                    if (selectedDateTime.isAfter(currentDateTime)) {
+                                                        navController.previousBackStackEntry
+                                                            ?.savedStateHandle
+                                                            ?.set(
+                                                                "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
+                                                                editedtimeAndDate
+                                                            )
+                                                    }else{
+                                                        showNoBackInTimeDialog = true
+                                                    }
+                                                } catch (e: ParseException) {
+                                                    e.printStackTrace()
+                                                }
                                             }
                                         )
                                         NoBackInTimeDialog(
                                             showNoBackInTimeDialog = showNoBackInTimeDialog,
-                                            onDismiss = {
-                                            },
+                                            onDismiss = {},
                                             onSave = {
                                                 showNoBackInTimeDialog = false
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set(
-                                                        "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                        editedtimeAndDate
-                                                    )
                                             }
                                         )
                                     },
@@ -570,7 +566,7 @@ class ProfileActivity  : ComponentActivity() {
                                     mContext,
                                     { _, hour: Int, minute: Int ->
                                         val newTime = "$hour:$minute"
-                                        timeAndDate = timeAndDate!!.replaceAfterLast("|", newTime)
+                                        timeAndDate = timeAndDate!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
                                     }, mHour, mMinute, true
                                 )
@@ -608,10 +604,7 @@ class ProfileActivity  : ComponentActivity() {
                                     Text(text = Date)
                                 }
                             }
-
-                            if (!isTimeAndDateChanged) {
                                 editedtimeAndDate = timeAndDate
-                            }
                         }
                     }
                     composable("PhoneNumberField") {
@@ -1006,7 +999,7 @@ class ProfileActivity  : ComponentActivity() {
     ) {
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = { onDismiss() },
+                onDismissRequest = {},
                 title = { Text("Unsaved Changes") },
                 text = { Text("You haven't saved your changes. Do you want to save them?") },
                 confirmButton = {
@@ -1034,7 +1027,7 @@ class ProfileActivity  : ComponentActivity() {
     ) {
         if (showNoBackInTimeDialog) {
             AlertDialog(
-                onDismissRequest = { onDismiss() },
+                onDismissRequest = {},
                 title = { Text(getString(R.string.sms_time_travel_titel))},
                 text = { Text(getString(R.string.sms_time_travel_Text))},
                 confirmButton = {
