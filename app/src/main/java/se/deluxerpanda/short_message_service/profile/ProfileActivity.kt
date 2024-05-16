@@ -600,7 +600,7 @@ class ProfileActivity  : ComponentActivity() {
                                     Text(text = Date)
                                 }
                             }
-                                editedtimeAndDate = timeAndDate
+                            editedtimeAndDate = timeAndDate
                         }
                     }
                     composable("PhoneNumberField") {
@@ -729,7 +729,7 @@ class ProfileActivity  : ComponentActivity() {
                                         ),
                                         label = {
                                             Text(
-                                                text = "Phone number ${index + 1}",
+                                                text = "${getString(R.string.history_info_PhoneNumber_name)} ${index + 1}",
                                                 textAlign = TextAlign.Center
                                             )
                                         },
@@ -751,11 +751,15 @@ class ProfileActivity  : ComponentActivity() {
                                                 }
                                                 IconButton(onClick = {
                                                     Log.d("editedphoneNumber-1: ", editedphoneNumber!!)
+
                                                     editedPhoneNumbers =
                                                         editedPhoneNumbers.toMutableList()
                                                             .also { list ->
+
+                                                                println("List before removing : " + list)
+
                                                                 if (editedPhoneNumbers.size != 1) {
-                                                                        list.removeAt(index)
+                                                                    list.removeAt(index)
                                                                 } else {
                                                                     Toast.makeText(
                                                                         mContext,
@@ -765,6 +769,7 @@ class ProfileActivity  : ComponentActivity() {
                                                                 }
                                                                 editedphoneNumber = editedPhoneNumbers.joinToString(",")
                                                                 Log.d("editedphoneNumber-2: ", editedphoneNumber!!)
+                                                                println("List after  removing : " + list)
                                                                 isPhoneNumberChanged = true
                                                             }
                                                 }) {
@@ -915,6 +920,7 @@ class ProfileActivity  : ComponentActivity() {
                                 }
                             }
                             if (!isMessageChanged){
+
                                 editedMessage = MessageFieldText
                             }
                         }
