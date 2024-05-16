@@ -11,7 +11,6 @@ import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -71,13 +70,8 @@ import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 
 class ProfileActivity  : ComponentActivity() {
@@ -506,14 +500,17 @@ class ProfileActivity  : ComponentActivity() {
                                             showDialog = showDialog,
                                             onDismiss = {
                                                 showDialog = false
-                                              navController.popBackStack()
+                                                if (showNoBackInTimeDialog == false){
+                                                    navController.popBackStack()
+                                                }
+
                                             },
                                             onSave = {
-                                                showDialog = false
-                                                val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
-                                                val timeStr: String = timeAndDate!!.substringAfter("| ")
-                                                val dateStr: String = timeAndDate!!.substringBefore(" |")
+                                              //  showDialog = false
                                                 try {
+                                                    val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                                    val timeStr: String = timeAndDate!!.substringAfter("| ")
+                                                    val dateStr: String = timeAndDate!!.substringBefore(" |")
                                                     val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
                                                     val currentDateTime = LocalDateTime.now()
 
@@ -534,7 +531,6 @@ class ProfileActivity  : ComponentActivity() {
                                         )
                                         NoBackInTimeDialog(
                                             showNoBackInTimeDialog = showNoBackInTimeDialog,
-                                            onDismiss = {},
                                             onSave = {
                                                 showNoBackInTimeDialog = false
                                             }
@@ -722,8 +718,9 @@ class ProfileActivity  : ComponentActivity() {
                                             isPhoneNumberChanged = true
                                         },
                                         keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Phone,
+                                            keyboardType = KeyboardType.Number,
                                             imeAction = ImeAction.Done,
+                                            autoCorrect = false
                                         ),
                                         keyboardActions = KeyboardActions(
                                             onDone = {
@@ -1015,21 +1012,22 @@ class ProfileActivity  : ComponentActivity() {
                         Text("Don't Save")
                     }
                 },
-                properties = DialogProperties()
+                properties = DialogProperties(),
             )
         }
     }
     @Composable
     fun NoBackInTimeDialog(
         showNoBackInTimeDialog: Boolean,
-        onDismiss: () -> Unit,
-        onSave: () -> Unit
+        onSave: () -> Unit,
     ) {
         if (showNoBackInTimeDialog) {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(getString(R.string.sms_time_travel_titel))},
+
                 text = { Text(getString(R.string.sms_time_travel_Text))},
+
                 confirmButton = {
                     TextButton(
                         modifier = Modifier.fillMaxWidth(),
@@ -1039,12 +1037,16 @@ class ProfileActivity  : ComponentActivity() {
                         Text(getString(R.string.text_ok))
                     }
                 },
+
                 dismissButton = {},
-                properties = DialogProperties()
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
             )
         }
     }
-        }
+}
 
 
 
