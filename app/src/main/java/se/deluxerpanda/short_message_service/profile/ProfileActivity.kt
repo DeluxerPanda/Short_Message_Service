@@ -691,7 +691,7 @@ class ProfileActivity  : ComponentActivity() {
                         ) { innerPadding ->
                             val keyboardController = LocalSoftwareKeyboardController.current
                             val mContext = LocalContext.current
-                            var editedPhoneNumbers by remember {
+                            var list by remember {
                                 mutableStateOf(
                                     phoneNumber?.split(",") ?: listOf()
                                 )
@@ -705,16 +705,16 @@ class ProfileActivity  : ComponentActivity() {
                                     .padding(20.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                editedPhoneNumbers.forEachIndexed { index, phone ->
+                                list.forEachIndexed { index, phone ->
                                     OutlinedTextField(
                                         value = phone,
                                         onValueChange = {
-                                            editedPhoneNumbers =
-                                                editedPhoneNumbers.toMutableList().also { list ->
+                                            list =
+                                                list.toMutableList().also { list ->
                                                     list[index] = it
                                                 }
                                             editedphoneNumber =
-                                                editedPhoneNumbers.joinToString(",")
+                                                list.joinToString(",")
                                             isPhoneNumberChanged = true
                                         },
                                         keyboardOptions = KeyboardOptions(
@@ -750,15 +750,10 @@ class ProfileActivity  : ComponentActivity() {
                                                     )
                                                 }
                                                 IconButton(onClick = {
-                                                    Log.d("editedphoneNumber-1: ", editedphoneNumber!!)
-
-                                                    editedPhoneNumbers =
-                                                        editedPhoneNumbers.toMutableList()
+                                                    list =
+                                                        list.toMutableList()
                                                             .also { list ->
-
-                                                                println("List before removing : " + list)
-
-                                                                if (editedPhoneNumbers.size != 1) {
+                                                                if (list.size != 1) {
                                                                     list.removeAt(index)
                                                                 } else {
                                                                     Toast.makeText(
@@ -767,9 +762,7 @@ class ProfileActivity  : ComponentActivity() {
                                                                         Toast.LENGTH_SHORT
                                                                     ).show()
                                                                 }
-                                                                editedphoneNumber = editedPhoneNumbers.joinToString(",")
-                                                                Log.d("editedphoneNumber-2: ", editedphoneNumber!!)
-                                                                println("List after  removing : " + list)
+                                                                editedphoneNumber = list.joinToString(",")
                                                                 isPhoneNumberChanged = true
                                                             }
                                                 }) {
@@ -786,8 +779,8 @@ class ProfileActivity  : ComponentActivity() {
                                     )
                                 }
                                 IconButton(onClick = {
-                                    editedPhoneNumbers =
-                                        editedPhoneNumbers.toMutableList().also { list ->
+                                    list =
+                                        list.toMutableList().also { list ->
                                             list.add("")
                                             isPhoneNumberChanged = true
                                         }
