@@ -3,15 +3,19 @@ package se.deluxerpanda.short_message_service.profile
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -68,6 +72,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
+import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.text.ParseException
 import java.time.LocalDateTime
@@ -75,6 +80,8 @@ import java.time.format.DateTimeFormatter
 
 
 class ProfileActivity  : ComponentActivity() {
+
+
 
     private var title: String? = null
     private var alarmId = 0
@@ -91,6 +98,9 @@ class ProfileActivity  : ComponentActivity() {
     private var editedphoneNumber: String? = null
     private var editedphoneNumberNew: String? = null
 
+    private var phoneNumberID: String? = null
+private var phoneNumberData: String? = null
+
     private var MessageFieldText: String? = null
 
 
@@ -99,12 +109,13 @@ class ProfileActivity  : ComponentActivity() {
 
     private var contactName: String? = null
     private var contactNameAndLast: String? = null
-    @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("DefaultLocale")
+
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val intent = intent
+        var intent = intent
         if (intent != null) {
             title = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TITLE")
             alarmId = intent.getIntExtra("EXTRA_HISTORY_PROFILE_ALARMID", 0)
@@ -711,7 +722,7 @@ class ProfileActivity  : ComponentActivity() {
                                         onValueChange = {
                                             list =
                                                 list.toMutableList().also { list ->
-                                                    list[index] = it
+                                                    list[index] = "it"
                                                 }
                                             editedphoneNumber =
                                                 list.joinToString(",")
@@ -738,11 +749,23 @@ class ProfileActivity  : ComponentActivity() {
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 IconButton(onClick = {
-                                                    Toast.makeText(
-                                                        mContext,
-                                                        "Coming Soon! - import contacts!",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                 intent = Intent(this@ProfileActivity, PhoneListActivity::class.java)
+                                                 PhoneListActivityLauncher.launch(intent)
+
+
+                                                 list = list.toMutableList().also { list ->
+                                                     if (phoneNumberData != null) {
+                                                         list[index] = phoneNumberData.toString()
+                                                         editedphoneNumber =
+                                                             list.joinToString(",")
+                                                         isPhoneNumberChanged = true
+                                                     }
+                                                 }
+
+
+
+
+                                                    Toast.makeText(mContext, "Coming Soon! - import contacts!", Toast.LENGTH_SHORT).show()
                                                 }) {
                                                     Icon(
                                                         painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
@@ -923,6 +946,19 @@ class ProfileActivity  : ComponentActivity() {
                 }
             }
 
+  private val PhoneListActivityLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult<Intent, ActivityResult>(
+            ActivityResultContracts.StartActivityForResult(),
+            object : ActivityResultCallback<ActivityResult> {
+                override fun onActivityResult(result: ActivityResult) {
+                    if (result.resultCode == RESULT_OK) {
+                        val data = result.data
+                        phoneNumberData = data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS").toString()
+                        Toast.makeText(this@ProfileActivity, phoneNumberData, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+
 
     fun it_isPhoneNumberField(){
         if (editedphoneNumber!!.contains(",")) {
@@ -1045,7 +1081,15 @@ class ProfileActivity  : ComponentActivity() {
             )
         }
     }
+
 }
+
+
+
+
+
+
+
 
 
 
