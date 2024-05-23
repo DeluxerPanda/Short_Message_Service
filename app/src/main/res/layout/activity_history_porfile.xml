@@ -43,7 +43,7 @@
                 android:layout_alignTop="@id/btnToMainSmsSchedulerPage"
                 android:layout_toStartOf="@id/btnToDeleteScheduledMessage"
                 app:srcCompat="@drawable/baseline_pause"
-                android:contentDescription="@string/DelayScheduledMessage" />
+                android:contentDescription="@string/DelayScheduleMessage" />
 
             <ImageView
                 android:id="@+id/btnToDeleteScheduledMessage"
@@ -53,7 +53,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_alignParentEnd="true"
                 app:srcCompat="@drawable/ic_baseline_delete_outline"
-                android:contentDescription="@string/DeleteScheduledMessage" />
+                android:contentDescription="@string/DeleteScheduleMessage" />
         </RelativeLayout>
         <TextView
             android:id="@+id/Profile_History_group_name"

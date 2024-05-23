@@ -1,22 +1,19 @@
 package se.deluxerpanda.short_message_service.profile
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -93,16 +90,17 @@ class ProfileActivity  : ComponentActivity() {
     private var timeAndDate: String? = null
     private var editedtimeAndDate: String? = null
 
+    private  var repeats: String? = null
+
     private var phoneNumber: String? = null
     private var phoneNumberNew: String? = null
     private var editedphoneNumber: String? = null
     private var editedphoneNumberNew: String? = null
 
     private var phoneNumberID: String? = null
-private var phoneNumberData: String? = null
+    private var phoneNumberData: String? = null
 
     private var MessageFieldText: String? = null
-
 
     private var  isMessageChanged: Boolean = false
     private var editedMessage: String? = null
@@ -110,6 +108,7 @@ private var phoneNumberData: String? = null
     private var contactName: String? = null
     private var contactNameAndLast: String? = null
 
+    private var UpdateSceduluedSmS: Boolean = false
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -127,6 +126,8 @@ private var phoneNumberData: String? = null
 
 
             timeAndDate = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE")
+
+            repeats = intent.getStringExtra("EXTRA_HISTORY_PROFILE_REPEATS")
 
             phoneNumber = intent.getStringExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER")
             phoneNumberNew = if (phoneNumber!!.contains(",")) {
@@ -146,19 +147,21 @@ private var phoneNumberData: String? = null
                             entry.savedStateHandle.get<String>("EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE")
                         if (TimeAndDateFieldTextupdate != null) {
                             timeAndDate = TimeAndDateFieldTextupdate
+                            UpdateSceduluedSmS = true
                         }
 
                         val MessageFieldTextupdate =
                             entry.savedStateHandle.get<String>("EXTRA_PROFILE_EDITOR_FINAL_MESSAGE")
                         if (MessageFieldTextupdate != null) {
                             MessageFieldText = MessageFieldTextupdate
+                            UpdateSceduluedSmS = true
                         }
 
                         val PhoneNumberFieldTextupdate =
                             entry.savedStateHandle.get<String>("EXTRA_PROFILE_EDITOR_FINAL_PHONENUMBER")
                         if (PhoneNumberFieldTextupdate != null) {
                             phoneNumber = PhoneNumberFieldTextupdate
-
+                            UpdateSceduluedSmS = true
                             phoneNumberNew = if (phoneNumber!!.contains(",")) {
                                 phoneNumber!!.replace(",", "\n")
                             } else {
@@ -181,8 +184,33 @@ private var phoneNumberData: String? = null
                                     title = {
                                     },
                                     navigationIcon = {
+                                        var showReSceduledOrNotDialog by remember { mutableStateOf(false) }
+                                        ReSceduledOrNotDialog(
+                                            showReSceduledOrNotDialog = showReSceduledOrNotDialog,
+                                            onSave = {
+
+                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_TIMEANDDATE", timeAndDate)
+
+                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_MESSAGE", MessageFieldText)
+
+                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_PHONENUMBER", phoneNumber)
+
+
+                                                showReSceduledOrNotDialog = false
+                                                finish()
+                                            },
+                                            onDismiss = {
+                                                showReSceduledOrNotDialog = false
+                                                finish()
+                                            }
+                                        )
                                         IconButton(onClick = {
-                                            finish()
+                                            if (UpdateSceduluedSmS == true){
+                                                showReSceduledOrNotDialog = true
+                                            }else{
+                                                finish()
+                                            }
+
                                         }
                                         ) {
                                             Icon(
@@ -193,39 +221,56 @@ private var phoneNumberData: String? = null
                                     },
 
                                     actions = {
+                                        var showSendNowDialog by remember { mutableStateOf(false) }
+                                        SendNowDialog(
+                                            showSendNowDialog = showSendNowDialog,
+                                            onSave = {
+                                                showSendNowDialog = false
+                                            }
+                                        )
                                         IconButton(onClick = {
-                                            Toast.makeText(
-                                                this@ProfileActivity,
-                                                "Coming Soon!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            showSendNowDialog = true
                                         })
                                         {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_send),
-                                                contentDescription = "Close button"
+                                                contentDescription = "Send now button"
                                             )
                                         }
+                                        var showDelayDialog by remember { mutableStateOf(false) }
+                                        DelayDialog(
+                                            showDelayDialog = showDelayDialog,
+                                            onSave = {
+                                                showDelayDialog = false
+                                            }
+                                        )
                                         IconButton(onClick = {
-                                            Toast.makeText(
-                                                this@ProfileActivity,
-                                                "Coming Soon!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            showDelayDialog = true
                                         })
                                         {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_pause),
-                                                contentDescription = "Close button"
+                                                contentDescription = "Delay button"
                                             )
                                         }
+                                        var showDeleteDialog by remember { mutableStateOf(false) }
+                                        DeleteDialog(
+                                            showDeleteDialog = showDeleteDialog,
+                                            onSave = {
+                                                showDeleteDialog = false
+                                                val mainActivity = MainActivity()
+                                                mainActivity.deleteAlarm(
+                                                    alarmId,
+                                                    this@ProfileActivity
+                                                )
+                                                finish()
+                                            },
+                                            onDismiss = {
+                                                showDeleteDialog = false
+                                            }
+                                        )
                                         IconButton(onClick = {
-                                            val mainActivity = MainActivity()
-                                            mainActivity.deleteAlarm(
-                                                alarmId,
-                                                this@ProfileActivity
-                                            )
-                                            finish()
+                                            showDeleteDialog = true
                                         })
                                         {
                                             Icon(
@@ -314,7 +359,7 @@ private var phoneNumberData: String? = null
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = timeAndDate!!,
+                                                text = timeAndDate!! +"\n Repeats: " +repeats,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 15.sp,
                                                 modifier = Modifier.padding(
@@ -578,7 +623,7 @@ private var phoneNumberData: String? = null
                                     }, mHour, mMinute, true
                                 )
 
-                                Text(text = "Time")
+                                Text(text = "Time:")
                                 OutlinedButton(onClick = {
                                     mTimePickerDialog.show()
                                 }) {
@@ -604,12 +649,20 @@ private var phoneNumberData: String? = null
                                     }, mYear, mMonth, mDay
                                 )
 
-                                Text(text = "Date")
+                                Text(text = "Date:")
                                 OutlinedButton(onClick = {
                                     mDatePickerDialog.show()
                                 }) {
                                     Text(text = Date)
                                 }
+
+                                Text(text = "Repeats evry:")
+                                OutlinedButton(onClick = {
+                                //    mDatePickerDialog.show()
+                                }) {
+                                    repeats?.let { it1 -> Text(text = it1) }
+                                }
+
                             }
                             editedtimeAndDate = timeAndDate
                         }
@@ -708,6 +761,9 @@ private var phoneNumberData: String? = null
                                 )
                             }
                             var isPhoneNumberChanged by remember { mutableStateOf(false) }
+
+
+
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -717,12 +773,28 @@ private var phoneNumberData: String? = null
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 list.forEachIndexed { index, phone ->
+                                    val launchPhoneList = rememberLauncherForActivityResult(
+                                        contract = ActivityResultContracts.StartActivityForResult()
+                                    ) { result ->
+                                        if (result.resultCode == Activity.RESULT_OK) {
+                                            val phoneNumberData = result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
+                                            // Handle the phone number data received
+                                            list = list.toMutableList().also { list ->
+                                                if (phoneNumberData != null) {
+                                                    list[index] = phoneNumberData.toString()
+                                                    editedphoneNumber =
+                                                        list.joinToString(",")
+                                                    isPhoneNumberChanged = true
+                                                }
+                                            }
+                                        }
+                                    }
                                     OutlinedTextField(
                                         value = phone,
                                         onValueChange = {
                                             list =
                                                 list.toMutableList().also { list ->
-                                                    list[index] = "it"
+                                                    list[index] = it
                                                 }
                                             editedphoneNumber =
                                                 list.joinToString(",")
@@ -750,22 +822,7 @@ private var phoneNumberData: String? = null
                                             ) {
                                                 IconButton(onClick = {
                                                  intent = Intent(this@ProfileActivity, PhoneListActivity::class.java)
-                                                 PhoneListActivityLauncher.launch(intent)
-
-
-                                                 list = list.toMutableList().also { list ->
-                                                     if (phoneNumberData != null) {
-                                                         list[index] = phoneNumberData.toString()
-                                                         editedphoneNumber =
-                                                             list.joinToString(",")
-                                                         isPhoneNumberChanged = true
-                                                     }
-                                                 }
-
-
-
-
-                                                    Toast.makeText(mContext, "Coming Soon! - import contacts!", Toast.LENGTH_SHORT).show()
+                                                    launchPhoneList.launch(intent)
                                                 }) {
                                                     Icon(
                                                         painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
@@ -895,7 +952,7 @@ private var phoneNumberData: String? = null
 
                             val keyboardController = LocalSoftwareKeyboardController.current
 
-                            var text by remember { mutableStateOf(MessageFieldText) }
+                            var text by remember { mutableStateOf(MessageFieldText)}
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -945,19 +1002,6 @@ private var phoneNumberData: String? = null
                     }
                 }
             }
-
-  private val PhoneListActivityLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult<Intent, ActivityResult>(
-            ActivityResultContracts.StartActivityForResult(),
-            object : ActivityResultCallback<ActivityResult> {
-                override fun onActivityResult(result: ActivityResult) {
-                    if (result.resultCode == RESULT_OK) {
-                        val data = result.data
-                        phoneNumberData = data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS").toString()
-                        Toast.makeText(this@ProfileActivity, phoneNumberData, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
 
 
     fun it_isPhoneNumberField(){
@@ -1078,6 +1122,126 @@ private var phoneNumberData: String? = null
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,
                 ),
+            )
+        }
+    }
+
+    @Composable
+    fun SendNowDialog(
+        showSendNowDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showSendNowDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(getString(R.string.send_now))},
+
+                text = { Text(getString(R.string.history_info_MoreSoon_name))},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
+
+    @Composable
+    fun DelayDialog(
+        showDelayDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showDelayDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(getString(R.string.DelayScheduleMessage))},
+
+                text = { Text(getString(R.string.history_info_MoreSoon_name))},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
+
+    @Composable
+    fun DeleteDialog(
+        showDeleteDialog: Boolean,
+        onSave: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(getString(R.string.DeleteScheduleMessage))},
+                text = { Text(getString(R.string.DeleteScheduleMessage)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        onDismiss()
+                        onSave()
+                    }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onDismiss() }) {
+                        Text(getString(R.string.text_Cancel))
+                    }
+                },
+                properties = DialogProperties(),
+            )
+        }
+    }
+
+    @Composable
+    fun ReSceduledOrNotDialog(
+        showReSceduledOrNotDialog: Boolean,
+        onSave: () -> Unit,
+        onDismiss: () -> Unit
+    ) {
+        if (showReSceduledOrNotDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(getString(R.string.ReSceduleOrNotDialog_title))},
+                text = { Text(getString(R.string.ReSceduleOrNotDialog_text))},
+                confirmButton = {
+                    TextButton(onClick = {
+                        onDismiss()
+                        onSave()
+                    }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { onDismiss() }) {
+                        Text(getString(R.string.text_Cancel))
+                    }
+                },
+                properties = DialogProperties(),
             )
         }
     }

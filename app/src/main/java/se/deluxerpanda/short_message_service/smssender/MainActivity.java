@@ -495,6 +495,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", finalTitle);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
+                        intent.putExtra("EXTRA_HISTORY_PROFILE_REPEATS", getRepeatSmS);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber);
                         intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
                         startActivity(intent);

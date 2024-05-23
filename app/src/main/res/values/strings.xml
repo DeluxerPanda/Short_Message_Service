@@ -78,6 +78,8 @@
     <string name="send_now">Send now!</string>
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="exit_name">Exit</string>
-    <string name="DeleteScheduledMessage">Delete Scheduled Message</string>
-    <string name="DelayScheduledMessage">Delay Scheduled Message</string>
+    <string name="DeleteScheduleMessage">Delete Scheduled Message</string>
+    <string name="DelayScheduleMessage">Delay Scheduled Message</string>
+    <string name="ReSceduleOrNotDialog_title">Reschedule this SMS</string>
+    <string name="ReSceduleOrNotDialog_text">Do you want to reschedule this SMS?</string>
 </resources>

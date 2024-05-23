@@ -78,7 +78,9 @@
     <string name="puse">Pausa</string>
     <string name="send_now">Skicka nu!</string>
     <string name="exit_name">Exit</string>
-    <string name="DeleteScheduledMessage">Delete Scheduled Message</string>
-    <string name="DelayScheduledMessage">Delay Scheduled Message</string>
+    <string name="DeleteScheduleMessage">Delete Scheduled Message</string>
+    <string name="DelayScheduleMessage">Delay Scheduled Message</string>
 
+    <string name="ReSceduleOrNotDialog_title">Omplanera detta sms</string>
+    <string name="ReSceduleOrNotDialog_text">Vill du omplanera detta sms?</string>
 </resources>
