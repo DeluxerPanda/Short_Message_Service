@@ -15,16 +15,22 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -49,11 +55,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily.Companion.SansSerif
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -62,6 +75,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -242,7 +256,7 @@ class ProfileActivity  : ComponentActivity() {
                                             showDelayDialog = showDelayDialog,
                                             onSave = {
                                                 showDelayDialog = false
-                                            }
+                                           }
                                         )
                                         IconButton(onClick = {
                                             showDelayDialog = true
@@ -659,6 +673,7 @@ class ProfileActivity  : ComponentActivity() {
                                 Text(text = "Repeats evry:")
                                 OutlinedButton(onClick = {
                                 //    mDatePickerDialog.show()
+
                                 }) {
                                     repeats?.let { it1 -> Text(text = it1) }
                                 }
@@ -1076,10 +1091,24 @@ class ProfileActivity  : ComponentActivity() {
         if (showDialog) {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text("Unsaved Changes") },
-                text = { Text("You haven't saved your changes. Do you want to save them?") },
+                title = { Text(
+                    text = "Unsaved Changes",
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    )) },
+                text = { Text(text = "You haven't saved your changes. Do you want to save them?",
+                    fontWeight = FontWeight.Bold,) },
                 confirmButton = {
-                    TextButton(onClick = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
                         onSave()
                         onDismiss()
                     }) {
@@ -1087,7 +1116,15 @@ class ProfileActivity  : ComponentActivity() {
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { onDismiss() }) {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.errorContainer,
+                            ),
+                        onClick = { onDismiss() }) {
                         Text("Don't Save")
                     }
                 },
@@ -1103,13 +1140,26 @@ class ProfileActivity  : ComponentActivity() {
         if (showNoBackInTimeDialog) {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text(getString(R.string.sms_time_travel_titel))},
+                title = { Text(
+                    text = getString(R.string.sms_time_travel_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
 
-                text = { Text(getString(R.string.sms_time_travel_Text))},
+                text = { Text(
+                    text = getString(R.string.sms_time_travel_Text),
+                    fontWeight = FontWeight.Bold,)},
 
                 confirmButton = {
                     TextButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
                         onClick = {
                         onSave()
                     }) {
@@ -1134,13 +1184,27 @@ class ProfileActivity  : ComponentActivity() {
         if (showSendNowDialog) {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text(getString(R.string.send_now))},
+                title = { Text(
+                    text = getString(R.string.send_now),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
 
-                text = { Text(getString(R.string.history_info_MoreSoon_name))},
+                text = { Text(
+                    text = getString(R.string.history_info_MoreSoon_name),
+                    fontWeight = FontWeight.Bold,
+                    )},
 
                 confirmButton = {
                     TextButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
                         onClick = {
                             onSave()
                         }) {
@@ -1157,6 +1221,7 @@ class ProfileActivity  : ComponentActivity() {
         }
     }
 
+
     @Composable
     fun DelayDialog(
         showDelayDialog: Boolean,
@@ -1164,14 +1229,30 @@ class ProfileActivity  : ComponentActivity() {
     ) {
         if (showDelayDialog) {
             AlertDialog(
-                onDismissRequest = {},
-                title = { Text(getString(R.string.DelayScheduleMessage))},
 
-                text = { Text(getString(R.string.history_info_MoreSoon_name))},
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.DelayScheduleMessage),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    )
+                    )},
+
+                text = { Text(
+                    text = getString(R.string.history_info_MoreSoon_name),
+                    fontWeight = FontWeight.Bold,
+                )},
 
                 confirmButton = {
                     TextButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
                         onClick = {
                             onSave()
                         }) {
@@ -1184,6 +1265,7 @@ class ProfileActivity  : ComponentActivity() {
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,
                 ),
+
             )
         }
     }
@@ -1197,18 +1279,41 @@ class ProfileActivity  : ComponentActivity() {
         if (showDeleteDialog) {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text(getString(R.string.DeleteScheduleMessage))},
-                text = { Text(getString(R.string.DeleteScheduleMessage)) },
+                title = { Text(
+                    text = getString(R.string.DeleteScheduleMessage),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+                text = { Text(
+                    text = getString(R.string.DeleteScheduleMessage),
+                    fontWeight = FontWeight.Bold,) },
                 confirmButton = {
-                    TextButton(onClick = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.errorContainer,
+                            ),
+                        onClick = {
                         onDismiss()
                         onSave()
                     }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.delete_name))
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { onDismiss() }) {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = { onDismiss() }) {
                         Text(getString(R.string.text_Cancel))
                     }
                 },
@@ -1226,10 +1331,24 @@ class ProfileActivity  : ComponentActivity() {
         if (showReSceduledOrNotDialog) {
             AlertDialog(
                 onDismissRequest = {},
-                title = { Text(getString(R.string.ReSceduleOrNotDialog_title))},
-                text = { Text(getString(R.string.ReSceduleOrNotDialog_text))},
+                title = { Text(
+                    text = getString(R.string.ReSceduleOrNotDialog_title),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+                text = { Text(text = getString(R.string.ReSceduleOrNotDialog_text),
+                    fontWeight = FontWeight.Bold,)},
                 confirmButton = {
-                    TextButton(onClick = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
                         onDismiss()
                         onSave()
                     }) {
@@ -1237,7 +1356,15 @@ class ProfileActivity  : ComponentActivity() {
                     }
                 },
                 dismissButton = {
-                    TextButton(onClick = { onDismiss() }) {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.errorContainer,
+                            ),
+                        onClick = { onDismiss() }) {
                         Text(getString(R.string.text_Cancel))
                     }
                 },
