@@ -70,6 +70,7 @@
     <string name="history_info_Profile_Edit_Phone_number_name">Edit Phone numbers</string>
     <string name="history_info_Profile_Edit_Message_name">Edit message</string>
     <string name="history_info_Profile_Edit_Must_have_one_number">You must have at least one number</string>
+    <string name="history_info_Profile_Edit_cannot_have_more_number">You cannot have more than 30 numbers</string>
 
     <string name="Custom_name">Custom</string>
 
@@ -83,4 +84,6 @@
     <string name="DelayScheduleMessage">Delay Scheduled Message</string>
     <string name="ReSceduleOrNotDialog_title">Reschedule this SMS</string>
     <string name="ReSceduleOrNotDialog_text">Do you want to reschedule this SMS?</string>
+
+    <string name="RepeatsEveryTimeName">Repeats every:</string>
 </resources>

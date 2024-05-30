@@ -326,6 +326,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void addMoreNumbers(){
         if (counterLeft[0] != counterMax) {
+    //        while (counterLeft[0] != counterMax){
+
             TextView addNumbers = findViewById(R.id.addNumbers);
             counterLeft[0]++;
             addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
@@ -344,6 +346,7 @@ public class MainActivity extends AppCompatActivity {
             dynamicEditText.setId(dynamicTextViewId);
             editTextMap.put(dynamicTextViewId, dynamicEditText);
             ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
+
             contactButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

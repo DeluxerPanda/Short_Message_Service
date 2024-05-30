@@ -17,13 +17,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -57,11 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -75,7 +69,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -96,6 +89,8 @@ class ProfileActivity  : ComponentActivity() {
 
     private var title: String? = null
     private var alarmId = 0
+
+    private val MaxNumbers = 30
 
     private var photoUri: Uri? = null
 
@@ -205,6 +200,8 @@ class ProfileActivity  : ComponentActivity() {
 
                                                 intent.putExtra("EXTRA_PROFILE_RESCHEDULE_TIMEANDDATE", timeAndDate)
 
+                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_REPEATS", repeats)
+
                                                 intent.putExtra("EXTRA_PROFILE_RESCHEDULE_MESSAGE", MessageFieldText)
 
                                                 intent.putExtra("EXTRA_PROFILE_RESCHEDULE_PHONENUMBER", phoneNumber)
@@ -312,7 +309,8 @@ class ProfileActivity  : ComponentActivity() {
                                     textAlign = TextAlign.Center,
                                     fontSize = 24.sp,
                                     fontFamily = SansSerif,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1
                                 )
                                 Text(
                                     text = "ID: $alarmId",
@@ -373,7 +371,7 @@ class ProfileActivity  : ComponentActivity() {
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = timeAndDate!! +"\n Repeats: " +repeats,
+                                                text = timeAndDate!! +"\n"+getString(R.string.RepeatsEveryTimeName)+" "+repeats,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 15.sp,
                                                 modifier = Modifier.padding(
@@ -669,18 +667,27 @@ class ProfileActivity  : ComponentActivity() {
                                 }) {
                                     Text(text = Date)
                                 }
-
-                                Text(text = "Repeats evry:")
+                                var selectedOptionText by remember { mutableStateOf("") }
+                                var showDialog by remember { mutableStateOf(false) }
+                                Text(text = getString(R.string.RepeatsEveryTimeName))
                                 OutlinedButton(onClick = {
-                                //    mDatePickerDialog.show()
+                                    showDialog = true
 
                                 }) {
-                                    repeats?.let { it1 -> Text(text = it1) }
-                                }
+                                    Text(text = repeats.toString())
 
+                                }
+                                ShowOptionsDialog(
+                                    showDialog = showDialog,
+                                    onDismiss = { showDialog = false },
+                                    onConfirm = { selectedOption ->
+                                        repeats = selectedOptionText
+                                    }
+                                )
                             }
                             editedtimeAndDate = timeAndDate
                         }
+
                     }
                     composable("PhoneNumberField") {
                         val scrollBehavior =
@@ -876,8 +883,16 @@ class ProfileActivity  : ComponentActivity() {
                                 IconButton(onClick = {
                                     list =
                                         list.toMutableList().also { list ->
+                                            if (list.size < MaxNumbers){
                                             list.add("")
                                             isPhoneNumberChanged = true
+                                            }else{
+                                                Toast.makeText(
+                                                    mContext,
+                                                    R.string.history_info_Profile_Edit_cannot_have_more_number,
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
                                         }
                                 }) {
                                     Icon(
@@ -1097,8 +1112,10 @@ class ProfileActivity  : ComponentActivity() {
                     style = TextStyle(
                         fontSize = 20.sp,
                     )) },
-                text = { Text(text = "You haven't saved your changes. Do you want to save them?",
-                    fontWeight = FontWeight.Bold,) },
+                text = { Text(
+                    text = "You haven't saved your changes. Do you want to save them?",
+                    fontWeight = FontWeight.Bold,
+                ) },
                 confirmButton = {
                     TextButton(
                         modifier = Modifier
@@ -1149,7 +1166,8 @@ class ProfileActivity  : ComponentActivity() {
 
                 text = { Text(
                     text = getString(R.string.sms_time_travel_Text),
-                    fontWeight = FontWeight.Bold,)},
+                    fontWeight = FontWeight.Bold,
+                )},
 
                 confirmButton = {
                     TextButton(
@@ -1287,7 +1305,8 @@ class ProfileActivity  : ComponentActivity() {
                     ))},
                 text = { Text(
                     text = getString(R.string.DeleteScheduleMessage),
-                    fontWeight = FontWeight.Bold,) },
+                    fontWeight = FontWeight.Bold,
+                ) },
                 confirmButton = {
                     TextButton(
                         modifier = Modifier
@@ -1337,8 +1356,14 @@ class ProfileActivity  : ComponentActivity() {
                     style = TextStyle(
                         fontSize = 20.sp,
                     ))},
-                text = { Text(text = getString(R.string.ReSceduleOrNotDialog_text),
-                    fontWeight = FontWeight.Bold,)},
+                text = { Text(
+                    text = getString(R.string.ReSceduleOrNotDialog_text)
+                            + "\n" + timeAndDate
+                            + "\n" + getString(R.string.RepeatsEveryTimeName) + " " + repeats
+                            + "\n" + phoneNumber
+                            + "\n" + MessageFieldText,
+                    fontWeight = FontWeight.Bold,
+                )},
                 confirmButton = {
                     TextButton(
                         modifier = Modifier
@@ -1372,6 +1397,75 @@ class ProfileActivity  : ComponentActivity() {
             )
         }
     }
+
+    @Composable
+    fun ShowOptionsDialog(
+        showDialog: Boolean,
+        onDismiss: () -> Unit,
+        onConfirm: (String) -> Unit
+    ) {
+        val choices = listOf(
+            stringResource(R.string.send_sms_every_year_text),
+            stringResource(R.string.send_sms_every_month_text),
+            stringResource(R.string.send_sms_every_week_text),
+            stringResource(R.string.send_sms_every_day_text)
+        )
+        var selectedOptionIndex by remember { mutableStateOf(0) }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    onDismiss()
+                },
+                title = {
+                    Text(text = stringResource(R.string.send_sms_every_text))
+                },
+                text = {
+                    Column {
+                        choices.forEachIndexed { index, choice ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedOptionIndex = index
+                                    }
+                            ) {
+                                RadioButton(
+                                    selected = (selectedOptionIndex == index),
+                                    onClick = {
+                                        selectedOptionIndex = index
+                                    }
+                                )
+                                Text(text = choice)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            onConfirm(choices[selectedOptionIndex])
+                            onDismiss()
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.text_ok))
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            onDismiss()
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.text_Cancel))
+                    }
+                }
+            )
+        }
+    }
+
+
 
 }
 
