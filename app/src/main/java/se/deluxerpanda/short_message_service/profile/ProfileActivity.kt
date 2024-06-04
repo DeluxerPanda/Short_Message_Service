@@ -60,6 +60,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.EmojiSupportMatch
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily.Companion.SansSerif
 import androidx.compose.ui.text.font.FontWeight
@@ -90,7 +92,7 @@ class ProfileActivity  : ComponentActivity() {
     private var title: String? = null
     private var alarmId = 0
 
-    private val MaxNumbers = 30
+    private val MaxNumbers = 10
 
     private var photoUri: Uri? = null
 
@@ -119,6 +121,7 @@ class ProfileActivity  : ComponentActivity() {
 
     private var UpdateSceduluedSmS: Boolean = false
 
+    private var ToastContent: String? = null
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -880,6 +883,7 @@ class ProfileActivity  : ComponentActivity() {
                                             .padding(8.dp),
                                     )
                                 }
+                                var ToastBool by remember { mutableStateOf(false) }
                                 IconButton(onClick = {
                                     list =
                                         list.toMutableList().also { list ->
@@ -887,11 +891,10 @@ class ProfileActivity  : ComponentActivity() {
                                             list.add("")
                                             isPhoneNumberChanged = true
                                             }else{
-                                                Toast.makeText(
-                                                    mContext,
-                                                    R.string.history_info_Profile_Edit_cannot_have_more_number,
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                   ToastContent = getString(R.string.history_info_Profile_Edit_cannot_have_more_number)+
+                                                           " "+MaxNumbers.toString()+" "+getString(R.string.More_Then_One_Number_name)
+
+                                                ToastBool = true
                                             }
                                         }
                                 }) {
@@ -900,6 +903,12 @@ class ProfileActivity  : ComponentActivity() {
                                         contentDescription = "add button"
                                     )
                                 }
+                                ToastDialog(
+                                    ToastBool = ToastBool,
+                                    onSave = {
+                                        ToastBool = false
+                                    }
+                                )
                                 // Update phoneNumber if it's not changed
                                 if (!isPhoneNumberChanged) {
                                     editedphoneNumber = phoneNumber
@@ -978,11 +987,11 @@ class ProfileActivity  : ComponentActivity() {
                                 )
                             },
                         ) { innerPadding ->
-                            val mContext = LocalContext.current
 
                             val keyboardController = LocalSoftwareKeyboardController.current
 
                             var text by remember { mutableStateOf(MessageFieldText)}
+                            var ToastBool by remember { mutableStateOf(false) }
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -995,12 +1004,16 @@ class ProfileActivity  : ComponentActivity() {
                                     OutlinedTextField(
                                         value = it,
                                         onValueChange = {
-                                            if (it.length <= 159){
+                                            if (it.toByteArray().size <= 140){
                                                 text = it
                                                 editedMessage = text
                                                 isMessageChanged = true
                                             }else{
-                                                Toast.makeText(mContext, "max 160 characters", Toast.LENGTH_SHORT).show()
+
+                                                ToastContent = getString(R.string.history_info_Profile_Edit_cannot_have_more_number)+
+                                                        " "+MaxNumbers.toString()+" "+getString(R.string.More_Then_One_Number_name)
+
+                                                ToastBool = true
                                                 keyboardController?.hide()
                                             }
                                         },
@@ -1022,6 +1035,13 @@ class ProfileActivity  : ComponentActivity() {
                                     )
                                 }
                             }
+
+                            ToastDialog(
+                                ToastBool = ToastBool,
+                                onSave = {
+                                    ToastBool = false
+                                }
+                            )
                             if (!isMessageChanged){
 
                                 editedMessage = MessageFieldText
@@ -1464,7 +1484,52 @@ class ProfileActivity  : ComponentActivity() {
             )
         }
     }
+    @Composable
+    fun ToastDialog(
+         ToastBool: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (ToastBool) {
+            AlertDialog(
 
+                onDismissRequest = {},
+                title = { Text(
+                    text = ("\uD83D\uDE45"),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .width(300.dp),
+                )},
+
+                text = { Text(
+                    text = ToastContent.toString(),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok))
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+
+                )
+        }
+    }
 
 
 }

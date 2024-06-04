@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     private  int permissionCheck;
 
     private static int[] counterLeft = {0};
-    private static int counterMax = 29;
+    private static int counterMax = 9;
     private int phoneNumberEditTextID;
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
     private boolean hasSendSmsPermission() {
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             String repeatSmS = (String) selectedOptionText.getText();
             if (hasSendSmsPermission()) {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
-                    if (message.length() <= 160) {
+                    if (message.getBytes().length <= 140) {
                         if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
                             scheduleSMS(phonenumber,message);
                             hideKeyboard();
@@ -325,8 +325,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMoreNumbers(){
-        if (counterLeft[0] != counterMax) {
-    //        while (counterLeft[0] != counterMax){
+    //    if (counterLeft[0] != counterMax) {
+            while (counterLeft[0] != counterMax){
 
             TextView addNumbers = findViewById(R.id.addNumbers);
             counterLeft[0]++;
@@ -341,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
             EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
 
-           //     dynamicEditText.setText("+" + counterLeft[0] +"123");
+                dynamicEditText.setText("+" + counterLeft[0] +"123");
 
             dynamicEditText.setId(dynamicTextViewId);
             editTextMap.put(dynamicTextViewId, dynamicEditText);
