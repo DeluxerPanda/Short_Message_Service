@@ -316,8 +316,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addMoreNumbers(){
-    //    if (counterLeft[0] != counterMax) {
-            while (counterLeft[0] != counterMax){
+        if (counterLeft[0] != counterMax) {
+    //        while (counterLeft[0] != counterMax){
 
             TextView addNumbers = findViewById(R.id.addNumbers);
             counterLeft[0]++;
@@ -332,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
             EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
 
-                dynamicEditText.setText("+" + counterLeft[0] +"123");
+         //       dynamicEditText.setText("+" + counterLeft[0] +"123");
 
             dynamicEditText.setId(dynamicTextViewId);
             editTextMap.put(dynamicTextViewId, dynamicEditText);
