@@ -61,16 +61,30 @@
     <string name="history_info_no_SMS_scheduled">Det finns inga schemalagda SMS</string>
 
     <string name="history_info_PhoneNumber_name">Telefonnummer:</string>
-    <string name="history_info_Message_name">Meddelande:</string>
+    <string name="history_info_Message_name">Meddelande</string>
     <string name="history_info_Date_name">Datum:</string>
     <string name="history_info_Time_name">Tid:</string>
     <string name="history_info_Repeat_name">Upprepa varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
 
-    <string name="history_info_Profile_Send_to">Skickas till:</string>
+    <string name="history_info_Profile_Send_to">Skickas till</string>
+
+    <string name="history_info_Profile_Edit_TimeAndDate_name">Redigera tid och datum</string>
+    <string name="history_info_Profile_Edit_Phone_number_name">Redigera telefonnummer</string>
+    <string name="history_info_Profile_Edit_Message_name">Redigera meddelande</string>
+    <string name="history_info_Profile_Edit_Must_have_one_number">Du måste ha minst ett nummer!</string>
+    <string name="history_info_Profile_Edit_cannot_have_more_number">Du kan inte ha fler än</string>
 
     <string name="Custom_name">Anpassad</string>
     <string name="puse">Pausa</string>
     <string name="send_now">Skicka nu!</string>
+    <string name="exit_name">Exit</string>
+    <string name="DeleteScheduleMessage">Ta bort schemalagt meddelande</string>
+    <string name="delete_name">Radera</string>
+    <string name="DelayScheduleMessage">Fördröj schemalagt meddelande</string>
+    <string name="ReSceduleOrNotDialog_title">Omplanera detta sms</string>
+    <string name="ReSceduleOrNotDialog_text">Vill du omplanera detta sms?</string>
 
+    <string name="RepeatsEveryTimeName">Upprepas varje:</string>
+    <string name="More_Then_One_Number_name">nummer</string>
 </resources>

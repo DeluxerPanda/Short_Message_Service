@@ -16,7 +16,6 @@
         android:hint="@string/text_hint_phone_number"
         android:inputType="phone"
         android:textAlignment="center"
-        android:textColorHint="#A1887F"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="VisualLintTextFieldSize" />
@@ -32,7 +31,9 @@
         android:clickable="true"
         android:contentDescription="To contacts"
         app:srcCompat="@drawable/ic_baseline_delete_outline"
-        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+        app:tint="@color/md_theme_error"
+        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+        android:focusable="true" />
 
     <ImageView
         android:id="@+id/btnToContacts"
@@ -44,6 +45,7 @@
         android:clickable="true"
         android:contentDescription="To Delete"
         app:srcCompat="@drawable/ic_baseline_import_contacts"
-        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+        tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+        android:focusable="true" />
 
 </RelativeLayout>

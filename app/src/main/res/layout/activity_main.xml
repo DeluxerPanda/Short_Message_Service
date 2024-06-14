@@ -27,19 +27,6 @@
             android:textStyle="bold|italic"
             android:typeface="normal"
             tools:ignore="TextSizeCheck" />
-        <ImageView
-            android:visibility="invisible"
-            android:id="@+id/btnToHamburger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@id/App_Title"
-            android:layout_alignTop="@id/App_Title"
-            android:layout_marginStart="8dp"
-            android:backgroundTintMode="src_over"
-            android:clickable="true"
-            android:contentDescription="To Hamburger"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
     </RelativeLayout>
 
     <LinearLayout
@@ -80,8 +67,8 @@
                 android:clickable="true"
                 android:contentDescription="To contacts"
                 app:srcCompat="@drawable/ic_baseline_import_contacts"
-                app:tint="@color/md_theme_dark_inversePrimary"
-                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck" />
+                tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
+                android:focusable="true" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -103,7 +90,6 @@
             android:layout_height="wrap_content"
             android:text="@string/text_add_phone_number"
             android:textAlignment="viewStart"
-            android:textColor="#00BCD4"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -209,7 +195,16 @@
             android:orientation="vertical"
             tools:ignore="UselessLeaf">
         </LinearLayout>
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/history_name"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:typeface="normal"
+            tools:ignore="TextSizeCheck" />
         <LinearLayout
             android:id="@+id/app_backgrund"
             android:layout_width="match_parent"

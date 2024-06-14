@@ -1,6 +1,12 @@
 pluginManagement {
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -13,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "sms Sender"
+rootProject.name = "Short_Message_Service"
 include(":app")
