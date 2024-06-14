@@ -27,19 +27,6 @@
             android:textStyle="bold|italic"
             android:typeface="normal"
             tools:ignore="TextSizeCheck" />
-        <ImageView
-            android:id="@+id/btnToHamburger"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@id/App_Title"
-            android:layout_alignTop="@id/App_Title"
-            android:layout_marginStart="8dp"
-            android:backgroundTintMode="src_over"
-            android:clickable="true"
-            android:contentDescription="To Hamburger"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
-            android:focusable="true" />
     </RelativeLayout>
 
     <LinearLayout

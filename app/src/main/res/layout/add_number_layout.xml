@@ -16,7 +16,6 @@
         android:hint="@string/text_hint_phone_number"
         android:inputType="phone"
         android:textAlignment="center"
-        android:textColorHint="#A1887F"
         android:textSize="20sp"
         android:textStyle="bold"
         tools:ignore="VisualLintTextFieldSize" />
@@ -32,6 +31,7 @@
         android:clickable="true"
         android:contentDescription="To contacts"
         app:srcCompat="@drawable/ic_baseline_delete_outline"
+        app:tint="@color/md_theme_error"
         tools:ignore="ContentDescription,HardcodedText,TouchTargetSizeCheck,ImageContrastCheck"
         android:focusable="true" />
 

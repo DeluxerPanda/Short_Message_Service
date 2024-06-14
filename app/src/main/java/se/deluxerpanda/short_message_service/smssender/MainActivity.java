@@ -144,15 +144,6 @@ public class MainActivity extends AppCompatActivity {
         SetTimeText.setText(" "+timeText);
         SetDateStartText.setText(" " + formattedDate);
 
-        ImageView btnToHamburger = findViewById(R.id.btnToHamburger);
-        btnToHamburger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard();
-                Toast.makeText(MainActivity.this, "Coming Soon!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         ImageView btnToContacts = findViewById(R.id.btnToContacts);
         btnToContacts.setOnClickListener(new View.OnClickListener() {
             @Override

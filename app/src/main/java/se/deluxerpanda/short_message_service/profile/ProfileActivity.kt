@@ -2,10 +2,13 @@ package se.deluxerpanda.short_message_service.profile
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.widget.DatePicker
@@ -60,8 +63,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.EmojiSupportMatch
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily.Companion.SansSerif
 import androidx.compose.ui.text.font.FontWeight
@@ -78,11 +79,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.MainActivity
+import se.deluxerpanda.short_message_service.smssender.MainActivity.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.UUID
 
 
 class ProfileActivity  : ComponentActivity() {
@@ -200,14 +205,55 @@ class ProfileActivity  : ComponentActivity() {
                                         ReSceduledOrNotDialog(
                                             showReSceduledOrNotDialog = showReSceduledOrNotDialog,
                                             onSave = {
+                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm") // Corrected the format to match the input string
 
-                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_TIMEANDDATE", timeAndDate)
+                                                try {
+                                                    val date: Date? = timeAndDate.let { sdf.parse(it.toString()) }
+                                                    val triggerTime: Long? = date?.time
 
-                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_REPEATS", repeats)
 
-                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_MESSAGE", MessageFieldText)
+                                                    val newalarmId = UUID.randomUUID().hashCode()
 
-                                                intent.putExtra("EXTRA_PROFILE_RESCHEDULE_PHONENUMBER", phoneNumber)
+                                                    intent.putExtra("EXTRA_PHONE_NUMBER", phoneNumber)
+                                                    intent.putExtra("EXTRA_MESSAGES", MessageFieldText)
+                                                    intent.putExtra("EXTRA_ALARMID", newalarmId)
+                                                    intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+                                                    intent.putExtra("EXTRA_REPEATSMS", repeats)
+
+
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                        startForegroundService(intent)
+                                                    } else {
+                                                        startService(intent)
+                                                    }
+
+                                                    val pendingIntent = PendingIntent.getBroadcast(
+                                                        this@ProfileActivity, newalarmId, intent,
+                                                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                                                    )
+
+
+                                                    val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+
+                                                    if (triggerTime != null) {
+                                                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+                                                    }
+
+
+                                                    if (triggerTime != null) {
+                                                        saveAlarmDetails(this@ProfileActivity, newalarmId, triggerTime, repeats, phoneNumber, MessageFieldText)
+                                                    }
+
+
+                                                        val mainActivity = MainActivity()
+                                                        mainActivity.deleteAlarm(
+                                                            alarmId,
+                                                            this@ProfileActivity
+                                                        )
+
+                                                } catch (e: ParseException) {
+                                                    e.printStackTrace()
+                                                }
 
 
                                                 showReSceduledOrNotDialog = false
@@ -289,7 +335,8 @@ class ProfileActivity  : ComponentActivity() {
                                         {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
-                                                contentDescription = "Delete button"
+                                                contentDescription = "Delete button",
+                                                tint = MaterialTheme.colorScheme.error
                                             )
                                         }
                                     },
@@ -642,7 +689,8 @@ class ProfileActivity  : ComponentActivity() {
                                 OutlinedButton(onClick = {
                                     mTimePickerDialog.show()
                                 }) {
-                                    Text(text = Time)
+                                    Text(text = Time,
+                                        color = MaterialTheme.colorScheme.secondary)
 
                                 }
 
@@ -668,7 +716,8 @@ class ProfileActivity  : ComponentActivity() {
                                 OutlinedButton(onClick = {
                                     mDatePickerDialog.show()
                                 }) {
-                                    Text(text = Date)
+                                    Text(text = Date,
+                                        color = MaterialTheme.colorScheme.secondary)
                                 }
                                 var selectedOptionText by remember { mutableStateOf("") }
                                 var showDialog by remember { mutableStateOf(false) }
@@ -677,14 +726,15 @@ class ProfileActivity  : ComponentActivity() {
                                     showDialog = true
 
                                 }) {
-                                    Text(text = repeats.toString())
+                                    Text(text = repeats.toString(),
+                                        color = MaterialTheme.colorScheme.secondary)
 
                                 }
                                 ShowOptionsDialog(
                                     showDialog = showDialog,
                                     onDismiss = { showDialog = false },
                                     onConfirm = { selectedOption ->
-                                        repeats = selectedOptionText
+                                        repeats = selectedOption
                                     }
                                 )
                             }
@@ -873,7 +923,8 @@ class ProfileActivity  : ComponentActivity() {
                                                 }) {
                                                     Icon(
                                                         painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
-                                                        contentDescription = "delete button"
+                                                        contentDescription = "delete button",
+                                                        tint = MaterialTheme.colorScheme.error
                                                     )
                                                 }
                                             }
@@ -1053,7 +1104,6 @@ class ProfileActivity  : ComponentActivity() {
                 }
             }
 
-
     fun it_isPhoneNumberField(){
         if (editedphoneNumber!!.contains(",")) {
             editedphoneNumberNew = editedphoneNumber!!.replace(",", "\n")
@@ -1149,7 +1199,8 @@ class ProfileActivity  : ComponentActivity() {
                         onSave()
                         onDismiss()
                     }) {
-                        Text("Save")
+                        Text("Save",
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 dismissButton = {
@@ -1162,7 +1213,8 @@ class ProfileActivity  : ComponentActivity() {
                                 MaterialTheme.colorScheme.errorContainer,
                             ),
                         onClick = { onDismiss() }) {
-                        Text("Don't Save")
+                        Text("Don't Save",
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 properties = DialogProperties(),
@@ -1201,7 +1253,8 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                         onSave()
                     }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
 
@@ -1246,7 +1299,8 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                             onSave()
                         }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
 
@@ -1294,7 +1348,8 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                             onSave()
                         }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
 
@@ -1340,7 +1395,8 @@ class ProfileActivity  : ComponentActivity() {
                         onDismiss()
                         onSave()
                     }) {
-                        Text(getString(R.string.delete_name))
+                        Text(getString(R.string.delete_name),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 dismissButton = {
@@ -1353,7 +1409,8 @@ class ProfileActivity  : ComponentActivity() {
                                 MaterialTheme.colorScheme.surface,
                             ),
                         onClick = { onDismiss() }) {
-                        Text(getString(R.string.text_Cancel))
+                        Text(getString(R.string.text_Cancel),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 properties = DialogProperties(),
@@ -1397,7 +1454,8 @@ class ProfileActivity  : ComponentActivity() {
                         onDismiss()
                         onSave()
                     }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 dismissButton = {
@@ -1410,7 +1468,8 @@ class ProfileActivity  : ComponentActivity() {
                                 MaterialTheme.colorScheme.errorContainer,
                             ),
                         onClick = { onDismiss() }) {
-                        Text(getString(R.string.text_Cancel))
+                        Text(getString(R.string.text_Cancel),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 properties = DialogProperties(),
@@ -1469,7 +1528,8 @@ class ProfileActivity  : ComponentActivity() {
                             onDismiss()
                         }
                     ) {
-                        Text(text = stringResource(R.string.text_ok))
+                        Text(text = stringResource(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
                 dismissButton = {
@@ -1478,7 +1538,8 @@ class ProfileActivity  : ComponentActivity() {
                             onDismiss()
                         }
                     ) {
-                        Text(text = stringResource(R.string.text_Cancel))
+                        Text(text = stringResource(R.string.text_Cancel),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             )
@@ -1517,7 +1578,8 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                             onSave()
                         }) {
-                        Text(getString(R.string.text_ok))
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
                     }
                 },
 

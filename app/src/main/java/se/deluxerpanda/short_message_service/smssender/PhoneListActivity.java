@@ -35,9 +35,8 @@ import se.deluxerpanda.short_message_service.R;
 
 public class PhoneListActivity extends AppCompatActivity {
 
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private ExpandableListView contactListView;
-    private int lastExpandedPosition = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,15 +49,10 @@ public class PhoneListActivity extends AppCompatActivity {
         TextBox_button.setVisibility(View.GONE);
         // back button
         ImageView btnToHamburger = findViewById(R.id.btnToMainSmsSchedulerPage);
-        btnToHamburger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        btnToHamburger.setOnClickListener(v ->  getOnBackPressedDispatcher().onBackPressed());
 
         // Initialize the ExpandableListView and permission check
-        this.contactListView = (ExpandableListView) findViewById(R.id.Phone_list);
+        this.contactListView = findViewById(R.id.Phone_list);
         checkPermissionAndLoadContacts();
     }
 
@@ -93,25 +87,24 @@ public class PhoneListActivity extends AppCompatActivity {
         TextBox_button.setVisibility(View.VISIBLE);
         TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission_settings));
         TextBox_button.setGravity(Gravity.CENTER);
-        TextBox_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                onBackPressed();
-                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
-            }
+        TextBox_button.setOnClickListener(v -> {
+            getOnBackPressedDispatcher().onBackPressed();
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
         });
 
     }
 
-    boolean hasSinglePhoneNumber = false;
     private void loadContacts() {
         List<Map<String, String>> groupData = new ArrayList<>();
         List<List<Map<String, String>>> childData = new ArrayList<>();
 
         Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        while (cursor.moveToNext()) {
+        while (true) {
+            assert cursor != null;
+            if (!cursor.moveToNext()) break;
             String contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
             String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
 
@@ -129,13 +122,13 @@ public class PhoneListActivity extends AppCompatActivity {
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
                         new String[]{contactId}, null);
 
+                assert phoneCursor != null;
                 if (phoneCursor.getCount() == 1) {
                     if (phoneCursor.moveToFirst()) {
                         // If there's only one phone number, save it
                         String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
                         curGroupMap.put("PHONE", phoneNumber);
-                        hasSinglePhoneNumber = true;
-                        curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
+                        curGroupMap.put("SINGLE_PHONE", String.valueOf(true));
 
                     }
                 }
@@ -156,8 +149,7 @@ public class PhoneListActivity extends AppCompatActivity {
                         curChildMap.put("CATAGORY",phoneTypeLabelFinl);
 
                     curChildMap.put("PHONE", phoneNumber);
-                    hasSinglePhoneNumber = false;
-                    curGroupMap.put("SINGLE_PHONE", String.valueOf(hasSinglePhoneNumber));
+                    curGroupMap.put("SINGLE_PHONE", String.valueOf(false));
                 }
 
                 childData.add(children);
@@ -230,25 +222,21 @@ public class PhoneListActivity extends AppCompatActivity {
             TextBox_text.setGravity(Gravity.CENTER);
 
             TextBox_button.setVisibility(View.GONE);
-            TextBox_button.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    onBackPressed();
-                    Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                    intent.setData(uri);
-                    startActivity(intent);
-                }
+            TextBox_button.setOnClickListener(v -> {
+                getOnBackPressedDispatcher().onBackPressed();
+                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
             });
 
         }
 
-        contactListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
-                setPhoneNumber(phoneNumber);
-                return true;
-            }
+        contactListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
+            @SuppressWarnings("unchecked")
+            String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
+            setPhoneNumber(phoneNumber);
+            return true;
         });
 
         contactListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -260,13 +248,13 @@ public class PhoneListActivity extends AppCompatActivity {
                 int childCount = adapter.getChildrenCount(groupPosition);
 
                 if (childCount == 0) {
+                    @SuppressWarnings("unchecked")
                     String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
                     if (phoneNumber != null) {
                         setPhoneNumber(phoneNumber);
                     } else {
                         Toast.makeText(PhoneListActivity.this, "No phone number available for this contact", Toast.LENGTH_SHORT).show();
                     }
-                    return true;
                 } else {
 
                     if (contactListView.isGroupExpanded(groupPosition)) {
@@ -279,8 +267,8 @@ public class PhoneListActivity extends AppCompatActivity {
                         contactListView.expandGroup(groupPosition);
                         lastExpandedGroupPosition = groupPosition;
                     }
-                    return true;
                 }
+                return true;
             }
         });
 
