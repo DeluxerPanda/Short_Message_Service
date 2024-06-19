@@ -78,6 +78,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.smssender.AlarmReceiver
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.smssender.MainActivity.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
@@ -212,38 +213,51 @@ class ProfileActivity  : ComponentActivity() {
                                                     val triggerTime: Long? = date?.time
 
 
+                                                    var intent2: Intent = Intent(
+                                                        this@ProfileActivity,
+                                                        AlarmReceiver::class.java
+                                                    )
+
                                                     val newalarmId = UUID.randomUUID().hashCode()
 
-                                                    intent.putExtra("EXTRA_PHONE_NUMBER", phoneNumber)
-                                                    intent.putExtra("EXTRA_MESSAGES", MessageFieldText)
-                                                    intent.putExtra("EXTRA_ALARMID", newalarmId)
-                                                    intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
-                                                    intent.putExtra("EXTRA_REPEATSMS", repeats)
+                                                    intent2.putExtra("EXTRA_PHONE_NUMBER", phoneNumber)
+                                                    intent2.putExtra("EXTRA_MESSAGES", MessageFieldText)
+                                                    intent2.putExtra("EXTRA_ALARMID", newalarmId)
+                                                    intent2.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+                                                    intent2.putExtra("EXTRA_REPEATSMS", repeats)
 
 
                                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                                        startForegroundService(intent)
+                                                        startForegroundService(intent2)
                                                     } else {
-                                                        startService(intent)
+                                                        startService(intent2)
                                                     }
 
+
                                                     val pendingIntent = PendingIntent.getBroadcast(
-                                                        this@ProfileActivity, newalarmId, intent,
+                                                        this@ProfileActivity,
+                                                        newalarmId,
+                                                        intent2,
                                                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                                                     )
 
-
                                                     val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
 
-                                                    if (triggerTime != null) {
-                                                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
-                                                    }
 
+                                                    alarmManager.setExactAndAllowWhileIdle(
+                                                        AlarmManager.RTC_WAKEUP,
+                                                        triggerTime!!,
+                                                        pendingIntent
+                                                    )
 
-                                                    if (triggerTime != null) {
-                                                        saveAlarmDetails(this@ProfileActivity, newalarmId, triggerTime, repeats, phoneNumber, MessageFieldText)
-                                                    }
-
+                                                    saveAlarmDetails(
+                                                        this@ProfileActivity,
+                                                        newalarmId,
+                                                        triggerTime,
+                                                        repeats,
+                                                        phoneNumber,
+                                                        MessageFieldText
+                                                    )
 
                                                         val mainActivity = MainActivity()
                                                         mainActivity.deleteAlarm(
@@ -679,7 +693,8 @@ class ProfileActivity  : ComponentActivity() {
                                 val mTimePickerDialog = TimePickerDialog(
                                     mContext,
                                     { _, hour: Int, minute: Int ->
-                                        val newTime = "$hour:$minute"
+                                        val formattedMinute = String.format("%02d", minute)
+                                        val newTime = "$hour:$formattedMinute"
                                         timeAndDate = timeAndDate!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
                                     }, mHour, mMinute, true
@@ -719,7 +734,6 @@ class ProfileActivity  : ComponentActivity() {
                                     Text(text = Date,
                                         color = MaterialTheme.colorScheme.secondary)
                                 }
-                                var selectedOptionText by remember { mutableStateOf("") }
                                 var showDialog by remember { mutableStateOf(false) }
                                 Text(text = getString(R.string.RepeatsEveryTimeName))
                                 OutlinedButton(onClick = {
