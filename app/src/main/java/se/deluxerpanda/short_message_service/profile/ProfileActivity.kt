@@ -7,6 +7,8 @@ import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
+import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -83,11 +85,10 @@ import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.smssender.MainActivity.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
 import se.deluxerpanda.short_message_service.ui.theme.AppTheme
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 
@@ -106,6 +107,7 @@ class ProfileActivity  : ComponentActivity() {
 
     private var timeAndDate: String? = null
     private var editedtimeAndDate: String? = null
+    private var  isTimeAndDateChanged: Boolean = false
 
     private  var repeats: String? = null
 
@@ -165,6 +167,13 @@ class ProfileActivity  : ComponentActivity() {
                             entry.savedStateHandle.get<String>("EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE")
                         if (TimeAndDateFieldTextupdate != null) {
                             timeAndDate = TimeAndDateFieldTextupdate
+                            UpdateSceduluedSmS = true
+                        }
+
+                        val RepeatFieldTextupdate =
+                            entry.savedStateHandle.get<String>("EXTRA_PROFILE_EDITOR_FINAL_REPEAT")
+                        if (RepeatFieldTextupdate != null) {
+                            repeats = RepeatFieldTextupdate
                             UpdateSceduluedSmS = true
                         }
 
@@ -268,8 +277,6 @@ class ProfileActivity  : ComponentActivity() {
                                                 } catch (e: ParseException) {
                                                     e.printStackTrace()
                                                 }
-
-
                                                 showReSceduledOrNotDialog = false
                                                 finish()
                                             },
@@ -435,7 +442,7 @@ class ProfileActivity  : ComponentActivity() {
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             Text(
-                                                text = timeAndDate!! +"\n"+getString(R.string.RepeatsEveryTimeName)+" "+repeats,
+                                                text = timeAndDate!! +"\n"+getString(R.string.history_info_Repeat_name)+" "+repeats,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 15.sp,
                                                 modifier = Modifier.padding(
@@ -554,6 +561,8 @@ class ProfileActivity  : ComponentActivity() {
                     }
                     composable("TimeAndDateField") {
                         var showNoBackInTimeDialog by remember { mutableStateOf(false) }
+                        var repeatsEdited by remember { mutableStateOf(repeats)}
+                        val mContext = LocalContext.current
                         val scrollBehavior =
                             TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                         Scaffold(
@@ -574,10 +583,11 @@ class ProfileActivity  : ComponentActivity() {
                                     },
                                     navigationIcon = {
                                         IconButton(onClick = {
-                                            val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
-                                            val timeStr: String = timeAndDate!!.substringAfter("| ")
-                                            val dateStr: String = timeAndDate!!.substringBefore(" |")
                                             try {
+                                                val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm",
+                                                    Locale.getDefault())
+                                                val timeStr: String = timeAndDate!!.substringAfter("| ")
+                                                val dateStr: String = timeAndDate!!.substringBefore(" |")
                                                 val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
                                                 val currentDateTime = LocalDateTime.now()
 
@@ -588,12 +598,25 @@ class ProfileActivity  : ComponentActivity() {
                                                             "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
                                                             editedtimeAndDate
                                                         )
+                                                    navController.previousBackStackEntry
+                                                        ?.savedStateHandle
+                                                        ?.set(
+                                                            "EXTRA_PROFILE_EDITOR_FINAL_REPEAT",
+                                                            repeatsEdited
+                                                        )
                                                     navController.popBackStack()
                                                 } else {
                                                     showNoBackInTimeDialog = true
                                                 }
                                             } catch (e: ParseException) {
                                                 e.printStackTrace()
+
+                                                Toast.makeText(
+                                                    mContext,
+                                                    e.printStackTrace().toString(),
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
                                             }
                                         }
                                         ) {
@@ -608,9 +631,9 @@ class ProfileActivity  : ComponentActivity() {
                                         var showDialog by remember { mutableStateOf(false) }
 
                                         IconButton(onClick = {
-
-                                            if (editedtimeAndDate == timeAndDate) {
+                                            if (isTimeAndDateChanged == true) {
                                                 showDialog = true
+                                                isTimeAndDateChanged = false
                                             } else {
                                                 showDialog = false
                                                 navController.previousBackStackEntry
@@ -638,7 +661,6 @@ class ProfileActivity  : ComponentActivity() {
 
                                             },
                                             onSave = {
-                                              //  showDialog = false
                                                 try {
                                                     val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
                                                     val timeStr: String = timeAndDate!!.substringAfter("| ")
@@ -674,7 +696,7 @@ class ProfileActivity  : ComponentActivity() {
                             },
                         ) { innerPadding ->
                             // Fetching local context
-                            val mContext = LocalContext.current
+                   
                             var Time by remember { mutableStateOf(timeAndDate!!.substringAfterLast("|")) }
 
                             Column(
@@ -697,10 +719,12 @@ class ProfileActivity  : ComponentActivity() {
                                         val newTime = "$hour:$formattedMinute"
                                         timeAndDate = timeAndDate!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
+                                        isTimeAndDateChanged = true
+
                                     }, mHour, mMinute, true
                                 )
 
-                                Text(text = "Time:")
+                                Text(text = getString(R.string.history_info_Time_name))
                                 OutlinedButton(onClick = {
                                     mTimePickerDialog.show()
                                 }) {
@@ -723,11 +747,11 @@ class ProfileActivity  : ComponentActivity() {
                                         val newDate = "$year-$formattedMonth-$dayOfMonth"
                                         timeAndDate = timeAndDate!!.replaceBeforeLast(" |", newDate)
                                         Date = newDate
-
+                                        isTimeAndDateChanged = true
                                     }, mYear, mMonth, mDay
                                 )
 
-                                Text(text = "Date:")
+                                Text(text = getString(R.string.history_info_Date_name))
                                 OutlinedButton(onClick = {
                                     mDatePickerDialog.show()
                                 }) {
@@ -735,12 +759,11 @@ class ProfileActivity  : ComponentActivity() {
                                         color = MaterialTheme.colorScheme.secondary)
                                 }
                                 var showDialog by remember { mutableStateOf(false) }
-                                Text(text = getString(R.string.RepeatsEveryTimeName))
+                                Text(text = getString(R.string.send_sms_every_text))
                                 OutlinedButton(onClick = {
                                     showDialog = true
-
                                 }) {
-                                    Text(text = repeats.toString(),
+                                    Text(text = repeatsEdited.toString(),
                                         color = MaterialTheme.colorScheme.secondary)
 
                                 }
@@ -748,11 +771,15 @@ class ProfileActivity  : ComponentActivity() {
                                     showDialog = showDialog,
                                     onDismiss = { showDialog = false },
                                     onConfirm = { selectedOption ->
-                                        repeats = selectedOption
+                                        repeatsEdited = selectedOption
+                                        isTimeAndDateChanged = true
                                     }
                                 )
                             }
+                        if (!isTimeAndDateChanged) {
                             editedtimeAndDate = timeAndDate
+                        }
+
                         }
 
                     }
@@ -1191,13 +1218,13 @@ class ProfileActivity  : ComponentActivity() {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(
-                    text = "Unsaved Changes",
+                    text = getString(R.string.ask_save_changes_Titel_name),
                     fontWeight = FontWeight.Bold,
                     style = TextStyle(
                         fontSize = 20.sp,
                     )) },
                 text = { Text(
-                    text = "You haven't saved your changes. Do you want to save them?",
+                    text = getString(R.string.ask_save_changes_Text_name),
                     fontWeight = FontWeight.Bold,
                 ) },
                 confirmButton = {
@@ -1213,7 +1240,7 @@ class ProfileActivity  : ComponentActivity() {
                         onSave()
                         onDismiss()
                     }) {
-                        Text("Save",
+                        Text(getString(R.string.save_name),
                             color = MaterialTheme.colorScheme.secondary)
                     }
                 },
@@ -1227,7 +1254,7 @@ class ProfileActivity  : ComponentActivity() {
                                 MaterialTheme.colorScheme.errorContainer,
                             ),
                         onClick = { onDismiss() }) {
-                        Text("Don't Save",
+                        Text(getString(R.string.dont_save_name),
                             color = MaterialTheme.colorScheme.secondary)
                     }
                 },
@@ -1450,7 +1477,7 @@ class ProfileActivity  : ComponentActivity() {
                 text = { Text(
                     text = getString(R.string.ReSceduleOrNotDialog_text)
                             + "\n" + timeAndDate
-                            + "\n" + getString(R.string.RepeatsEveryTimeName) + " " + repeats
+                            + "\n" + getString(R.string.history_info_Repeat_name) + " " + repeats
                             + "\n" + phoneNumber
                             + "\n" + MessageFieldText,
                     fontWeight = FontWeight.Bold,
@@ -1501,7 +1528,8 @@ class ProfileActivity  : ComponentActivity() {
             stringResource(R.string.send_sms_every_year_text),
             stringResource(R.string.send_sms_every_month_text),
             stringResource(R.string.send_sms_every_week_text),
-            stringResource(R.string.send_sms_every_day_text)
+            stringResource(R.string.send_sms_every_day_text)/*,
+            stringResource(R.string.send_sms_every_now_text)*/
         )
         var selectedOptionIndex by remember { mutableStateOf(0) }
 
@@ -1511,7 +1539,7 @@ class ProfileActivity  : ComponentActivity() {
                     onDismiss()
                 },
                 title = {
-                    Text(text = stringResource(R.string.send_sms_every_text))
+                    Text(text = stringResource(R.string.history_info_Repeat_name))
                 },
                 text = {
                     Column {

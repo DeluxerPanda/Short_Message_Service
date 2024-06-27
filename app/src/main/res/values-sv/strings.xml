@@ -14,14 +14,15 @@
     <string name="set_time_button_text">Sätt tid</string>
     <string name="set_time_clock">00:00</string>
 
-    <string name="set_date_start_button_text">sms börjar</string>
+    <string name="set_date_start_button_text">Sätt datum</string>
     <string name="set_date_start_date">0000–00–00</string>
 
-    <string name="send_sms_every_text">sms skickas varje</string>
+    <string name="send_sms_every_text">upprepas varje:</string>
     <string name="send_sms_every_day_text">Dag</string>
     <string name="send_sms_every_week_text">Vecka</string>
     <string name="send_sms_every_month_text">Månad</string>
     <string name="send_sms_every_year_text">År</string>
+    <string name="send_sms_every_now_text">En gång (upprepas inte)</string>
 
     <string name="history_name">Schemalagda SMS</string>
     <string name="sms_notify_message_sent_number_text">Skicka till:</string>
@@ -45,8 +46,8 @@
     <string name="sms_number_or_masage_are_empty_titel">Nummer och meddelande krävs</string>
     <string name="sms_number_or_masage_are_empty_text">Ange både telefonnummer och meddelande.</string>
 
-    <string name="text_ok">Ok</string>
-    <string name="text_Cancel">avbryt</string>
+    <string name="text_ok">OK</string>
+    <string name="text_Cancel">Avbryt</string>
 
     <string name="text_ask_give_permission_settings">Öppna inställningar</string>
 
@@ -64,7 +65,7 @@
     <string name="history_info_Message_name">Meddelande</string>
     <string name="history_info_Date_name">Datum:</string>
     <string name="history_info_Time_name">Tid:</string>
-    <string name="history_info_Repeat_name">Upprepa varje:</string>
+    <string name="history_info_Repeat_name">upprepas varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
 
     <string name="history_info_Profile_Send_to">Skickas till</string>
@@ -76,6 +77,11 @@
     <string name="history_info_Profile_Edit_cannot_have_more_number">Du kan inte ha fler än</string>
 
     <string name="Custom_name">Anpassad</string>
+
+    <string name="save_name">Spara</string>
+    <string name="dont_save_name">Spara inte</string>
+    <string name="ask_save_changes_Titel_name">Vill du spara ändringarna?</string>
+    <string name="ask_save_changes_Text_name">Du har inte sparat dina ändringar. \n Vill du spara dem?</string>
     <string name="puse">Pausa</string>
     <string name="send_now">Skicka nu!</string>
     <string name="exit_name">Exit</string>
@@ -85,6 +91,5 @@
     <string name="ReSceduleOrNotDialog_title">Omplanera detta sms</string>
     <string name="ReSceduleOrNotDialog_text">Vill du omplanera detta sms?</string>
 
-    <string name="RepeatsEveryTimeName">Upprepas varje:</string>
     <string name="More_Then_One_Number_name">nummer</string>
 </resources>

@@ -10,10 +10,10 @@
 
     <string name="schedule_sms_button_text">Schedule SMS</string>
 
-    <string name="set_time_button_text">Set time</string>
+    <string name="set_time_button_text">set time</string>
     <string name="set_time_clock">00:00</string>
 
-    <string name="set_date_start_button_text">sms starts at</string>
+    <string name="set_date_start_button_text">set date</string>
     <string name="set_date_start_date">0000–00–00</string>
 
     <string name="send_sms_every_text">send sms every</string>
@@ -21,6 +21,7 @@
     <string name="send_sms_every_week_text">Week</string>
     <string name="send_sms_every_month_text">Month</string>
     <string name="send_sms_every_year_text">Year</string>
+    <string name="send_sms_every_now_text">One time (does not repeat)</string>
 
     <string name="history_name">Scheduled SMS</string>
     <string name="sms_notify_message_sent_number_text">Sent to:</string>
@@ -61,7 +62,7 @@
     <string name="history_info_Message_name">Message</string>
     <string name="history_info_Date_name">Date:</string>
     <string name="history_info_Time_name">Time:</string>
-    <string name="history_info_Repeat_name">Repeat every:</string>
+    <string name="history_info_Repeat_name">repeat every:</string>
     <string name="history_info_MoreSoon_name">More coming soon!</string>
 
     <string name="history_info_Profile_Send_to">Sends to</string>
@@ -75,6 +76,11 @@
     <string name="Custom_name">Custom</string>
 
     <string name="demo_text_160" translatable="false">The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz,.</string>
+
+    <string name="save_name">Save</string>
+    <string name="dont_save_name">Dont Save</string>
+    <string name="ask_save_changes_Titel_name">Do you want to save the changes?</string>
+    <string name="ask_save_changes_Text_name">You havent saved your changes. \n Do you want to save them?</string>
     <string name="puse">Pause</string>
     <string name="send_now">Send now!</string>
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
@@ -85,6 +91,5 @@
     <string name="ReSceduleOrNotDialog_title">Reschedule this SMS</string>
     <string name="ReSceduleOrNotDialog_text">Do you want to reschedule this SMS?</string>
 
-    <string name="RepeatsEveryTimeName">Repeats every:</string>
      <string name="More_Then_One_Number_name">numbers</string>
 </resources>

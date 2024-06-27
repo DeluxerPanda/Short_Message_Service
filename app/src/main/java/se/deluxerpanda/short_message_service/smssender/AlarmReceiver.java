@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.Random;
 
 import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.profile.ProfileActivity;
 import se.deluxerpanda.short_message_service.scheduled.ScheduledList;
 
 public class AlarmReceiver extends BroadcastReceiver {

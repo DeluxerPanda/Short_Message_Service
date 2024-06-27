@@ -97,25 +97,40 @@ public class MainActivity extends AppCompatActivity {
     private static int counterMax = 9;
     private int phoneNumberEditTextID;
     static HashMap<Integer, EditText> editTextMap = new HashMap<>();
-    private boolean hasSendSmsPermission() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            return true;
+
+
+    private boolean checkPermissions() {
+        // Define an array of all the permissions you want to check
+        String[] permissions = {
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.READ_PHONE_STATE
+        };
+
+        // Check if all permissions are granted
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                // Return false if any permission is not granted
+                return false;
+            }
         }
-        return false;
+        // Return true if all permissions are granted
+        return true;
     }
+
 
 
     private void requestPermission() {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS, Manifest.permission.POST_NOTIFICATIONS},
+                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS, Manifest.permission.POST_NOTIFICATIONS,Manifest.permission.READ_PHONE_STATE},
                 SMS_PERMISSION_REQUEST_CODE);
     }
     // SetTimeText
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!hasSendSmsPermission()) {
+        if (!checkPermissions()) {
             requestPermission();
         }
         setContentView((R.layout.activity_main));
@@ -183,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
             String repeatSmS = (String) selectedOptionText.getText();
-            if (hasSendSmsPermission()) {
+            if (checkPermissions()) {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
                     if (message.getBytes().length <= 140) {
                         if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
@@ -294,12 +309,13 @@ public class MainActivity extends AppCompatActivity {
                 getString(R.string.send_sms_every_year_text),
                 getString(R.string.send_sms_every_month_text),
                 getString(R.string.send_sms_every_week_text),
-                getString(R.string.send_sms_every_day_text)
+                getString(R.string.send_sms_every_day_text)/*,
+                getString(R.string.send_sms_every_now_text)*/
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder
-                .setTitle(getString(R.string.send_sms_every_text))
+                .setTitle(getString(R.string.history_info_Repeat_name))
                 .setPositiveButton(getString(R.string.text_ok), (dialog, which) -> {
                     selectedOptionText.setText(choices[selectedOptionIndex]);
                 })
