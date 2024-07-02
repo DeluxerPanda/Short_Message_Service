@@ -83,7 +83,8 @@
     <string name="ask_save_changes_Titel_name">Vill du spara ändringarna?</string>
     <string name="ask_save_changes_Text_name">Du har inte sparat dina ändringar. \n Vill du spara dem?</string>
     <string name="puse">Pausa</string>
-    <string name="send_now">Skicka nu!</string>
+    <string name="send_now_Titel">Skicka nu!</string>
+    <string name="send_now_Description">Vill du skicka detta sms nu?</string>
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Ta bort schemalagt meddelande</string>
     <string name="delete_name">Radera</string>

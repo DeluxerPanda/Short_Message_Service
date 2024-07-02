@@ -6,6 +6,7 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.net.ParseException
@@ -306,6 +307,23 @@ class ProfileActivity  : ComponentActivity() {
                                         SendNowDialog(
                                             showSendNowDialog = showSendNowDialog,
                                             onSave = {
+                                                val alarmreceiver = AlarmReceiver()
+                                                var intentAlarmReceiver: Intent = Intent()
+                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm")
+                                                val date: Date? = timeAndDate.let { sdf.parse(it.toString()) }
+                                                val triggerTime: Long? = date?.time
+                                                intentAlarmReceiver.putExtra("EXTRA_PHONE_NUMBER", phoneNumber)
+                                                intentAlarmReceiver.putExtra("EXTRA_MESSAGES", MessageFieldText)
+                                                intentAlarmReceiver.putExtra("EXTRA_ALARMID", alarmId)
+                                                intentAlarmReceiver.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+                                                intentAlarmReceiver.putExtra("EXTRA_REPEATSMS", repeats)
+                                                alarmreceiver.sendNow(
+                                                    this@ProfileActivity,
+                                                    intentAlarmReceiver
+                                                )
+                                                showSendNowDialog = false
+                                            },
+                                            onDismiss = {
                                                 showSendNowDialog = false
                                             }
                                         )
@@ -1312,19 +1330,20 @@ class ProfileActivity  : ComponentActivity() {
     fun SendNowDialog(
         showSendNowDialog: Boolean,
         onSave: () -> Unit,
+        onDismiss: () -> Unit
     ) {
         if (showSendNowDialog) {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(
-                    text = getString(R.string.send_now),
+                    text = getString(R.string.send_now_Titel),
                     fontWeight = FontWeight.Bold,
                     style = TextStyle(
                         fontSize = 20.sp,
                     ))},
 
                 text = { Text(
-                    text = getString(R.string.history_info_MoreSoon_name),
+                    text = getString(R.string.send_now_Description),
                     fontWeight = FontWeight.Bold,
                     )},
 
@@ -1332,20 +1351,34 @@ class ProfileActivity  : ComponentActivity() {
                     TextButton(
                         modifier = Modifier
                             .shadow(4.dp, shape = RoundedCornerShape(14.dp))
-                            .width(300.dp)
+                            .width(130.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(
                                 MaterialTheme.colorScheme.surface,
                             ),
                         onClick = {
                             onSave()
+                            onDismiss()
                         }) {
                         Text(getString(R.string.text_ok),
                             color = MaterialTheme.colorScheme.secondary)
                     }
                 },
 
-                dismissButton = {},
+                dismissButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(130.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = { onDismiss() }) {
+                        Text(getString(R.string.text_Cancel),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
                 properties = DialogProperties(
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,

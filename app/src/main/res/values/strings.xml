@@ -82,7 +82,8 @@
     <string name="ask_save_changes_Titel_name">Do you want to save the changes?</string>
     <string name="ask_save_changes_Text_name">You havent saved your changes. \n Do you want to save them?</string>
     <string name="puse">Pause</string>
-    <string name="send_now">Send now!</string>
+    <string name="send_now_Titel">Send now!</string>
+    <string name="send_now_Description">Do you want to send this SMS now?</string>
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Delete Scheduled Message</string>

@@ -1,306 +1,263 @@
-package se.deluxerpanda.short_message_service.smssender;
+package se.deluxerpanda.short_message_service.smssender
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.SimpleExpandableListAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
+import android.os.Bundle
+import android.provider.ContactsContract
+import android.provider.Settings
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ExpandableListView
+import android.widget.ExpandableListView.OnGroupClickListener
+import android.widget.ImageView
+import android.widget.SimpleExpandableListAdapter
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import se.deluxerpanda.short_message_service.R
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
+class PhoneListActivity : AppCompatActivity() {
+    private lateinit var contactListView: ExpandableListView
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_phone_list)
 
-import se.deluxerpanda.short_message_service.R;
+        val textBoxText: TextView = findViewById(R.id.Phone_list_TextBox_text)
+        val textBoxButton: Button = findViewById(R.id.Phone_list_TextBox_button)
 
-public class PhoneListActivity extends AppCompatActivity {
+        textBoxText.visibility = View.GONE
+        textBoxButton.visibility = View.GONE
 
-    private ExpandableListView contactListView;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_phone_list);
-
-        TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
-        Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
-
-        TextBox_text.setVisibility(View.GONE);
-        TextBox_button.setVisibility(View.GONE);
         // back button
-        ImageView btnToHamburger = findViewById(R.id.btnToMainSmsSchedulerPage);
-        btnToHamburger.setOnClickListener(v ->  getOnBackPressedDispatcher().onBackPressed());
+        val btnToHamburger: ImageView = findViewById(R.id.btnToMainSmsSchedulerPage)
+        btnToHamburger.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         // Initialize the ExpandableListView and permission check
-        this.contactListView = findViewById(R.id.Phone_list);
-        checkPermissionAndLoadContacts();
+        contactListView = findViewById(R.id.Phone_list)
+        checkPermissionAndLoadContacts()
     }
 
-    private void checkPermissionAndLoadContacts() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+    private fun checkPermissionAndLoadContacts() {
+        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            loadContacts();
+            loadContacts()
         } else {
-            showPermissionExplanationDialog();
+            showPermissionExplanationDialog()
         }
     }
 
+    private fun showPermissionExplanationDialog() {
+        val phoneList: ExpandableListView = findViewById(R.id.Phone_list)
+        val textBoxText: TextView = findViewById(R.id.Phone_list_TextBox_text)
+        val textBoxText2: TextView = findViewById(R.id.Phone_list_TextBox_text2)
+        val textBoxButton: Button = findViewById(R.id.Phone_list_TextBox_button)
 
-    private void showPermissionExplanationDialog() {
+        phoneList.visibility = View.GONE
 
-        ExpandableListView Phone_list = findViewById(R.id.Phone_list);
-        TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
-        TextView TextBox_text2 = findViewById(R.id.Phone_list_TextBox_text2);
-        Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
+        textBoxText.visibility = View.VISIBLE
+        textBoxText.text = getString(R.string.sms_no_permission_contacts_titel)
+        textBoxText.gravity = Gravity.CENTER
 
-        Phone_list.setVisibility(View.GONE);
+        textBoxText2.visibility = View.VISIBLE
+        textBoxText2.text = getString(R.string.sms_no_permission_contacts_text)
+        textBoxText2.gravity = Gravity.CENTER
 
-        TextBox_text.setVisibility(View.VISIBLE);
-        TextBox_text.setText(getResources().getString(R.string.sms_no_permission_contacts_titel));
-        TextBox_text.setGravity(Gravity.CENTER);
-
-        TextBox_text2.setVisibility(View.VISIBLE);
-        TextBox_text2.setText(getResources().getString(R.string.sms_no_permission_contacts_text));
-        TextBox_text2.setGravity(Gravity.CENTER);
-
-        TextBox_button.setVisibility(View.VISIBLE);
-        TextBox_button.setText(getResources().getString(R.string.text_ask_give_permission_settings));
-        TextBox_button.setGravity(Gravity.CENTER);
-        TextBox_button.setOnClickListener(v -> {
-            getOnBackPressedDispatcher().onBackPressed();
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            Uri uri = Uri.fromParts("package", getPackageName(), null);
-            intent.setData(uri);
-            startActivity(intent);
-        });
-
+        textBoxButton.visibility = View.VISIBLE
+        textBoxButton.text = getString(R.string.text_ask_give_permission_settings)
+        textBoxButton.gravity = Gravity.CENTER
+        textBoxButton.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri = Uri.fromParts("package", packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
     }
 
-    private void loadContacts() {
-        List<Map<String, String>> groupData = new ArrayList<>();
-        List<List<Map<String, String>>> childData = new ArrayList<>();
+    private fun loadContacts() {
+        val groupData = mutableListOf<Map<String, String>>()
+        val childData = mutableListOf<List<Map<String, String>>>()
 
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        while (true) {
-            assert cursor != null;
-            if (!cursor.moveToNext()) break;
-            String contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID));
-            String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME));
+        val cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)
+        cursor?.use {
+            while (it.moveToNext()) {
+                val contactId = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
 
+                if (it.getInt(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+                    val curGroupMap = mutableMapOf<String, String>()
+                    groupData.add(curGroupMap)
+                    curGroupMap["NAME"] = name
+                    curGroupMap["CONTACTID"] = contactId
+                    val children = mutableListOf<Map<String, String>>()
 
-            // Check if the contact has at least one phone number
-            if (Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                Map<String, String> curGroupMap = new HashMap<>();
-                groupData.add(curGroupMap);
-                curGroupMap.put("NAME", name);
-                curGroupMap.put("CONTACTID", contactId);
-                List<Map<String, String>> children = new ArrayList<>();
-
-                Cursor phoneCursor = getContentResolver().query(
+                    val phoneCursor = contentResolver.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        new String[]{contactId}, null);
+                        "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID} = ?",
+                        arrayOf(contactId), null
+                    )
 
-                assert phoneCursor != null;
-                if (phoneCursor.getCount() == 1) {
-                    if (phoneCursor.moveToFirst()) {
-                        // If there's only one phone number, save it
-                        String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                        curGroupMap.put("PHONE", phoneNumber);
-                        curGroupMap.put("SINGLE_PHONE", String.valueOf(true));
+                    phoneCursor?.use { pc ->
+                        if (pc.count == 1) {
+                            if (pc.moveToFirst()) {
+                                val phoneNumber = pc.getString(pc.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                                curGroupMap["PHONE"] = phoneNumber
+                                curGroupMap["SINGLE_PHONE"] = true.toString()
+                            }
+                        }
 
+                        while (pc.moveToNext()) {
+                            val phoneNumber = pc.getString(pc.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                            val curChildMap = mutableMapOf<String, String>()
+                            children.add(curChildMap)
+
+                            val phoneType = pc.getInt(pc.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.TYPE))
+                            val phoneTypeLabel = ContactsContract.CommonDataKinds.Phone.getTypeLabel(resources, phoneType, getString(R.string.Custom_name))
+                            val phoneTypeLabelFinal = "$phoneTypeLabel:"
+                            curChildMap["CATAGORY"] = phoneTypeLabelFinal
+                            curChildMap["PHONE"] = phoneNumber
+                            curGroupMap["SINGLE_PHONE"] = false.toString()
+                        }
                     }
+                    childData.add(children)
                 }
-
-                while (phoneCursor.moveToNext()) {
-                    String phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    Map<String, String> curChildMap = new HashMap<>();
-                    children.add(curChildMap);
-
-                    int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.TYPE));
-
-
-
-                        CharSequence phoneTypeLabel = ContactsContract.CommonDataKinds.Phone.getTypeLabel(
-                                getResources(), phoneType, getResources().getString(R.string.Custom_name));
-
-                        String phoneTypeLabelFinl = phoneTypeLabel + ":";
-                        curChildMap.put("CATAGORY",phoneTypeLabelFinl);
-
-                    curChildMap.put("PHONE", phoneNumber);
-                    curGroupMap.put("SINGLE_PHONE", String.valueOf(false));
-                }
-
-                childData.add(children);
-                phoneCursor.close();
             }
         }
 
-        cursor.close();
-        SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
-                this,
-                groupData,
-                R.layout.activity_phone_group_layout, // layout for group
-                new String[]{"NAME"},
-                new int[]{R.id.group_name},
-                childData,
-                R.layout.activity_phone_item_layout, // layout for child
-                new String[]{"PHONE","CATAGORY"},
-                new int[]{R.id.contact_number, R.id.contact_category}
-        )
-        {
-            @Override
-            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-                View view = super.getGroupView(groupPosition, isExpanded, convertView, parent);
-
-                // Get the contact photo URI
-                Uri photoUri = getContactPhotoUri(groupData.get(groupPosition).get("CONTACTID"));
-                ImageView contactImageView = view.findViewById(R.id.group_image);
+        val adapter = object : SimpleExpandableListAdapter(
+            this,
+            groupData,
+            R.layout.activity_phone_group_layout, // layout for group
+            arrayOf("NAME"),
+            intArrayOf(R.id.group_name),
+            childData,
+            R.layout.activity_phone_item_layout, // layout for child
+            arrayOf("PHONE", "CATAGORY"),
+            intArrayOf(R.id.contact_number, R.id.contact_category)
+        ) {
+            override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup): View {
+                val view = super.getGroupView(groupPosition, isExpanded, convertView, parent)
+                val photoUri = getContactPhotoUri(groupData[groupPosition]["CONTACTID"])
+                val contactImageView: ImageView = view.findViewById(R.id.group_image)
                 if (photoUri != null) {
-                   // Load the contact photo into the ImageView
-                    contactImageView.setImageURI(photoUri);
-                    // Create a rounded drawable and set it directly to the ImageView
-                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
-                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
-                    contactImageView.setImageDrawable(roundedDrawable);
-
-                }else {
-                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
-                }
-
-                ImageView arrowImageView1 = view.findViewById(R.id.arrow_icon1);
-                ImageView arrowImageView2 = view.findViewById(R.id.arrow_icon2);
-                // Check if it's a single phone number (no arrow icon) or multiple phone numbers (with arrow icon)
-                if (Boolean.parseBoolean(groupData.get(groupPosition).get("SINGLE_PHONE"))) {
-                    arrowImageView1.setVisibility(View.GONE);
-                    arrowImageView2.setVisibility(View.GONE);
+                    contactImageView.setImageURI(photoUri)
+                    val roundedDrawable = RoundedBitmapDrawableFactory.create(resources, (contactImageView.drawable as BitmapDrawable).bitmap)
+                    roundedDrawable.isCircular = true
+                    contactImageView.setImageDrawable(roundedDrawable)
                 } else {
-                    arrowImageView1.setVisibility(View.VISIBLE);
-                    arrowImageView2.setVisibility(View.GONE);
-                if (isExpanded){
-                    arrowImageView1.setVisibility(View.GONE);
-                    arrowImageView2.setVisibility(View.VISIBLE);
+                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
                 }
+
+                val arrowImageView1: ImageView = view.findViewById(R.id.arrow_icon1)
+                val arrowImageView2: ImageView = view.findViewById(R.id.arrow_icon2)
+                if (groupData[groupPosition]["SINGLE_PHONE"].toBoolean()) {
+                    arrowImageView1.visibility = View.GONE
+                    arrowImageView2.visibility = View.GONE
+                } else {
+                    arrowImageView1.visibility = View.VISIBLE
+                    arrowImageView2.visibility = View.GONE
+                    if (isExpanded) {
+                        arrowImageView1.visibility = View.GONE
+                        arrowImageView2.visibility = View.VISIBLE
+                    }
                 }
-                return view;
+                return view
             }
-
-        };
-
-        contactListView.setAdapter(adapter);
-
-        if (contactListView.getAdapter().isEmpty()){
-            ExpandableListView Phone_list = findViewById(R.id.Phone_list);
-            TextView TextBox_text = findViewById(R.id.Phone_list_TextBox_text);
-            Button TextBox_button = findViewById(R.id.Phone_list_TextBox_button);
-
-            Phone_list.setVisibility(View.GONE);
-
-            TextBox_text.setVisibility(View.VISIBLE);
-            TextBox_text.setText(getResources().getString(R.string.No_contacts_found));
-            TextBox_text.setGravity(Gravity.CENTER);
-
-            TextBox_button.setVisibility(View.GONE);
-            TextBox_button.setOnClickListener(v -> {
-                getOnBackPressedDispatcher().onBackPressed();
-                Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
-            });
-
         }
 
-        contactListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
-            @SuppressWarnings("unchecked")
-            String phoneNumber = ((Map<String, String>) adapter.getChild(groupPosition, childPosition)).get("PHONE");
-            setPhoneNumber(phoneNumber);
-            return true;
-        });
+        contactListView.setAdapter(adapter)
 
-        contactListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            int lastExpandedGroupPosition = -1;
+        if (adapter.isEmpty) {
+            val phoneList: ExpandableListView = findViewById(R.id.Phone_list)
+            val textBoxText: TextView = findViewById(R.id.Phone_list_TextBox_text)
+            val textBoxButton: Button = findViewById(R.id.Phone_list_TextBox_button)
 
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                ExpandableListAdapter adapter = contactListView.getExpandableListAdapter();
-                int childCount = adapter.getChildrenCount(groupPosition);
+            phoneList.visibility = View.GONE
 
+            textBoxText.visibility = View.VISIBLE
+            textBoxText.text = getString(R.string.No_contacts_found)
+            textBoxText.gravity = Gravity.CENTER
+
+            textBoxButton.visibility = View.GONE
+            textBoxButton.setOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+                val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+                val uri = Uri.fromParts("package", packageName, null)
+                intent.data = uri
+                startActivity(intent)
+            }
+        }
+
+        contactListView.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
+            val phoneNumber = (adapter.getChild(groupPosition, childPosition) as Map<*, *>)["PHONE"]
+            setPhoneNumber(phoneNumber.toString())
+            true
+        }
+
+        contactListView.setOnGroupClickListener(object : ExpandableListView.OnGroupClickListener {
+            var lastExpandedGroupPosition = -1
+
+            override fun onGroupClick(parent: ExpandableListView, v: View, groupPosition: Int, id: Long): Boolean {
+                val childCount = contactListView.expandableListAdapter.getChildrenCount(groupPosition)
                 if (childCount == 0) {
-                    @SuppressWarnings("unchecked")
-                    String phoneNumber = ((Map<String, String>) adapter.getGroup(groupPosition)).get("PHONE");
+                    val phoneNumber = (adapter.getGroup(groupPosition) as? Map<*, *>)?.get("PHONE")
+
                     if (phoneNumber != null) {
-                        setPhoneNumber(phoneNumber);
+                        setPhoneNumber(phoneNumber.toString())
                     } else {
-                        Toast.makeText(PhoneListActivity.this, "No phone number available for this contact", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this@PhoneListActivity, "No phone number available for this contact", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-
                     if (contactListView.isGroupExpanded(groupPosition)) {
-                        contactListView.collapseGroup(groupPosition);
-                        lastExpandedGroupPosition = -1;
+                        contactListView.collapseGroup(groupPosition)
+                        lastExpandedGroupPosition = -1
                     } else {
                         if (lastExpandedGroupPosition != -1) {
-                            contactListView.collapseGroup(lastExpandedGroupPosition);
+                            contactListView.collapseGroup(lastExpandedGroupPosition)
                         }
-                        contactListView.expandGroup(groupPosition);
-                        lastExpandedGroupPosition = groupPosition;
+                        contactListView.expandGroup(groupPosition)
+                        lastExpandedGroupPosition = groupPosition
                     }
                 }
-                return true;
+                return true
             }
-        });
-
-
+        })
     }
 
-    public void setPhoneNumber(String phoneNumber){
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("PHONE_NUMBER_FROM_CONTACTS", phoneNumber);
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
-    }
-
-
-    private Uri getContactPhotoUri(String contactID) {
-        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
-        String selection = ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?";
-        String[] selectionArgs = {contactID};
-
-        Cursor cursor = getContentResolver().query(contactUri, projection, selection, selectionArgs, null);
-        Uri photoUri = null;
-
-        if (cursor != null && cursor.moveToFirst()) {
-            String photoUriString = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-            if (photoUriString != null) {
-                photoUri = Uri.parse(photoUriString);
-            }
-            cursor.close();
+    private fun setPhoneNumber(phoneNumber: String?) {
+        val resultIntent = Intent().apply {
+            putExtra("PHONE_NUMBER_FROM_CONTACTS", phoneNumber)
         }
-        return photoUri;
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 
+    private fun getContactPhotoUri(contactID: String?): Uri? {
+        val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
+        val selection = "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID}=?"
+        val selectionArgs = arrayOf(contactID)
 
+        var photoUri: Uri? = null
+        val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val photoUriString = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
+                if (photoUriString != null) {
+                    photoUri = Uri.parse(photoUriString)
+                }
+            }
+        }
+        return photoUri
+    }
 }

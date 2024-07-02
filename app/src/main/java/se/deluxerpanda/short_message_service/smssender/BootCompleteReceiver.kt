@@ -1,139 +1,130 @@
-package se.deluxerpanda.short_message_service.smssender;
+package se.deluxerpanda.short_message_service.smssender
 
-import static java.sql.DriverManager.println;
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.util.Log
+import se.deluxerpanda.short_message_service.R
+import java.text.SimpleDateFormat
+import java.util.Date
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.util.Log;
+class BootCompleteReceiver : BroadcastReceiver() {
+    private var day: String? = null
+    private var week: String? = null
+    private var month: String? = null
+    private var year: String? = null
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != null && intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            Log.d("BootCompleteReceiver", "Device booted.")
 
-import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.smssender.AlarmReceiver;
+            val alarmList = getAllAlarms(context)
 
-public class BootCompleteReceiver extends BroadcastReceiver {
-    private String day;
-    private String week;
-    private String month;
-    private String year;
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction() != null && intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Log.d("BootCompleteReceiver", "Device booted.");
-
-
-            List<MainActivity.AlarmDetails> alarmList = getAllAlarms(context);
-
-            for (MainActivity.AlarmDetails alarm : alarmList) {
-                if (alarm != null) {
-           String phonenumber = alarm.getPhonenumber();
-           String message = alarm.getMessage();
-           long triggerTime = alarm.getTimeInMillis();
-           String repeatSmS = alarm.getRepeatSmS();
-               int alarmId = alarm.getAlarmId();
-                        scheduleAlarm(phonenumber,message, context, triggerTime, repeatSmS, alarmId);
-                }
-            }
+            for (alarm in alarmList) {
+                val phonenumber = alarm.phonenumber
+                val message = alarm.message
+                val triggerTime = alarm.timeInMillis
+                val repeatSmS = alarm.repeatSmS
+                val alarmId = alarm.alarmId
+                scheduleAlarm(phonenumber, message, context, triggerTime, repeatSmS, alarmId)
             }
         }
-
-    private void scheduleAlarm(String phonenumber, String message, Context context, long triggerTime, String repeatSmS, int alarmId){
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date date = new Date(triggerTime);
-
-        day = context.getString(R.string.send_sms_every_day_text);
-        week = context.getString(R.string.send_sms_every_week_text);
-        month = context.getString(R.string.send_sms_every_month_text);
-        year = context.getString(R.string.send_sms_every_year_text);
-
-        long intervalMillis = 0;
-
-        if (repeatSmS.equalsIgnoreCase(day)) {
-            intervalMillis = AlarmManager.INTERVAL_DAY;
-        } else if (repeatSmS.equalsIgnoreCase(week)) {
-            intervalMillis = AlarmManager.INTERVAL_DAY * 7;
-        } else if (repeatSmS.equalsIgnoreCase(month)) {
-            intervalMillis = AlarmManager.INTERVAL_DAY * 30;
-        } else if (repeatSmS.equalsIgnoreCase(year)) {
-            intervalMillis = AlarmManager.INTERVAL_DAY * 365;
-        }
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-        Intent intent = new Intent(context, AlarmReceiver.class);
-
-        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-        intent.putExtra("EXTRA_MESSAGES", message);
-        intent.putExtra("EXTRA_ALARMID", alarmId);
-        intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
-        intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        }
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-
-
-        alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerTime,
-                pendingIntent
-        );
-
-        MainActivity.saveAlarmDetails(context, alarmId, triggerTime,repeatSmS, phonenumber,message);
     }
 
-    private List<MainActivity.AlarmDetails> getAllAlarms(Context context) {
-        List<MainActivity.AlarmDetails> alarmList = new ArrayList<>();
-        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
+    private fun scheduleAlarm(
+        phonenumber: String,
+        message: String,
+        context: Context,
+        triggerTime: Long,
+        repeatSmS: String,
+        alarmId: Int
+    ) {
+        SimpleDateFormat("yyyy-MM-dd HH:mm")
+        Date(triggerTime)
 
-        Set<Integer> uniqueAlarmIds = new HashSet<>();
+        day = context.getString(R.string.send_sms_every_day_text)
+        week = context.getString(R.string.send_sms_every_week_text)
+        month = context.getString(R.string.send_sms_every_month_text)
+        year = context.getString(R.string.send_sms_every_year_text)
 
-        // Iterate through all saved alarms and add them to the list
-        Map<String, ?> allEntries = preferences.getAll();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            String key = entry.getKey();
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            // Separate keys for triggerTime and releaseTime
-            String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
+        val intent = Intent(context, AlarmReceiver::class.java)
+        intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber)
+        intent.putExtra("EXTRA_MESSAGES", message)
+        intent.putExtra("EXTRA_ALARMID", alarmId)
+        intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+        intent.putExtra("EXTRA_REPEATSMS", repeatSmS)
 
-            String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(Intent(context, AlarmReceiver::class.java))
+        } else {
+            context.startService(Intent(context, AlarmReceiver::class.java))
+        }
 
-            String getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getPhonenumber = preferences.getString(getPhonenumberKey, String.valueOf(0));
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            alarmId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
 
-            String getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getMessage = preferences.getString(getMessageKey, String.valueOf(0));
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            triggerTime,
+            pendingIntent
+        )
 
-            String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
+        MainActivity.saveAlarmDetails(
+            context,
+            alarmId,
+            triggerTime,
+            repeatSmS,
+            phonenumber,
+            message
+        )
+    }
 
-            long triggerTime = preferences.getLong(triggerTimeKey, 0);
+    private fun getAllAlarms(context: Context): List<MainActivity.AlarmDetails> {
+        val alarmList: MutableList<MainActivity.AlarmDetails> = ArrayList()
+        val preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE)
 
-            int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
-            if (!uniqueAlarmIds.contains(alarmId)) {
+        val uniqueAlarmIds: MutableSet<Int> = HashSet()
 
-                MainActivity.AlarmDetails alarmDetails = new MainActivity.AlarmDetails(alarmId, triggerTime,getRepeatSmS,getPhonenumber, getMessage);
-                alarmList.add(alarmDetails);
+        val allEntries = preferences.all
+        for ((key, _) in allEntries) {
+            val triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1)
+            val getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1)
+            val getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1)
+            val getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1)
 
-                // Lägg till alarmId i set för att undvika dubbletter
-                uniqueAlarmIds.add(alarmId);
+            val getPhonenumber = preferences.getString(getPhonenumberKey, null)
+            val getMessage = preferences.getString(getMessageKey, null)
+            val getRepeatSmS = preferences.getString(getRepeatSmSKey, null)
+            val triggerTime = preferences.getLong(triggerTimeKey, 0)
+
+            if (getPhonenumber != null && getMessage != null && getRepeatSmS != null) {
+                val alarmId = key.substring(key.lastIndexOf("_") + 1).toInt()
+                if (!uniqueAlarmIds.contains(alarmId)) {
+                    val alarmDetails =
+                        MainActivity.AlarmDetails(
+                            alarmId,
+                            triggerTime,
+                            getRepeatSmS,
+                            getPhonenumber,
+                            getMessage
+                        )
+                    alarmList.add(alarmDetails)
+                    uniqueAlarmIds.add(alarmId)
+                }
+            } else {
+                Log.e("BootCompleteReceiver", "Incomplete alarm details for key: $key")
             }
         }
 
-        return alarmList;
+        return alarmList
     }
 }
