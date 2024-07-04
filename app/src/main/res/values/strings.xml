@@ -88,7 +88,6 @@
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Delete Scheduled Message</string>
     <string name="delete_name">Delete</string>
-    <string name="DelayScheduleMessage">Delay Scheduled Message</string>
     <string name="ReSceduleOrNotDialog_title">Reschedule this SMS</string>
     <string name="ReSceduleOrNotDialog_text">Do you want to reschedule this SMS?</string>
 

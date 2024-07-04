@@ -88,7 +88,6 @@
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Ta bort schemalagt meddelande</string>
     <string name="delete_name">Radera</string>
-    <string name="DelayScheduleMessage">Fördröj schemalagt meddelande</string>
     <string name="ReSceduleOrNotDialog_title">Omplanera detta sms</string>
     <string name="ReSceduleOrNotDialog_text">Vill du omplanera detta sms?</string>
 

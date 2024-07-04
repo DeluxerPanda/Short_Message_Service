@@ -14,6 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -336,22 +337,6 @@ class ProfileActivity  : ComponentActivity() {
                                                 contentDescription = "Send now button"
                                             )
                                         }
-                                        var showDelayDialog by remember { mutableStateOf(false) }
-                                        DelayDialog(
-                                            showDelayDialog = showDelayDialog,
-                                            onSave = {
-                                                showDelayDialog = false
-                                           }
-                                        )
-                                        IconButton(onClick = {
-                                            showDelayDialog = true
-                                        })
-                                        {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.baseline_pause),
-                                                contentDescription = "Delay button"
-                                            )
-                                        }
                                         var showDeleteDialog by remember { mutableStateOf(false) }
                                         DeleteDialog(
                                             showDeleteDialog = showDeleteDialog,
@@ -580,6 +565,7 @@ class ProfileActivity  : ComponentActivity() {
                     composable("TimeAndDateField") {
                         var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                         var repeatsEdited by remember { mutableStateOf(repeats)}
+                        var timeAndDateEdited by remember { mutableStateOf(timeAndDate)}
                         val mContext = LocalContext.current
                         val scrollBehavior =
                             TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -601,11 +587,10 @@ class ProfileActivity  : ComponentActivity() {
                                     },
                                     navigationIcon = {
                                         IconButton(onClick = {
+                                            val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                            val timeStr: String = timeAndDateEdited!!.substringAfter("| ")
+                                            val dateStr: String = timeAndDateEdited!!.substringBefore(" |")
                                             try {
-                                                val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm",
-                                                    Locale.getDefault())
-                                                val timeStr: String = timeAndDate!!.substringAfter("| ")
-                                                val dateStr: String = timeAndDate!!.substringBefore(" |")
                                                 val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
                                                 val currentDateTime = LocalDateTime.now()
 
@@ -614,7 +599,7 @@ class ProfileActivity  : ComponentActivity() {
                                                         ?.savedStateHandle
                                                         ?.set(
                                                             "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                            editedtimeAndDate
+                                                            timeAndDateEdited
                                                         )
                                                     navController.previousBackStackEntry
                                                         ?.savedStateHandle
@@ -646,22 +631,8 @@ class ProfileActivity  : ComponentActivity() {
                                     },
 
                                     actions = {
-                                        var showDialog by remember { mutableStateOf(false) }
-
                                         IconButton(onClick = {
-                                            if (isTimeAndDateChanged == true) {
-                                                showDialog = true
-                                                isTimeAndDateChanged = false
-                                            } else {
-                                                showDialog = false
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set(
-                                                        "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                        editedtimeAndDate
-                                                    )
-                                                navController.popBackStack()
-                                            }
+                                            navController.popBackStack()
                                         })
                                         {
                                             Icon(
@@ -669,38 +640,6 @@ class ProfileActivity  : ComponentActivity() {
                                                 contentDescription = "Close button"
                                             )
                                         }
-                                        UnsavedChangesDialog(
-                                            showDialog = showDialog,
-                                            onDismiss = {
-                                                showDialog = false
-                                                if (showNoBackInTimeDialog == false){
-                                                    navController.popBackStack()
-                                                }
-
-                                            },
-                                            onSave = {
-                                                try {
-                                                    val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
-                                                    val timeStr: String = timeAndDate!!.substringAfter("| ")
-                                                    val dateStr: String = timeAndDate!!.substringBefore(" |")
-                                                    val selectedDateTime = LocalDateTime.parse("$dateStr $timeStr", sdfDateTime)
-                                                    val currentDateTime = LocalDateTime.now()
-
-                                                    if (selectedDateTime.isAfter(currentDateTime)) {
-                                                        navController.previousBackStackEntry
-                                                            ?.savedStateHandle
-                                                            ?.set(
-                                                                "EXTRA_PROFILE_EDITOR_FINAL_TIMEANDDATE",
-                                                                editedtimeAndDate
-                                                            )
-                                                    }else{
-                                                        showNoBackInTimeDialog = true
-                                                    }
-                                                } catch (e: ParseException) {
-                                                    e.printStackTrace()
-                                                }
-                                            }
-                                        )
                                         NoBackInTimeDialog(
                                             showNoBackInTimeDialog = showNoBackInTimeDialog,
                                             onSave = {
@@ -735,7 +674,7 @@ class ProfileActivity  : ComponentActivity() {
                                     { _, hour: Int, minute: Int ->
                                         val formattedMinute = String.format("%02d", minute)
                                         val newTime = "$hour:$formattedMinute"
-                                        timeAndDate = timeAndDate!!.replaceAfterLast("| ", newTime)
+                                        timeAndDateEdited = timeAndDateEdited!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
                                         isTimeAndDateChanged = true
 
@@ -752,7 +691,7 @@ class ProfileActivity  : ComponentActivity() {
                                 }
 
 
-                                var Date by remember { mutableStateOf(timeAndDate!!.substringBefore("|")) }
+                                var Date by remember { mutableStateOf(timeAndDateEdited!!.substringBefore("|")) }
                                 // Parsing year, month, and day from the Date string
                                 val mYear = try { Date.substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 }
                                 val mMonth = try { Date.substringAfter("-").substringBefore("-").trim().toInt() } catch (e: NumberFormatException) { 0 } -1
@@ -762,12 +701,13 @@ class ProfileActivity  : ComponentActivity() {
                                     mContext,
                                     { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                                         val formattedMonth = String.format("%02d", month + 1)
-                                        val newDate = "$year-$formattedMonth-$dayOfMonth"
-                                        timeAndDate = timeAndDate!!.replaceBeforeLast(" |", newDate)
+                                        val formattedDay = String.format("%02d", dayOfMonth)
+                                        val newDate = "$year-$formattedMonth-$formattedDay"
+                                        timeAndDateEdited = timeAndDateEdited!!.replaceBeforeLast(" |", newDate)
                                         Date = newDate
-                                        isTimeAndDateChanged = true
                                     }, mYear, mMonth, mDay
                                 )
+
 
                                 Text(text = getString(R.string.history_info_Date_name))
                                 OutlinedButton(onClick = {
@@ -794,9 +734,6 @@ class ProfileActivity  : ComponentActivity() {
                                     }
                                 )
                             }
-                        if (!isTimeAndDateChanged) {
-                            editedtimeAndDate = timeAndDate
-                        }
 
                         }
 
@@ -840,23 +777,8 @@ class ProfileActivity  : ComponentActivity() {
                                     },
 
                                     actions = {
-                                        var showDialog by remember { mutableStateOf(false) }
                                         IconButton(onClick = {
-                                            if (editedphoneNumber != phoneNumber
-                                            ) {
-                                                showDialog = true
-                                            } else {
-
-                                                showDialog = false
-                                                it_isPhoneNumberField()
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set(
-                                                        "EXTRA_PROFILE_EDITOR_FINAL_PHONENUMBER",
-                                                        editedphoneNumber
-                                                    )
-                                                navController.popBackStack()
-                                            }
+                                            navController.popBackStack()
                                         })
                                         {
                                             Icon(
@@ -864,23 +786,6 @@ class ProfileActivity  : ComponentActivity() {
                                                 contentDescription = "Close button"
                                             )
                                         }
-                                        UnsavedChangesDialog(
-                                            showDialog = showDialog,
-                                            onDismiss = {
-                                                showDialog = false
-                                                navController.popBackStack()
-                                            },
-                                            onSave = {
-                                                showDialog = false
-                                                it_isPhoneNumberField()
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set(
-                                                        "EXTRA_PROFILE_EDITOR_FINAL_PHONENUMBER",
-                                                        editedphoneNumber
-                                                    )
-                                            }
-                                        )
                                     },
 
                                     scrollBehavior = scrollBehavior,
@@ -1060,18 +965,8 @@ class ProfileActivity  : ComponentActivity() {
                                     },
 
                                     actions = {
-                                        var showDialog by remember { mutableStateOf(false) }
                                         IconButton(onClick = {
-                                            if (editedMessage != MessageFieldText
-                                            ) {
-                                                showDialog = true
-                                            } else {
-                                                showDialog = false
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set("EXTRA_PROFILE_EDITOR_FINAL_MESSAGE", editedMessage)
                                                 navController.popBackStack()
-                                            }
                                         })
                                         {
                                             Icon(
@@ -1079,18 +974,6 @@ class ProfileActivity  : ComponentActivity() {
                                                 contentDescription = "Close button"
                                             )
                                         }
-                                        UnsavedChangesDialog(
-                                            showDialog = showDialog,
-                                            onDismiss = {
-                                                showDialog = false
-                                                navController.popBackStack()},
-                                            onSave = {
-                                                showDialog = false
-                                                navController.previousBackStackEntry
-                                                    ?.savedStateHandle
-                                                    ?.set("EXTRA_PROFILE_EDITOR_FINAL_MESSAGE", editedMessage)
-                                            }
-                                        )
                                     },
 
                                     scrollBehavior = scrollBehavior,
@@ -1153,7 +1036,6 @@ class ProfileActivity  : ComponentActivity() {
                                 }
                             )
                             if (!isMessageChanged){
-
                                 editedMessage = MessageFieldText
                             }
                         }
@@ -1226,60 +1108,6 @@ class ProfileActivity  : ComponentActivity() {
         return photoUri
     }
 
-    @Composable
-    fun UnsavedChangesDialog(
-        showDialog: Boolean,
-        onDismiss: () -> Unit,
-        onSave: () -> Unit
-    ) {
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = {},
-                title = { Text(
-                    text = getString(R.string.ask_save_changes_Titel_name),
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                    )) },
-                text = { Text(
-                    text = getString(R.string.ask_save_changes_Text_name),
-                    fontWeight = FontWeight.Bold,
-                ) },
-                confirmButton = {
-                    TextButton(
-                        modifier = Modifier
-                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
-                            .width(130.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                MaterialTheme.colorScheme.surface,
-                            ),
-                        onClick = {
-                        onSave()
-                        onDismiss()
-                    }) {
-                        Text(getString(R.string.save_name),
-                            color = MaterialTheme.colorScheme.secondary)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        modifier = Modifier
-                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
-                            .width(130.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                MaterialTheme.colorScheme.errorContainer,
-                            ),
-                        onClick = { onDismiss() }) {
-                        Text(getString(R.string.dont_save_name),
-                            color = MaterialTheme.colorScheme.secondary)
-                    }
-                },
-                properties = DialogProperties(),
-            )
-        }
-    }
     @Composable
     fun NoBackInTimeDialog(
         showNoBackInTimeDialog: Boolean,
@@ -1383,56 +1211,6 @@ class ProfileActivity  : ComponentActivity() {
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,
                 ),
-            )
-        }
-    }
-
-
-    @Composable
-    fun DelayDialog(
-        showDelayDialog: Boolean,
-        onSave: () -> Unit,
-    ) {
-        if (showDelayDialog) {
-            AlertDialog(
-
-                onDismissRequest = {},
-                title = { Text(
-                    text = getString(R.string.DelayScheduleMessage),
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                    )
-                    )},
-
-                text = { Text(
-                    text = getString(R.string.history_info_MoreSoon_name),
-                    fontWeight = FontWeight.Bold,
-                )},
-
-                confirmButton = {
-                    TextButton(
-                        modifier = Modifier
-                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
-                            .width(300.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                MaterialTheme.colorScheme.surface,
-                            ),
-                        onClick = {
-                            onSave()
-                        }) {
-                        Text(getString(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
-                    }
-                },
-
-                dismissButton = {},
-                properties = DialogProperties(
-                    dismissOnBackPress = false,
-                    dismissOnClickOutside = false,
-                ),
-
             )
         }
     }
