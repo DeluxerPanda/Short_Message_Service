@@ -114,6 +114,23 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private boolean checkPermissionsSMS() {
+        // Define an array of all the permissions you want to check
+        String[] permissions = {
+                Manifest.permission.SEND_SMS,
+        };
+
+        // Check if all permissions are granted
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                // Return false if any permission is not granted
+                return false;
+            }
+        }
+        // Return true if all permissions are granted
+        return true;
+    }
+
 
 
     private void requestPermission() {
@@ -193,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
             String phonenumber = phoneNumberEditText.getText().toString();
             String message = messageEditText.getText().toString();
             String repeatSmS = (String) selectedOptionText.getText();
-            if (checkPermissions()) {
+            if (checkPermissionsSMS()) {
                 if (!phonenumber.isEmpty() && !message.isEmpty()) {
                     if (message.getBytes().length <= 140) {
                         if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
