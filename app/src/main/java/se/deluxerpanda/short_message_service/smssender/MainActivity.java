@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -635,7 +636,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AlarmReceiver.class);
 
             int alarmId = UUID.randomUUID().hashCode();
-
             if (counterLeft[0] > 0){
                 StringBuilder allText = new StringBuilder();
 
@@ -646,6 +646,7 @@ public class MainActivity extends AppCompatActivity {
                 String strnum = allText.toString() + phonenumber;
                 intent.putExtra("EXTRA_PHONE_NUMBER", strnum);
                 phonenumber = strnum;
+                allText.setLength(0);
             }else {
                 intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
             }
@@ -816,7 +817,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intenta = new Intent(context, MainActivity.class);
         intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intenta);
-
     }
 
     public void hideKeyboard() {
