@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.SEND_SMS,
                 Manifest.permission.READ_CONTACTS,
                 Manifest.permission.POST_NOTIFICATIONS,
-                Manifest.permission.READ_PHONE_STATE
         };
 
         // Check if all permissions are granted
@@ -428,7 +427,6 @@ public class MainActivity extends AppCompatActivity {
                     ContentResolver contentResolver = getContentResolver();
                     if (phonenumber.contains(",")) {
                         String[] phoneNumbers = phonenumber.split(",");
-
                         StringBuilder displayedNumbers = new StringBuilder();
                         StringBuilder titleBuilder = new StringBuilder();
 
@@ -476,7 +474,12 @@ public class MainActivity extends AppCompatActivity {
                     contactImageView.setImageDrawable(roundedDrawable);
                     photoUri_result = photoUri.toString();
                 } else {
-                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                    if (phonenumber.contains(",")) {
+                        contactImageView.setImageResource(R.drawable.baseline_groups);
+                    }else {
+                        contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                    }
+
                     photoUri_result = null;
                 }
                 TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);

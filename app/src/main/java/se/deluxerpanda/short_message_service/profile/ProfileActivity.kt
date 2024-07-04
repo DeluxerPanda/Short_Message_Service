@@ -1,20 +1,20 @@
 package se.deluxerpanda.short_message_service.profile
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -77,6 +77,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -90,7 +92,6 @@ import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import java.util.Locale
 import java.util.UUID
 
 
@@ -413,7 +414,15 @@ class ProfileActivity  : ComponentActivity() {
                                                     .size(130.dp)
                                                     .align(Alignment.CenterHorizontally)
                                             )
-                                        } else {
+                                        } else if (phoneNumber!!.contains(",")) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.baseline_groups),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .size(130.dp)
+                                                    .align(Alignment.CenterHorizontally)
+                                            )
+                                        }else{
                                             Image(
                                                 painter = painterResource(id = R.drawable.ic_baseline_person_24),
                                                 contentDescription = null,
@@ -489,16 +498,16 @@ class ProfileActivity  : ComponentActivity() {
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                         ) {
+                                            // Display the phone number
                                             Text(
                                                 text = phoneNumberNew!!,
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 15.sp,
                                                 modifier = Modifier.padding(
-                                                    top = 10.dp,
+                                                    top = 5.dp,
                                                     bottom = 10.dp
                                                 )
                                             )
-
                                             Image(
                                                 painter = painterResource(id = R.drawable.ic_baseline_edit_24),
                                                 contentDescription = "To Edit Phone Number",
@@ -513,6 +522,7 @@ class ProfileActivity  : ComponentActivity() {
                                     }
                                 }
                                 Spacer(modifier = Modifier.padding(10.dp))
+
                                 Text(
                                     text = getString(R.string.history_info_Message_name),
                                     textAlign = TextAlign.Center,
