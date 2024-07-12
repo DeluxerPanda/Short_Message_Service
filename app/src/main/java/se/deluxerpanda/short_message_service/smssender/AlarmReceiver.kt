@@ -54,7 +54,8 @@ class AlarmReceiver : BroadcastReceiver() {
             SmsManager.getDefault()
         }
 
-        val isMultiNumber = phonenumber!!.contains(",")
+        val isMultiNumber = phonenumber?.contains(",") ?: false
+
         if (isMultiNumber) {
             phonenumber!!.split(",\\s*".toRegex()).forEach { number ->
                 val parts = smsManager.divideMessage(message)

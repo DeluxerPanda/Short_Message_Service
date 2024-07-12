@@ -5,7 +5,9 @@
     <string name="app_contacts_name">Contacts</string>
 
     <string name="text_hint_phone_number">Enter Phone Number</string>
-    <string name="text_add_phone_number">Add more numbers:</string>
+    <string name="text_add_phone_number">extra numbers has been added</string>
+    <string name="text_add_phone_number_ENG_only">extra nummer har lagts till</string>
+    <string name="text_add_phone_number_add_text">Add extra numbers</string>
     <string name="text_hint_message">Enter message\n(max 160 characters)</string>
 
     <string name="schedule_sms_button_text">Schedule SMS</string>
@@ -63,6 +65,7 @@
     <string name="history_info_Date_name">Date:</string>
     <string name="history_info_Time_name">Time:</string>
     <string name="history_info_Repeat_name">repeat every:</string>
+    <string name="history_info_Repeat_every_name">every:</string>
     <string name="history_info_MoreSoon_name">More coming soon!</string>
 
     <string name="history_info_Profile_Send_to">Sends to</string>

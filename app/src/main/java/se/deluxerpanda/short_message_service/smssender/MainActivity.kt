@@ -1,904 +1,1482 @@
-package se.deluxerpanda.short_message_service.smssender;
+package se.deluxerpanda.short_message_service.smssender
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.TimePickerDialog;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
-import androidx.fragment.app.DialogFragment;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import se.deluxerpanda.short_message_service.R;
-import se.deluxerpanda.short_message_service.profile.ProfileActivity;
+import android.Manifest
+import android.app.Activity
+import android.app.AlarmManager
+import android.app.DatePickerDialog
+import android.app.PendingIntent
+import android.app.TimePickerDialog
+import android.content.ContentResolver
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.provider.ContactsContract
+import android.util.Log
+import android.widget.DatePicker
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.compose.AppTheme
+import kotlinx.coroutines.launch
+import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.profile.ProfileActivity
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.UUID
 
-public class MainActivity extends AppCompatActivity {
-    private static final int SMS_PERMISSION_REQUEST_CODE = 1;
-    private EditText phoneNumberEditText, messageEditText;
 
-    private static TextView SetTimeText;
-    private static TextView SetDateStartText;
-    private static TextView selectedOptionText;
+class MainActivity : AppCompatActivity() {
 
-    private static TextView addNumbers;
-    private LinearLayout pickDateEndsBox;
-    public static int timeHourSaved = -1;
-    public static int timeMinuteSaved = -1;
+    private val SMS_PERMISSION_REQUEST_CODE: Int = 1
 
-    private static String startDate;
-    private static String endDate;
-    public static String CHANNEL_ID = String.valueOf(UUID.randomUUID().hashCode());
+    private var ToastContent: String? = null
 
-    public static String CHANNEL_NAME = String.valueOf(R.string.app_name);
+    private var PhoneNumberFieldText: String? = ""
 
-    private String day;
-    private String week;
-    private String month;
-    private String year;
-    private static int hour;
-    private static int minute;
-    private int selectedOptionIndex;
-    private  int permissionCheck;
+    private var MessageFieldText: String? = ""
 
-    private static int[] counterLeft = {0};
-    private static int counterMax = 9;
-    private int phoneNumberEditTextID;
-    static HashMap<Integer, EditText> editTextMap = new HashMap<>();
+    private val MaxNumbers = 9
+    private var CurrentNumber = 0
+    private var phoneNumber: String? = null
+    private var editedphoneNumber: String? = null
 
+    private var phonenumber_extra: String? = null
 
-    private boolean checkPermissions() {
+    private var DateSet: String? = null
+
+    private var TimeSet: String? = null
+
+    private var repeats: String? = "null"
+
+    private var phoneNumberPattern = Regex("^\\d$")
+
+    private var contactNameAndLast: String? = null
+
+    private var photoUri: Uri? = null
+
+    private fun checkPermissions(): Boolean {
         // Define an array of all the permissions you want to check
-        String[] permissions = {
+        val permissions = arrayOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.POST_NOTIFICATIONS,
+        )
+
+        // Check if all permissions are granted
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Return false if any permission is not granted
+                return false
+            }
+        }
+        // Return true if all permissions are granted
+        return true
+    }
+
+    private fun checkPermissionsSMS(): Boolean {
+        // Define an array of all the permissions you want to check
+        val permissions = arrayOf(
+            Manifest.permission.SEND_SMS,
+        )
+
+        // Check if all permissions are granted
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Return false if any permission is not granted
+                return false
+            }
+        }
+        // Return true if all permissions are granted
+        return true
+    }
+
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
                 Manifest.permission.SEND_SMS,
                 Manifest.permission.READ_CONTACTS,
                 Manifest.permission.POST_NOTIFICATIONS,
-        };
-
-        // Check if all permissions are granted
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                // Return false if any permission is not granted
-                return false;
-            }
-        }
-        // Return true if all permissions are granted
-        return true;
+                Manifest.permission.READ_PHONE_STATE
+            ),
+            SMS_PERMISSION_REQUEST_CODE
+        )
     }
 
-    private boolean checkPermissionsSMS() {
-        // Define an array of all the permissions you want to check
-        String[] permissions = {
-                Manifest.permission.SEND_SMS,
-        };
-
-        // Check if all permissions are granted
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                // Return false if any permission is not granted
-                return false;
-            }
-        }
-        // Return true if all permissions are granted
-        return true;
-    }
-
-
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.SEND_SMS, Manifest.permission.READ_CONTACTS, Manifest.permission.POST_NOTIFICATIONS,Manifest.permission.READ_PHONE_STATE},
-                SMS_PERMISSION_REQUEST_CODE);
-    }
-    // SetTimeText
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         if (!checkPermissions()) {
-            requestPermission();
+            requestPermission()
         }
-        setContentView((R.layout.activity_main));
-        counterLeft = new int[]{0};
+
         // Use the current date as the default date in the picker.
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        hour = c.get(Calendar.HOUR_OF_DAY);
-        minute = c.get(Calendar.MINUTE)+ 6;
-        String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-        String timeText = String.format("%02d:%02d", hour, minute);
+        val c = Calendar.getInstance()
+        var year = c[Calendar.YEAR]
+        var month = c[Calendar.MONTH]
+        var day = c[Calendar.DAY_OF_MONTH]
+        DateSet = String.format("%04d-%02d-%02d", year, month + 1, day)
 
-        phoneNumberEditText = findViewById(R.id.phoneNumberEditText);
-
-        messageEditText = findViewById(R.id.messageEditText);
-
-        SetTimeText = findViewById(R.id.pickTime);
-
-        SetDateStartText = findViewById(R.id.SetDateStartText);
-
-        selectedOptionText = findViewById(R.id.selectedSendEvery);
+        val hour = c[Calendar.HOUR_OF_DAY]
+        val minute = c[Calendar.MINUTE]
+        TimeSet = String.format("%02d:%02d", hour, minute)
 
 
-        SetTimeText.setText(" "+timeText);
-        SetDateStartText.setText(" " + formattedDate);
 
-        ImageView btnToContacts = findViewById(R.id.btnToContacts);
-        btnToContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard();
-                phoneNumberEditTextID = phoneNumberEditText.getId();
-                Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                PhoneListActivityLauncher.launch(intent);
-            }
-        });
+        setContent {
+            AppTheme {
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "MainScreen") {
+                    composable("MainScreen") { entry ->
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            Text(
+                                text = stringResource(id = R.string.app_screen_name),
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
 
+                            Spacer(modifier = Modifier.height(16.dp))
 
-        TextView addNumbers = findViewById(R.id.addNumbers);
-        addNumbers.setText(getResources().getString(R.string.text_add_phone_number)+" "+ counterLeft[0] +" / "+counterMax + " (BETA)");
-        addNumbers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addMoreNumbers();
-            }
-        });
+                            //  PhoneNumberSection()
+                            var number by remember { mutableStateOf(PhoneNumberFieldText) }
+                            val launchPhoneList = rememberLauncherForActivityResult(
+                                contract = ActivityResultContracts.StartActivityForResult()
+                            ) { result ->
+                                if (result.resultCode == Activity.RESULT_OK) {
+                                    val phoneNumberData =
+                                        result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
+                                    phoneNumberData?.let { _ ->
+                                        number = phoneNumberData
+                                        // Now you can use textFieldValue
+                                    }
 
-        Button sendButton = findViewById(R.id.sendB);
-        sendButton.setOnClickListener(view -> {
-
-            Calendar currentCalendar = Calendar.getInstance();
-            long currentTimeInMillis = currentCalendar.getTimeInMillis();
-            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd H:mm", Locale.getDefault());
-            String selectedDateString = (String) SetDateStartText.getText();
-            String selectedTimeString = (String) SetTimeText.getText();
-            Date selectedDateTime = null;
-            try {
-                selectedDateTime = sdfDateTime.parse(selectedDateString + " " + selectedTimeString);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            String phonenumber = phoneNumberEditText.getText().toString();
-            String message = messageEditText.getText().toString();
-            String repeatSmS = (String) selectedOptionText.getText();
-            if (checkPermissionsSMS()) {
-                if (!phonenumber.isEmpty() && !message.isEmpty()) {
-                    if (message.getBytes().length <= 140) {
-                        if (selectedDateTime != null && selectedDateTime.getTime() > currentTimeInMillis) {
-                            scheduleSMS(phonenumber,message);
-                            hideKeyboard();
-                            History_info();
-
-                        }  else {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                            builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
-                            builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
-                            builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
                                 }
-                            });
-                            builder.show();
-                        }
-                    } else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle(getResources().getString(R.string.sms_max_characters_titel));
-                        builder.setMessage(getResources().getString(R.string.sms_max_characters_Text)+ "\n"+
-                                getResources().getString(R.string.sms_max_characters_Text_int)+" "+message.length());
-                        builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
                             }
-                        });
+     //
 
-                        builder.show();
-                    }
-                } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle(getResources().getString(R.string.sms_number_or_masage_are_empty_titel));
-                    builder.setMessage(getResources().getString(R.string.sms_number_or_masage_are_empty_text));
-                    builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+       //
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .clip(RoundedCornerShape(12.dp))
+                            ) {
+
+                                number?.let {
+                                    BasicTextField(
+                                        value = it,
+                                        onValueChange = { number = it },
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(Color.White, RoundedCornerShape(4.dp))
+                                            .padding(16.dp),
+                                        textStyle = TextStyle(
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center,
+                                            color = Color.Gray
+                                        ),
+                                        decorationBox = { innerTextField ->
+                                            if (number!!.isEmpty()) {
+                                                Text(
+                                                    text = stringResource(id = R.string.text_hint_phone_number),
+                                                    fontSize = 20.sp,
+                                                    fontWeight = FontWeight.Normal,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                            innerTextField()
+                                        }
+                                    )
+                                    PhoneNumberFieldText = number
+                                }
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
+                                    contentDescription = stringResource(id = R.string.todo),
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .padding(end = 8.dp)
+                                        .align(Alignment.CenterEnd)
+                                        .clickable {
+
+                                            intent = Intent(this@MainActivity, PhoneListActivity::class.java)
+
+                                            launchPhoneList.launch(intent)
+                                        }
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                            var phonenumber_extra_numbers = 0
+                            val phonenumber_number_extra_entry =
+                                entry.savedStateHandle.get<Int>("EXTRA_MAINACTIVITY_CURRENT_NUMBER")
+                            if (phonenumber_number_extra_entry != null) {
+                                phonenumber_extra_numbers = phonenumber_number_extra_entry
+                            }
+
+                            val phonenumber_extra_entry =
+                                entry.savedStateHandle.get<String>("EXTRA_MAINACTIVITY_FINAL_PHONENUMBER")
+                            if (phonenumber_extra_entry != null) {
+                                phonenumber_extra = phonenumber_extra_entry
+                            }
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Button(
+                                    onClick = {
+                                        //   intent = Intent(this@MainActivityTest, AddMoreNumbersActivity::class.java)
+                                        // launchPhoneList_extra_numbers.launch(intent)
+                                        phoneNumber = phonenumber_extra
+                                        navController.navigate("AddMoreNumbersScreen")
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = phonenumber_extra_numbers.toString() + " " + stringResource(
+                                            id = R.string.text_add_phone_number
+                                        ),
+                                        fontSize = 20.sp,
+
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+                            //  MessageSection()
+                            var message by remember { mutableStateOf(MessageFieldText) }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .clip(RoundedCornerShape(12.dp))
+                            ) {
+                                message?.let {
+                                    BasicTextField(
+                                        value = it,
+                                        onValueChange = { message = it },
+                                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(79.dp)
+                                            .background(Color.White, RoundedCornerShape(4.dp))
+                                            .padding(16.dp),
+                                        textStyle = TextStyle(
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Center,
+                                        ),
+
+                                        decorationBox = { innerTextField ->
+                                            if (message!!.isEmpty()) {
+                                                Text(
+                                                    text = stringResource(id = R.string.text_hint_message),
+                                                    fontSize = 20.sp,
+                                                    fontWeight = FontWeight.Normal,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
+                                            innerTextField()
+                                        }
+                                    )
+                                    MessageFieldText = message
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // TimePickerSection()
+                            val mContext = LocalContext.current
+                            var Time by remember { mutableStateOf(TimeSet) }
+                            // Parsing hour and minute from the Time string
+                            val mHour = try {
+                                Time!!.substringBeforeLast(":").trim().toInt()
+                            } catch (e: NumberFormatException) {
+                                0
+                            }
+                            val mMinute = try {
+                                Time!!.substringAfterLast(":").trim().toInt()
+                            } catch (e: NumberFormatException) {
+                                0
+                            }
+
+                            // Creating a TimePicker dialog
+                            val mTimePickerDialog = TimePickerDialog(
+                                mContext,
+                                { _, hour: Int, minute: Int ->
+                                    val formattedHour = String.format("%02d", hour)
+                                    val formattedMinute = String.format("%02d", minute)
+                                    val newTime = "$formattedHour:$formattedMinute"
+                                    TimeSet = newTime
+                                    Time = newTime
+                                }, mHour, mMinute, true
+                            )
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.set_time_button_text),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Button(
+                                    onClick = { mTimePickerDialog.show() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = TimeSet!!,
+                                        fontSize = 20.sp,
+                                    )
+                                }
+                            }
+
+                            //DatePickerSection()
+                            var Date by remember { mutableStateOf(DateSet) }
+                            // Parsing year, month, and day from the Date string
+                            val mYear = try {
+                                Date!!.substringBefore("-").trim().toInt()
+                            } catch (e: NumberFormatException) {
+                                0
+                            }
+                            val mMonth = try {
+                                Date!!.substringAfter("-").substringBefore("-").trim().toInt()
+                            } catch (e: NumberFormatException) {
+                                0
+                            } - 1
+                            val mDay = try {
+                                Date!!.substringAfterLast("-").substringBefore(" | ").trim().toInt()
+                            } catch (e: NumberFormatException) {
+                                0
+                            }
+                            // Creating a DatePickerDialog
+                            val mDatePickerDialog = DatePickerDialog(
+                                mContext,
+                                { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
+                                    val formattedMonth = String.format("%02d", month + 1)
+                                    val formattedDay = String.format("%02d", dayOfMonth)
+                                    val newDate = "$year-$formattedMonth-$formattedDay"
+                                    DateSet = newDate
+                                    Date = newDate
+                                }, mYear, mMonth, mDay
+                            )
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.set_date_start_button_text),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Button(
+                                    onClick = { mDatePickerDialog.show() },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = DateSet!!,
+                                        fontSize = 20.sp,
+                                    )
+                                }
+                            }
+
+                            //   SendEverySection()
+                            var ShowOptionsDialog by remember { mutableStateOf(false) }
+                            var showNoBackInTimeDialog by remember { mutableStateOf(false) }
+                            var showNoMainPhoneOrMessageDialog by remember { mutableStateOf(false) }
+                            if (repeats == "null") {
+                                repeats = stringResource(id = R.string.send_sms_every_year_text)
+                            }
+                            var repeatsEdited by remember { mutableStateOf(repeats) }
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.send_sms_every_text),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center
+                                )
+                                Button(
+                                    onClick = { ShowOptionsDialog = true },
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+
+                                    Text(
+                                        text = repeatsEdited!!,
+                                        fontSize = 20.sp,
+                                    )
+                                }
+                                OptionsDialog(
+                                    ShowOptionsDialog = ShowOptionsDialog,
+                                    onDismiss = { ShowOptionsDialog = false },
+                                    onConfirm = { selectedOption ->
+                                        repeatsEdited = selectedOption
+                                        repeats = repeatsEdited
+                                    }
+                                )
+                                NoBackInTimeDialog(
+                                    showNoBackInTimeDialog = showNoBackInTimeDialog,
+                                    onSave = {
+                                        showNoBackInTimeDialog = false
+                                    }
+                                )
+                                NoMainPhoneOrMessageDialog(
+                                    showNoMainPhoneOrMessageDialog = showNoMainPhoneOrMessageDialog,
+                                    onSave = {
+                                        showNoMainPhoneOrMessageDialog = false
+                                    }
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = {
+
+                                    if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()){
+
+                                        if (isSmsTooLong(message!!)) {
+                                            println("The message is too long.")
+                                        } else {
+                                            println("The message length is within the limit.")
+                                        }
+
+                                        val sdf = SimpleDateFormat("yyyy-MM-dd H:m")
+                                        val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                        val dateTimeString: String = DateSet + " " + TimeSet
+                                        val date = sdf.parse(dateTimeString)
+                                        val triggerTime = date?.time
+
+                                            val selectedDateTime = LocalDateTime.parse("$DateSet $TimeSet", sdfDateTime)
+                                            val currentDateTime = LocalDateTime.now()
+
+                                            if (selectedDateTime.isAfter(currentDateTime)) {
+
+                                        try {
+                                            var PhoneNumberFieldTextEdit: String = ""
+                                            if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && PhoneNumberFieldText!!.isNotEmpty()) {
+                                                PhoneNumberFieldTextEdit =
+                                                    "$PhoneNumberFieldText,$editedphoneNumber"
+                                            } else if (PhoneNumberFieldText!!.isNotEmpty()) {
+                                                PhoneNumberFieldTextEdit = "$PhoneNumberFieldText"
+                                            }
+
+                                            val alarmId = UUID.randomUUID().hashCode()
+
+                                            val alarmManager =
+                                                getSystemService(ALARM_SERVICE) as AlarmManager
+
+                                            val intent: Intent = Intent(
+                                                this@MainActivity,
+                                                AlarmReceiver::class.java
+                                            )
+
+                                            intent.putExtra(
+                                                "EXTRA_PHONE_NUMBER",
+                                                PhoneNumberFieldTextEdit
+                                            )
+                                            intent.putExtra("EXTRA_MESSAGES", message)
+                                            intent.putExtra("EXTRA_ALARMID", alarmId)
+                                            intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+                                            intent.putExtra("EXTRA_REPEATSMS", repeatsEdited)
+
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                startForegroundService(intent)
+                                            } else {
+                                                startService(intent)
+                                            }
+
+                                            val pendingIntent = PendingIntent.getBroadcast(
+                                                this@MainActivity, alarmId, intent,
+                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                                            )
+
+                                            alarmManager.setExactAndAllowWhileIdle(
+                                                AlarmManager.RTC_WAKEUP,
+                                                triggerTime!!,
+                                                pendingIntent
+                                            )
+
+
+                                            saveAlarmDetails(
+                                                this@MainActivity,
+                                                alarmId,
+                                                triggerTime,
+                                                repeatsEdited,
+                                                PhoneNumberFieldTextEdit,
+                                                message
+                                            )
+
+                                            val intenta = Intent(this@MainActivity, MainActivity::class.java)
+                                            intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                            startActivity(intenta)
+                                        } catch (e: ParseException) {
+                                            e.printStackTrace()
+                                        }
+                                    }else{
+                                     showNoBackInTimeDialog = true
+                                    }
+                                    }else {
+                                        showNoMainPhoneOrMessageDialog = true
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.schedule_sms_button_text),
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.history_name),
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            ScheduledSMSListUI()
+
+                            Spacer(modifier = Modifier.height(16.dp))
                         }
-                    });
-                    builder.show();
-                }
-            } else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(getResources().getString(R.string.sms_no_permission_sms_titel));
-                builder.setMessage(getResources().getString(R.string.sms_no_permission_sms_text));
-                builder.setPositiveButton(getResources().getString(R.string.text_ask_give_permission), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        onBackPressed();
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-
                     }
-                });
-                builder.show();
-            }
-        });
+                    composable("AddMoreNumbersScreen") {
+                        val scrollBehavior =
+                            TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+                        Scaffold(
+                            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 
+                            topBar = {
+                                CenterAlignedTopAppBar(
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    ),
+                                    title = {
+                                        Text(
+                                            stringResource(id = R.string.text_add_phone_number_add_text),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    },
+                                    navigationIcon = {
+                                        IconButton(onClick = {
+                                            navController.previousBackStackEntry
+                                                ?.savedStateHandle
+                                                ?.set(
+                                                    "EXTRA_MAINACTIVITY_CURRENT_NUMBER",
+                                                    CurrentNumber
+                                                )
 
-        // Check and request permission if needed
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS},
-                    SMS_PERMISSION_REQUEST_CODE);
-        }
-        Button pickTimeButton = findViewById(R.id.pickTime);
-        pickTimeButton.setOnClickListener(view -> {
-            TimePickerFragment timePickerFragment = new TimePickerFragment();
-            timePickerFragment.show(getSupportFragmentManager(), "timePicker");
-        });
+                                            navController.previousBackStackEntry
+                                                ?.savedStateHandle
+                                                ?.set(
+                                                    "EXTRA_MAINACTIVITY_FINAL_PHONENUMBER",
+                                                    editedphoneNumber
+                                                )
 
+                                            navController.popBackStack()
+                                        }
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_save),
+                                                contentDescription = "Save button"
+                                            )
+                                        }
+                                    },
 
-        Button pickDateStartButton = findViewById(R.id.SetDateStartText);
-        pickDateStartButton.setOnClickListener(view -> {
-            showDatePicker();
-        });
+                                    actions = {
+                                        IconButton(onClick = {
+                                            navController.popBackStack()
+                                        })
+                                        {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_close),
+                                                contentDescription = "Close button"
+                                            )
+                                        }
+                                    },
 
-        Button chooseOptionButton = findViewById(R.id.selectedSendEvery);
-        chooseOptionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showOptionsDialog();
-            }
-        });
-        History_info();
-    }
+                                    scrollBehavior = scrollBehavior,
+                                )
+                            },
+                        ) { innerPadding ->
+                            val keyboardController = LocalSoftwareKeyboardController.current
+                            var list by remember {
+                                mutableStateOf(
+                                    phoneNumber?.split(",") ?: listOf()
+                                )
+                            }
+                            var isPhoneNumberChanged by remember { mutableStateOf(false) }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(innerPadding)
+                                    .verticalScroll(rememberScrollState())
+                                    .padding(20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                list.forEachIndexed { index, phone ->
+                                    val launchPhoneList = rememberLauncherForActivityResult(
+                                        contract = ActivityResultContracts.StartActivityForResult()
+                                    ) { result ->
+                                        if (result.resultCode == Activity.RESULT_OK) {
+                                            val phoneNumberData =
+                                                result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
+                                            // Handle the phone number data received
+                                            list = list.toMutableList().also { list ->
+                                                if (phoneNumberData != null) {
+                                                    list[index] = phoneNumberData.toString()
+                                                    editedphoneNumber =
+                                                        list.joinToString(",")
+                                                    isPhoneNumberChanged = true
+                                                }
+                                            }
+                                        }
+                                    }
+                                    CurrentNumber = index + 1
+                                    OutlinedTextField(
+                                        value = phone,
+                                        onValueChange = {
+                                            list =
+                                                list.toMutableList().also { list ->
+                                                    list[index] = it
+                                                }
+                                            editedphoneNumber =
+                                                list.joinToString(",")
+                                            isPhoneNumberChanged = true
+                                        },
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Number,
+                                            imeAction = ImeAction.Done,
+                                            autoCorrect = false
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                keyboardController?.hide()
+                                            }
+                                        ),
+                                        label = {
+                                            Text(
+                                                text = "${getString(R.string.history_info_PhoneNumber_name)} ${index + 1}",
+                                                textAlign = TextAlign.Center
+                                            )
+                                        },
+                                        trailingIcon = {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                IconButton(onClick = {
+                                                    intent = Intent(
+                                                        this@MainActivity,
+                                                        PhoneListActivity::class.java
+                                                    )
+                                                    launchPhoneList.launch(intent)
+                                                }) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
+                                                        contentDescription = "import contacts button"
+                                                    )
+                                                }
+                                                IconButton(onClick = {
+                                                    list =
+                                                        list.toMutableList()
+                                                            .also { list ->
+                                                                list.removeAt(index)
+                                                                editedphoneNumber =
+                                                                    list.joinToString(",")
+                                                                isPhoneNumberChanged = true
+                                                            }
+                                                }) {
+                                                    Icon(
+                                                        painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
+                                                        contentDescription = "delete button",
+                                                        tint = MaterialTheme.colorScheme.error
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                    )
+                                }
+                                var ToastBool by remember { mutableStateOf(false) }
+                                IconButton(onClick = {
+                                    list =
+                                        list.toMutableList().also { list ->
+                                            if (list.size < MaxNumbers) {
+                                                list.add("")
+                                                isPhoneNumberChanged = true
+                                            } else {
+                                                ToastContent =
+                                                    getString(R.string.history_info_Profile_Edit_cannot_have_more_number) +
+                                                            " " + MaxNumbers.toString() + " " + getString(
+                                                        R.string.More_Then_One_Number_name
+                                                    )
 
-    private ActivityResultLauncher<Intent> PhoneListActivityLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
-                @Override
-                public void onActivityResult(ActivityResult result) {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        TextView textView = findViewById(phoneNumberEditTextID);
+                                                ToastBool = true
+                                            }
+                                        }
+                                }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.baseline_add),
+                                        contentDescription = "add button"
+                                    )
+                                }
 
-                        if (textView != null && textView instanceof TextView) {
-                            Intent data = result.getData();
-                            String phoneNumber = data.getStringExtra("PHONE_NUMBER_FROM_CONTACTS");
-                            textView.setText(phoneNumber);
+                                ToastDialog(
+                                    ToastBool = ToastBool,
+                                    onSave = {
+                                        ToastBool = false
+                                    }
+                                )
+                                // Update phoneNumber if it's not changed
+                                if (!isPhoneNumberChanged) {
+                                    editedphoneNumber = phoneNumber
+                                }
+                            }
                         }
                     }
                 }
-            });
-    public void showOptionsDialog() {
-        // Get the layout inflater
-        LayoutInflater inflater = getLayoutInflater();
 
-        String[] choices = {
-                getString(R.string.send_sms_every_year_text),
-                getString(R.string.send_sms_every_month_text),
-                getString(R.string.send_sms_every_week_text),
-                getString(R.string.send_sms_every_day_text)/*,
-                getString(R.string.send_sms_every_now_text)*/
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder
-                .setTitle(getString(R.string.history_info_Repeat_name))
-                .setPositiveButton(getString(R.string.text_ok), (dialog, which) -> {
-                    selectedOptionText.setText(choices[selectedOptionIndex]);
-                })
-                .setNegativeButton(getString(R.string.text_Cancel), (dialog, which) -> {
-
-                })
-                .setSingleChoiceItems(choices, 0, (dialog, which) -> {
-                    selectedOptionIndex = which;
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-    }
-
-    public void addMoreNumbers(){
-        if (counterLeft[0] != counterMax) {
-    //        while (counterLeft[0] != counterMax){
-
-            TextView addNumbers = findViewById(R.id.addNumbers);
-            counterLeft[0]++;
-            addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
-            LinearLayout parentLayout = findViewById(R.id.numbersContainer);
-            hideKeyboard();
-
-            View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.add_number_layout, null);
-
-            // Generate a unique ID for the TextView
-            int dynamicTextViewId = View.generateViewId();
-
-            EditText dynamicEditText = dynamicTextViewLayout.findViewById(R.id.phoneNumberEditText);
-
-         //       dynamicEditText.setText("+" + counterLeft[0] +"123");
-
-            dynamicEditText.setId(dynamicTextViewId);
-            editTextMap.put(dynamicTextViewId, dynamicEditText);
-            ImageView contactButton = dynamicTextViewLayout.findViewById(R.id.btnToContacts);
-
-            contactButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    hideKeyboard();
-                    phoneNumberEditTextID = dynamicEditText.getId();
-                    Intent intent = new Intent(MainActivity.this, PhoneListActivity.class);
-                    PhoneListActivityLauncher.launch(intent);
-                }
-            });
-
-            ImageView deleteButton = dynamicTextViewLayout.findViewById(R.id.btnToDeleteNumber);
-            deleteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    parentLayout.removeView(dynamicTextViewLayout);
-                    counterLeft[0]--;
-                    addNumbers.setText(getResources().getString(R.string.text_add_phone_number) + " " + counterLeft[0] + " / " + counterMax + " (BETA)");
-                }
-            });
-
-            // Add the dynamic TextView layout to the parent layout
-            parentLayout.addView(dynamicTextViewLayout);
+            }
         }
     }
-    private void showDatePicker() {
-        DatePickerFragment datePickerFragment = new DatePickerFragment();
 
-        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-    }
-
-
-    //time Dialog (start)
-    public void History_info(){
-        LinearLayout parentLayout = findViewById(R.id.app_backgrund);
-        LinearLayout linearLayout = (LinearLayout) parentLayout;
-        linearLayout.destroyDrawingCache();
-        linearLayout.removeAllViews();
-        List<AlarmDetails> alarmList = getAllAlarms(this);
+    @Composable
+    fun ScheduledSMSListUI() {
+        val alarmList = getAllAlarms(this@MainActivity)
         if (alarmList.isEmpty()) {
-            TextView AlarmListIsEmptyTextView = new TextView(this);
-            // Add your dynamic TextView here
-            AlarmListIsEmptyTextView.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            AlarmListIsEmptyTextView.setText(getResources().getString(R.string.history_info_no_SMS_scheduled));
-            AlarmListIsEmptyTextView.setTextSize(20);
-            AlarmListIsEmptyTextView.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC));
-            AlarmListIsEmptyTextView.setGravity(Gravity.CENTER);
-            linearLayout.addView(AlarmListIsEmptyTextView);
-        } else {
-            String title;
-            // Now you can use the alarmList as needed
-            for (AlarmDetails alarmDetails : alarmList) {
-                int alarmId = alarmDetails.getAlarmId();
-                // long timeInMillis = alarmDetails.getTimeInMillis();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat sdf2 = new SimpleDateFormat("H:mm");
-                // Format the date and print the result
-                String formattedDateStart = sdf.format(alarmDetails.getTimeInMillis());
-                String formattedClockTime = sdf2.format(alarmDetails.getTimeInMillis());
-                String getRepeatSmS = alarmDetails.getRepeatSmS();
-                String phonenumber = alarmDetails.getPhonenumber();
-                String message = alarmDetails.getMessage();
-                View dynamicTextViewLayout = getLayoutInflater().inflate(R.layout.history_info, null);
-                ImageView dynamicLinearLayout = dynamicTextViewLayout.findViewById(R.id.btnToProfile);
-                TextView history_info_contact_name_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_name);
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+                Text(
+                    text = stringResource(R.string.history_info_no_SMS_scheduled),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+        }
+            } else {
+                    alarmList.forEach { alarmDetails ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .clip(RoundedCornerShape(12.dp))
+                                .padding(top = 12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                            ) {
 
-                String contactName = null;
-                String contactNameAndLast = null;
-                String photoUri_result = null;
-                StringBuilder concatenatedNames = new StringBuilder();
-                int permissionCheckContacts = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
-                ImageView contactImageView = dynamicTextViewLayout.findViewById(R.id.history_info_contact_profile);
-                String contactNamea = null;
-                if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED) {
-                    ContentResolver contentResolver = getContentResolver();
-                    if (phonenumber.contains(",")) {
-                        String[] phoneNumbers = phonenumber.split(",");
-                        StringBuilder displayedNumbers = new StringBuilder();
-                        StringBuilder titleBuilder = new StringBuilder();
+                                if (photoUri != null) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(photoUri),
 
-                        for (String number : phoneNumbers) {
-                            contactName = getContactFirstName(contentResolver, number.trim());
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                } else if (alarmDetails.phonenumber!!.contains(",")) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.baseline_groups),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                }else{
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_baseline_person_24),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .align(Alignment.CenterVertically)
+                                    )
+                                }
 
-                            if (contactName != null) {
-                                displayedNumbers.append(contactName).append(", ");
-                                titleBuilder.append(contactName).append(", ");
-                            } else {
-                                displayedNumbers.append(number).append(", ");
-                                titleBuilder.append(number).append(", ");
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(end = 8.dp)
+                                ) {
+                                    (alarmDetails.phonenumber?.let { getContactName(it) }
+                                        ?: alarmDetails.phonenumber)?.let {
+                                        Text(
+                                            text = it,
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = alarmDetails.message!!,
+                                        fontSize = 15.sp,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(bottom = 8.dp)
+                                    )
+                                    Text(
+                                        text = " | "+ SimpleDateFormat("yyyy-MM-dd | H:mm").format(
+                                            alarmDetails.timeInMillis
+                                        ) + " | " + alarmDetails.repeatSmS +" | ",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .padding(bottom = 8.dp)
+                                    )
+                                }
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_baseline_info_outline_24),
+                                    contentDescription = stringResource(id = R.string.todo),
+                                    modifier = Modifier
+                                        .size(50.dp)
+                                        .padding(end = 8.dp)
+                                        .align(Alignment.CenterVertically)
+                                        .clickable {
+                                            val intent = Intent(
+                                                this@MainActivity,
+                                                ProfileActivity::class.java
+                                            ).apply {
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_ALARMID",
+                                                    alarmDetails.alarmId
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_POTOURL",
+                                                    getContactPhotoUri(alarmDetails.phonenumber!!)?.toString()
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_TITLE",
+                                                    alarmDetails.phonenumber
+                                                ) // Replace with actual title
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_TIMEANDDATE",
+                                                    SimpleDateFormat("yyyy-MM-dd | H:mm").format(
+                                                        alarmDetails.timeInMillis
+                                                    )
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_REPEATS",
+                                                    alarmDetails.repeatSmS
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_PHONENUMBER",
+                                                    alarmDetails.phonenumber
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_MESSAGE",
+                                                    alarmDetails.message
+                                                )
+                                            }
+                                            startActivity(intent)
+                                        }
+                                )
                             }
                         }
+                    }
+            }
+    }
 
-// Remove trailing comma and space
-                        String displayedNumbersStr = displayedNumbers.toString().replaceAll(", $", "");
-                        title = titleBuilder.toString().replaceAll(", $", "");
+    @Composable
+    fun ToastDialog(
+        ToastBool: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (ToastBool) {
+            AlertDialog(
 
-                        history_info_contact_name_TextView.setText(displayedNumbersStr);
-                        title = String.valueOf(title);
+                onDismissRequest = {},
+                title = {
+                    Text(
+                        text = ("\uD83D\uDE45"),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .width(300.dp),
+                    )
+                },
 
-                    } else {
-                        contactName = getContactFirstName(contentResolver, phonenumber);
-                        contactNameAndLast = getContactName(contentResolver, phonenumber);
-                        if (contactName != null) {
-                            history_info_contact_name_TextView.setText(contactName);
-                            title = String.valueOf(contactName);
-                        } else {
-                            history_info_contact_name_TextView.setText(phonenumber);
-                            title = String.valueOf(phonenumber);
+                text = {
+                    Text(
+                        text = ToastContent.toString(),
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(
+                            getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+
+                )
+        }
+    }
+
+    @Composable
+    fun OptionsDialog(
+        ShowOptionsDialog: Boolean,
+        onDismiss: () -> Unit,
+        onConfirm: (String) -> Unit
+    ) {
+        val choices = listOf(
+            stringResource(R.string.send_sms_every_year_text),
+            stringResource(R.string.send_sms_every_month_text),
+            stringResource(R.string.send_sms_every_week_text),
+            stringResource(R.string.send_sms_every_day_text)/*,
+            stringResource(R.string.send_sms_every_now_text)*/
+        )
+        var selectedOptionIndex by remember { mutableStateOf(0) }
+
+        if (ShowOptionsDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    onDismiss()
+                },
+                title = {
+                    Text(text = stringResource(R.string.history_info_Repeat_name))
+                },
+                text = {
+                    Column {
+                        choices.forEachIndexed { index, choice ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        selectedOptionIndex = index
+                                    }
+                            ) {
+                                RadioButton(
+                                    selected = (selectedOptionIndex == index),
+                                    onClick = {
+                                        selectedOptionIndex = index
+                                    }
+                                )
+                                Text(text = choice)
+                            }
                         }
                     }
-                } else {
-                    history_info_contact_name_TextView.setText(phonenumber);
-                    title = String.valueOf(phonenumber);
-                }
-                Uri photoUri = getContactPhotoUri(contactNameAndLast);
-                if (photoUri != null) {
-                    // Load the contact photo into the ImageView
-                    contactImageView.setImageURI(photoUri);
-                    // Create a rounded drawable and set it directly to the ImageView
-                    RoundedBitmapDrawable roundedDrawable = RoundedBitmapDrawableFactory.create(getResources(), ((BitmapDrawable) contactImageView.getDrawable()).getBitmap());
-                    roundedDrawable.setCircular(true); // Set to true if you want circular corners
-                    contactImageView.setImageDrawable(roundedDrawable);
-                    photoUri_result = photoUri.toString();
-                } else {
-                    if (phonenumber.contains(",")) {
-                        contactImageView.setImageResource(R.drawable.baseline_groups);
-                    }else {
-                        contactImageView.setImageResource(R.drawable.ic_baseline_person_24);
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            onConfirm(choices[selectedOptionIndex])
+                            onDismiss()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
                     }
-
-                    photoUri_result = null;
-                }
-                TextView history_info_message_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_message);
-                history_info_message_TextView.setText(message);
-                TextView history_info_date_and_time_TextView = dynamicTextViewLayout.findViewById(R.id.history_info_date_and_time);
-                String TimeAndDate = formattedDateStart + " | " + formattedClockTime;
-                history_info_date_and_time_TextView.setText(getResources().getString(R.string.history_info_Date_name) + " " + formattedDateStart
-                        + ", " + getResources().getString(R.string.history_info_Time_name) + " " + formattedClockTime);
-                linearLayout.addView(dynamicTextViewLayout);
-                String finalPhotoUri_result;
-                if (photoUri_result == null) {
-                    finalPhotoUri_result = null;
-                } else {
-                    finalPhotoUri_result = photoUri_result;
-                }
-                String finalTitle = title;
-                dynamicLinearLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", finalTitle);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_REPEATS", getRepeatSmS);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber);
-                        intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message);
-                        startActivity(intent);
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            onDismiss()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.text_Cancel),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
                     }
-                });
-            }
-        }
-    }
-    public static class TimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-            if (timeHourSaved != -1 && timeMinuteSaved != -1) {
-                return new TimePickerDialog(getActivity(), this, timeHourSaved, timeMinuteSaved, true);
-            }else {
-                // Create a new instance of TimePickerDialog and return it with 24-hour format.
-                return new TimePickerDialog(getActivity(), this, hour, minute, true);
-            }
-        }
-
-        public void onTimeSet(TimePicker view, int hour , int minute) {
-            // Do something with the time the user picks.
-            timeHourSaved = hour;
-            timeMinuteSaved = minute;
-            String timeText = String.format("%02d:%02d", hour, minute);
-            SetTimeText.setText(" "+timeText);
-        }
-    }
-    //time  Dialog (ends)
-//date  Dialog (starts)
-    public static class DatePickerFragment extends DialogFragment
-            implements DatePickerDialog.OnDateSetListener {
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-            int weekOfyear = c.get(Calendar.WEEK_OF_YEAR);
-            DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), this, year, month, day);
-            Date date = new Date();
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date startDate = dateFormat.parse(SetDateStartText.getText().toString());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-
-            return datePickerDialog;
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            Calendar currentCalendar = Calendar.getInstance();
-            currentCalendar.set(Calendar.HOUR_OF_DAY, 0);
-            currentCalendar.set(Calendar.MINUTE, 0);
-            currentCalendar.set(Calendar.SECOND, 0);
-            currentCalendar.set(Calendar.MILLISECOND, 0);
-            Date selectedDateTime;
-            String formattedDate = String.format("%04d-%02d-%02d", year, month + 1, day); // Adjust month by +1 since it's 0-based
-            SimpleDateFormat sdfDateTime = new SimpleDateFormat("yyyy-MM-dd");
-            long currentTimeInMillis = currentCalendar.getTimeInMillis();
-
-            try {
-                selectedDateTime = sdfDateTime.parse(formattedDate);
-                long selectedDateTimeInMillis = selectedDateTime.getTime();
-
-            if (selectedDateTime != null && selectedDateTimeInMillis >= currentTimeInMillis) {
-                SetDateStartText.setText(" " + formattedDate);
-            }else {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(getResources().getString(R.string.sms_time_travel_titel));
-                builder.setMessage(getResources().getString(R.string.sms_time_travel_Text));
-                builder.setPositiveButton(getResources().getString(R.string.text_ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.show();
-            }
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-//date  Dialog (ends)
-
-    private void scheduleSMS(String phonenumber, String message) {
-        String DateStart = (String) SetDateStartText.getText();
-        String Clock_Time = (String) SetTimeText.getText();
-        String dateTimeString = DateStart + " " + Clock_Time;
-        phonenumber = phonenumber.replaceAll("[/N.,'*;#]", "");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd H:m");
-        try {
-            Date date = sdf.parse(dateTimeString);
-            long triggerTime = date.getTime();
-
-            String repeatSmS = (String) selectedOptionText.getText();
-
-            day = getString(R.string.send_sms_every_day_text);
-            week = getString(R.string.send_sms_every_week_text);
-            month = getString(R.string.send_sms_every_month_text);
-            year = getString(R.string.send_sms_every_year_text);
-
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-            Intent intent = new Intent(this, AlarmReceiver.class);
-
-            int alarmId = UUID.randomUUID().hashCode();
-            if (counterLeft[0] > 0){
-                StringBuilder allText = new StringBuilder();
-
-                for (Map.Entry<Integer, EditText> entry : editTextMap.entrySet()) {
-                    EditText editText = entry.getValue();
-                    allText.append(editText.getText()).append(",");
                 }
-                String strnum = allText.toString() + phonenumber;
-                intent.putExtra("EXTRA_PHONE_NUMBER", strnum);
-                phonenumber = strnum;
-                allText.setLength(0);
-            }else {
-                intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber);
-            }
-            intent.putExtra("EXTRA_MESSAGES", message);
-            intent.putExtra("EXTRA_ALARMID", alarmId);
-            intent.putExtra("EXTRA_TRIGGERTIME", triggerTime);
-            intent.putExtra("EXTRA_REPEATSMS", repeatSmS);
-
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent);
-            }else {
-                startService(intent);
-            }
-
-
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarmId, intent,  PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-
-
-            long intervalMillis = 0;
-
-            if (repeatSmS.equalsIgnoreCase(day)) {
-                intervalMillis = AlarmManager.INTERVAL_DAY;
-            } else if (repeatSmS.equalsIgnoreCase(week)) {
-                intervalMillis = AlarmManager.INTERVAL_DAY * 7;
-            } else if (repeatSmS.equalsIgnoreCase(month)) {
-                intervalMillis = AlarmManager.INTERVAL_DAY * 30;
-            } else if (repeatSmS.equalsIgnoreCase(year)) {
-                intervalMillis = AlarmManager.INTERVAL_DAY * 365;
-            }
-
-            alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerTime,
-                    pendingIntent
-            );
-
-            saveAlarmDetails(this, alarmId, triggerTime,repeatSmS,phonenumber,message);
-        } catch (ParseException e) {
-            e.printStackTrace();
+            )
         }
     }
 
+    @Composable
+    fun NoBackInTimeDialog(
+        showNoBackInTimeDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showNoBackInTimeDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_time_travel_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
 
-    // Save alarm details in shared preferences
-    public static void saveAlarmDetails(Context mainActivity, int alarmId, long triggerTime, String repeatSmS, String phonenumber, String message) {
-        SharedPreferences preferences = mainActivity.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
+                text = { Text(
+                    text = getString(R.string.sms_time_travel_Text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
+
+    @Composable
+    fun NoMainPhoneOrMessageDialog(
+        showNoMainPhoneOrMessageDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showNoMainPhoneOrMessageDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_number_or_masage_are_empty_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+
+                text = { Text(
+                    text = getString(R.string.sms_number_or_masage_are_empty_text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
+
+    fun getContactName(phoneNumber: String): String? {
+        val contentResolver = contentResolver
+        return getContactNameResolver(contentResolver, phoneNumber)
+    }
+
+    companion object {
+
+        var CHANNEL_ID: String = UUID.randomUUID().hashCode().toString()
+
+        var CHANNEL_NAME: String = java.lang.String.valueOf(R.string.app_name)
+
+
+        fun getContactNameResolver(contentResolver: ContentResolver, phoneNumber: String?): String? {
+            val uri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phoneNumber)
+            )
+            val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
+
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        // Contact exists, return the name
+                        val contactName =
+                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                        return contactName
+                    }
+                } finally {
+                    cursor.close()
+                }
+            }
+            // Contact doesn't exist
+            return null
+        }
+
+        fun getContactFirstName(contentResolver: ContentResolver, phoneNumber: String?): String? {
+            val uri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(phoneNumber)
+            )
+            val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
+
+            val cursor = contentResolver.query(uri, projection, null, null, null)
+
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        // Contact exists, extract the first name from the display name
+                        val contactName =
+                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                        val parts =
+                            contactName.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
+                                .toTypedArray() // Split by whitespace
+                        return parts[0] // Return the first part
+                    }
+                } finally {
+                    cursor.close()
+                }
+            }
+            // Contact doesn't exist
+            return null
+        }
+
+        fun saveAlarmDetails(
+        mainActivity: Context,
+        alarmId: Int,
+        triggerTime: Long,
+        repeatSmS: String?,
+        phonenumber: String?,
+        message: String?
+    ) {
+        val preferences = mainActivity.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
+        val editor = preferences.edit()
 
         // Use unique keys for each alarm and each value
-        String triggerTimeKey = "triggerTime_" + alarmId;
-        String getRepeatSmSKey = "getRepeatSmSKey_"+ alarmId;
+        val triggerTimeKey = "triggerTime_$alarmId"
+        val getRepeatSmSKey = "getRepeatSmSKey_$alarmId"
 
-        String getPhoneNumberKey = "getPhoneNumberKey_"+ alarmId;
-        String getMessageKey = "getMessageKey_"+ alarmId;
+        val getPhoneNumberKey = "getPhoneNumberKey_$alarmId"
+        val getMessageKey = "getMessageKey_$alarmId"
 
         // Save the triggerTime and releaseTime using their respective keys
-        editor.putLong(triggerTimeKey, triggerTime);
-        editor.putString(getRepeatSmSKey,repeatSmS);
+        editor.putLong(triggerTimeKey, triggerTime)
+        editor.putString(getRepeatSmSKey, repeatSmS)
 
-        editor.putString(getPhoneNumberKey,phonenumber);
-        editor.putString(getMessageKey,message);
+        editor.putString(getPhoneNumberKey, phonenumber)
+        editor.putString(getMessageKey, message)
 
-        editor.apply();
+        editor.apply()
     }
 
-    public static class AlarmDetails {
-        private int alarmId;
-        private long triggerTime;
-
-        private String repeatSmS;
-        private String phonenumber;
-
-        private String message;
-
-        public AlarmDetails(int alarmId, long triggerTime, String repeatSmS, String phonenumber, String message) {
-            this.alarmId = alarmId;
-            this.triggerTime = triggerTime;
-            this.repeatSmS = repeatSmS;
-            this.phonenumber = phonenumber;
-            this.message = message;
-        }
-
-        public int getAlarmId() {
-            return alarmId;
-        }
-
-        public long getTimeInMillis() {
-            return triggerTime;
-        }
-
-        public String getRepeatSmS(){return repeatSmS;}
-
-        public String getPhonenumber(){return phonenumber;}
-        public  String getMessage(){return message;}
-
-    }
+    class AlarmDetails(
+        val alarmId: Int,
+        val timeInMillis: Long,
+        val repeatSmS: String?,
+        val phonenumber: String?,
+        val message: String?
+    )
 
     // Retrieve a list of all alarms
-    public static List<AlarmDetails> getAllAlarms(Context context) {
-        List<AlarmDetails> alarmList = new ArrayList<>();
-        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
+    fun getAllAlarms(context: Context): List<AlarmDetails> {
+        val alarmList: MutableList<AlarmDetails> = ArrayList()
+        val preferences = context.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
 
-        Set<Integer> uniqueAlarmIds = new HashSet<>();
+        val uniqueAlarmIds: MutableSet<Int> = HashSet()
 
         // Iterate through all saved alarms and add them to the list
-        Map<String, ?> allEntries = preferences.getAll();
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            String key = entry.getKey();
-
+        val allEntries = preferences.all
+        for ((key) in allEntries) {
             // Separate keys for triggerTime and releaseTime
-            String triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1);
+            val triggerTimeKey = "triggerTime_" + key.substring(key.lastIndexOf("_") + 1)
 
-            String getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1);
+            val getRepeatSmSKey = "getRepeatSmSKey_" + key.substring(key.lastIndexOf("_") + 1)
 
-            String getRepeatSmS = preferences.getString(getRepeatSmSKey, String.valueOf(0));
+            val getRepeatSmS = preferences.getString(getRepeatSmSKey, 0.toString())
 
-            String getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getPhonenumber = preferences.getString(getPhonenumberKey, String.valueOf(0));
+            val getPhonenumberKey = "getPhoneNumberKey_" + key.substring(key.lastIndexOf("_") + 1)
+            val getPhonenumber = preferences.getString(getPhonenumberKey, 0.toString())
 
-            String getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1);
-            String getMessage = preferences.getString(getMessageKey, String.valueOf(0));
+            val getMessageKey = "getMessageKey_" + key.substring(key.lastIndexOf("_") + 1)
+            val getMessage = preferences.getString(getMessageKey, 0.toString())
 
-            long triggerTime = preferences.getLong(triggerTimeKey, 0);
+            val triggerTime = preferences.getLong(triggerTimeKey, 0)
 
-            int alarmId = Integer.parseInt(key.substring(key.lastIndexOf("_") + 1));
+            val alarmId = key.substring(key.lastIndexOf("_") + 1).toInt()
             if (!uniqueAlarmIds.contains(alarmId)) {
-
-                AlarmDetails alarmDetails = new AlarmDetails(alarmId, triggerTime,getRepeatSmS,getPhonenumber, getMessage);
-                alarmList.add(alarmDetails);
+                val alarmDetails =
+                    AlarmDetails(alarmId, triggerTime, getRepeatSmS, getPhonenumber, getMessage)
+                alarmList.add(alarmDetails)
 
                 // Lägg till alarmId i set för att undvika dubbletter
-                uniqueAlarmIds.add(alarmId);
+                uniqueAlarmIds.add(alarmId)
             }
         }
 
-        return alarmList;
+        return alarmList
     }
-    public  void deleteAlarm(int alarmId, Context context) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE);
+
+    fun deleteAlarm(alarmId: Int, context: Context) {
+        val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, alarmId, intent, PendingIntent.FLAG_MUTABLE)
 
         // Cancel the alarm
-        alarmManager.cancel(pendingIntent);
+        alarmManager.cancel(pendingIntent)
 
         // Remove alarm details from shared preferences
-        SharedPreferences preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
+        val preferences = context.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
+        val editor = preferences.edit()
 
         // Remove entries for the specified alarmId
-        String triggerTimeKey = "triggerTime_" + alarmId;
-        String releaseTimeKey = "releaseTime_" + alarmId;
-        String getRepeatSmSKey = "getRepeatSmSKey_" + alarmId;
-        String getPhonenumber = "getPhoneNumberKey_" + alarmId;
-        String getMessage = "getMessageKey_" + alarmId;
+        val triggerTimeKey = "triggerTime_$alarmId"
+        val releaseTimeKey = "releaseTime_$alarmId"
+        val getRepeatSmSKey = "getRepeatSmSKey_$alarmId"
+        val getPhonenumber = "getPhoneNumberKey_$alarmId"
+        val getMessage = "getMessageKey_$alarmId"
 
 
-        editor.remove(triggerTimeKey);
-        editor.remove(releaseTimeKey);
-        editor.remove(getRepeatSmSKey);
-        editor.remove(getPhonenumber);
-        editor.remove(getMessage);
+        editor.remove(triggerTimeKey)
+        editor.remove(releaseTimeKey)
+        editor.remove(getRepeatSmSKey)
+        editor.remove(getPhonenumber)
+        editor.remove(getMessage)
 
-        editor.apply();
+        editor.apply()
 
 
-        Intent intenta = new Intent(context, MainActivity.class);
-        intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        context.startActivity(intenta);
+        val intenta = Intent(context, MainActivity::class.java)
+        intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        context.startActivity(intenta)
     }
 
-    public void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        View view = getCurrentFocus();
+        fun isSmsTooLong(message: String): Boolean {
+            // Define the limits
+            val gsmSingleMessageLimit = 160
+            val gsmMultipartMessageLimit = 153
+            val ucs2SingleMessageLimit = 70
+            val ucs2MultipartMessageLimit = 67
 
-        if (view != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
+            // Check if message contains non-GSM characters
+            val containsNonGsmCharacters = message.any { it.code > 127 }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-    }
-
-    public static String getContactFirstName(ContentResolver contentResolver, String phoneNumber) {
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
-
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    // Contact exists, extract the first name from the display name
-                    String contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                    String[] parts = contactName.split("\\s+"); // Split by whitespace
-                    return parts[0]; // Return the first part
+            return if (containsNonGsmCharacters) {
+                // UCS-2 encoding
+                if (message.length > ucs2SingleMessageLimit) {
+                    val segments = (message.length + ucs2MultipartMessageLimit - 1) / ucs2MultipartMessageLimit
+                    segments > 1
+                } else {
+                    false
                 }
-            } finally {
-                cursor.close();
-            }
-        }
-        // Contact doesn't exist
-        return null;
-    }
-
-    public static String getContactName(ContentResolver contentResolver, String phoneNumber) {
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        String[] projection = {ContactsContract.PhoneLookup.DISPLAY_NAME};
-
-        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-
-        if (cursor != null) {
-            try {
-                if (cursor.moveToFirst()) {
-                    // Contact exists, return the name
-                    String contactName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                    return contactName;
+            } else {
+                // GSM 7-bit encoding
+                if (message.length > gsmSingleMessageLimit) {
+                    val segments = (message.length + gsmMultipartMessageLimit - 1) / gsmMultipartMessageLimit
+                    segments > 1
+                } else {
+                    false
                 }
-            } finally {
-                cursor.close();
             }
         }
-        // Contact doesn't exist
-        return null;
+
     }
 
-    public Uri getContactPhotoUri(String contactID) {
-        if (contactID == null) {
-            return null;
-        }
-        Uri contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String[] projection = {ContactsContract.CommonDataKinds.Phone.PHOTO_URI};
-        String selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?";
-        String[] selectionArgs = {contactID};
+    private fun getContactPhotoUri(phoneNumber: String): Uri? {
+        val contentResolver = contentResolver
+        val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
+        val selection = "${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?"
+        val selectionArgs = arrayOf(phoneNumber)
 
-        Cursor cursor = getContentResolver().query(contactUri, projection, selection, selectionArgs, null);
-        Uri photoUri = null;
+        val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
+        var photoUri: Uri? = null
 
-        if (cursor != null && cursor.moveToFirst()) {
-            String photoUriString = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-            if (photoUriString != null) {
-                photoUri = Uri.parse(photoUriString);
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val photoUriString =
+                    it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
+                if (photoUriString != null) {
+                    photoUri = Uri.parse(photoUriString)
+                }
             }
-            cursor.close();
         }
-        return photoUri;
+        return photoUri
     }
+
+    fun deleteAlarm(alarmId: Int, profileActivity: ProfileActivity) {
+return Companion.deleteAlarm(alarmId ,profileActivity)
+    }
+    data class NavigationItems(
+        val title: String,
+        val selectedIcon: ImageVector,
+        val unselectedIcon: ImageVector,
+        val badgeCount: Int? = null
+    )
 
 }

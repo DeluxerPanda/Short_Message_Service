@@ -83,12 +83,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.compose.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.AlarmReceiver
 import se.deluxerpanda.short_message_service.smssender.MainActivity
-import se.deluxerpanda.short_message_service.smssender.MainActivity.saveAlarmDetails
+import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
-import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -682,8 +682,9 @@ class ProfileActivity  : ComponentActivity() {
                                 val mTimePickerDialog = TimePickerDialog(
                                     mContext,
                                     { _, hour: Int, minute: Int ->
+                                        val formattedHour = String.format("%02d", hour)
                                         val formattedMinute = String.format("%02d", minute)
-                                        val newTime = "$hour:$formattedMinute"
+                                        val newTime = "$formattedHour:$formattedMinute"
                                         timeAndDateEdited = timeAndDateEdited!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
                                         isTimeAndDateChanged = true
@@ -1068,7 +1069,7 @@ class ProfileActivity  : ComponentActivity() {
 
             for (number in phoneNumbers) {
                 contactName = MainActivity.getContactFirstName(contentResolver, number.trim { it <= ' ' })
-                contactNameAndLast = MainActivity.getContactName(contentResolver, number.trim { it <= ' ' })
+                contactNameAndLast = MainActivity.getContactNameResolver(contentResolver, number.trim { it <= ' ' })
                 if (contactName != null) {
                     titleBuilder.append(contactName)
                         .append(", ")
@@ -1085,7 +1086,7 @@ class ProfileActivity  : ComponentActivity() {
         } else {
             editedphoneNumberNew = editedphoneNumber
             contactName = MainActivity.getContactFirstName(contentResolver, editedphoneNumber)
-            contactNameAndLast = MainActivity.getContactName(contentResolver, editedphoneNumber)
+            contactNameAndLast = MainActivity.getContactNameResolver(contentResolver, editedphoneNumber)
             if (contactName != null) {
                 title = contactName.toString()
             } else {

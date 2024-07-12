@@ -6,7 +6,8 @@
     <string name="app_contacts_name">Kontakter</string>
 
     <string name="text_hint_phone_number">Skriv in telefonnummer</string>
-    <string name="text_add_phone_number">Lägg till fler nummer:</string>
+    <string name="text_add_phone_number">extra nummer har lagts till</string>
+    <string name="text_add_phone_number_add_text">Lagg till extra nummer</string>
     <string name="text_hint_message">Skriv meddelande\n(max 160 tecken)</string>
 
     <string name="schedule_sms_button_text">Schemalägg SMS</string>
@@ -66,6 +67,7 @@
     <string name="history_info_Date_name">Datum:</string>
     <string name="history_info_Time_name">Tid:</string>
     <string name="history_info_Repeat_name">upprepas varje:</string>
+    <string name="history_info_Repeat_every_name">varje:</string>
     <string name="history_info_MoreSoon_name">Mer kommer snart!</string>
 
     <string name="history_info_Profile_Send_to">Skickas till</string>

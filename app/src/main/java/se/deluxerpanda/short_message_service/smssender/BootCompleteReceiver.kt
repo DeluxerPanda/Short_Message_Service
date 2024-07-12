@@ -29,7 +29,13 @@ class BootCompleteReceiver : BroadcastReceiver() {
                 val triggerTime = alarm.timeInMillis
                 val repeatSmS = alarm.repeatSmS
                 val alarmId = alarm.alarmId
-                scheduleAlarm(phonenumber, message, context, triggerTime, repeatSmS, alarmId)
+                if (phonenumber != null) {
+                    if (message != null) {
+                        if (repeatSmS != null) {
+                            scheduleAlarm(phonenumber, message, context, triggerTime, repeatSmS, alarmId)
+                        }
+                    }
+                }
             }
         }
     }
@@ -88,8 +94,8 @@ class BootCompleteReceiver : BroadcastReceiver() {
         )
     }
 
-    private fun getAllAlarms(context: Context): List<MainActivity.AlarmDetails> {
-        val alarmList: MutableList<MainActivity.AlarmDetails> = ArrayList()
+    private fun getAllAlarms(context: Context): List<MainActivity.Companion.AlarmDetails> {
+        val alarmList: MutableList<MainActivity.Companion.AlarmDetails> = ArrayList()
         val preferences = context.getSharedPreferences("AlarmDetails", Context.MODE_PRIVATE)
 
         val uniqueAlarmIds: MutableSet<Int> = HashSet()
@@ -110,7 +116,7 @@ class BootCompleteReceiver : BroadcastReceiver() {
                 val alarmId = key.substring(key.lastIndexOf("_") + 1).toInt()
                 if (!uniqueAlarmIds.contains(alarmId)) {
                     val alarmDetails =
-                        MainActivity.AlarmDetails(
+                        MainActivity.Companion.AlarmDetails(
                             alarmId,
                             triggerTime,
                             getRepeatSmS,

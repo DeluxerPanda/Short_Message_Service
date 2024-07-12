@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -151,12 +152,21 @@ class PhoneListActivity : AppCompatActivity() {
                 val contactImageView: ImageView = view.findViewById(R.id.group_image)
                 if (photoUri != null) {
                     contactImageView.setImageURI(photoUri)
-                    val roundedDrawable = RoundedBitmapDrawableFactory.create(resources, (contactImageView.drawable as BitmapDrawable).bitmap)
-                    roundedDrawable.isCircular = true
-                    contactImageView.setImageDrawable(roundedDrawable)
+
+                    val drawable = contactImageView.drawable
+                    if (drawable != null && drawable is BitmapDrawable) {
+                        val roundedDrawable = RoundedBitmapDrawableFactory.create(resources, drawable.bitmap)
+                        roundedDrawable.isCircular = true
+                        contactImageView.setImageDrawable(roundedDrawable)
+                    } else {
+                        // Handle the case where the drawable is null or not a BitmapDrawable
+                        Log.e("PhoneListActivity", "Drawable is null or not a BitmapDrawable after setting URI")
+                        contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
+                    }
                 } else {
                     contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
                 }
+
 
                 val arrowImageView1: ImageView = view.findViewById(R.id.arrow_icon1)
                 val arrowImageView2: ImageView = view.findViewById(R.id.arrow_icon2)

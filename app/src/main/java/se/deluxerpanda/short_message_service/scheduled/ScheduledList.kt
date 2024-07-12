@@ -3,18 +3,34 @@ package se.deluxerpanda.short_message_service.scheduled
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.view.Gravity
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.registerForActivityResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.profile.ProfileActivity
 import se.deluxerpanda.short_message_service.smssender.MainActivity
@@ -22,192 +38,162 @@ import java.text.SimpleDateFormat
 import java.util.StringTokenizer
 
 class ScheduledList : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.scheduled_list_layout)
-        ScheduledSMSList()
-        // back button
-        val btnBack = findViewById<ImageView>(R.id.btnToMainSmsSchedulerPage)
-        btnBack.setOnClickListener { finish() }
+
+    private val requestContactsPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission is granted, reload the list
+            loadScheduledSMSList()
+        } else {
+            // Handle the case where the user denied the permission
+        }
     }
 
-    fun ScheduledSMSList() {
-        val parentLayout = findViewById<LinearLayout>(R.id.app_backgrund)
-        val linearLayout = parentLayout as LinearLayout
-        linearLayout.removeAllViews()
-
-        val alarmList = MainActivity.getAllAlarms(
-            this
-        )
-
-        if (alarmList.isEmpty()) {
-            val AlarmListIsEmptyTextView = TextView(this)
-
-
-            // Add your dynamic TextView here
-            AlarmListIsEmptyTextView.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-
-            AlarmListIsEmptyTextView.text =
-                resources.getString(R.string.history_info_no_SMS_scheduled)
-            AlarmListIsEmptyTextView.textSize = 20f
-            AlarmListIsEmptyTextView.typeface =
-                Typeface.create("sans-serif-black", Typeface.BOLD_ITALIC)
-            AlarmListIsEmptyTextView.gravity = Gravity.CENTER
-            linearLayout.addView(AlarmListIsEmptyTextView)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            ScheduledSMSListUI()
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            requestContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         } else {
-            // Now you can use the alarmList as needed
-            for (alarmDetails in alarmList) {
-                val alarmId = alarmDetails.alarmId
+            loadScheduledSMSList()
+        }
+    }
 
-                // long timeInMillis = alarmDetails.getTimeInMillis();
-                val sdf = SimpleDateFormat("yyyy-MM-dd")
-                val sdf2 = SimpleDateFormat("H:mm")
+    private fun loadScheduledSMSList() {
+        lifecycleScope.launch {
+            // Call your function to load the scheduled SMS list here
+        }
+    }
 
-
-                // Format the date and print the result
-                val formattedDateStart = sdf.format(alarmDetails.timeInMillis)
-                val formattedClockTime = sdf2.format(alarmDetails.timeInMillis)
-                val getRepeatSmS = alarmDetails.repeatSmS
-                val phonenumber = alarmDetails.phonenumber
-                val message = alarmDetails.message
-                val dynamicTextViewLayout = layoutInflater.inflate(R.layout.history_info, null)
-
-                val dynamicLinearLayout =
-                    dynamicTextViewLayout.findViewById<LinearLayout>(R.id.history_info_page)
-
-                val history_info_contact_name_TextView =
-                    dynamicTextViewLayout.findViewById<TextView>(R.id.history_info_contact_name)
-
-                var title: String
-                val inputString = phonenumber
-                var contactName: String? = null
-                var photoUri_result: String?
-                val concatenatedNames = StringBuilder()
-                val permissionCheckContacts =
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
-                val contactImageView =
-                    dynamicTextViewLayout.findViewById<ImageView>(R.id.history_info_contact_profile)
-                if (permissionCheckContacts == PackageManager.PERMISSION_GRANTED) {
-                    val contentResolver = contentResolver
-
-                    if (phonenumber.contains(",")) {
-// Creating a StringTokenizer object with delimiter ","
-                        val tokenizer = StringTokenizer(inputString, ",")
-
-                        val tokenCount = tokenizer.countTokens()
-                        val stringArray = arrayOfNulls<String>(tokenCount)
-
-                        // Converting each token to array elements
-                        for (i in 0 until tokenCount) {
-                            stringArray[i] = tokenizer.nextToken()
-                        }
-
-                        // Printing the output array
-                        for (element in stringArray) {
-                            contactName = MainActivity.getContactName(contentResolver, element)
-                            concatenatedNames.append(contactName).append(", ")
-                        }
-                        history_info_contact_name_TextView.text = concatenatedNames
-                        title = concatenatedNames.toString()
-                    } else {
-                        contactName = MainActivity.getContactName(contentResolver, phonenumber)
-                        if (contactName != null) {
-                            history_info_contact_name_TextView.text = contactName
-                            title = contactName.toString()
-                        } else {
-                            history_info_contact_name_TextView.text = phonenumber
-                            title = phonenumber.toString()
-                        }
+    @Composable
+    fun ScheduledSMSListUI() {
+        // This will contain the compose UI
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            // Call your composable function to display the list here
+            val alarmList = MainActivity.getAllAlarms(this@ScheduledList)
+            if (alarmList.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.history_info_no_SMS_scheduled),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                Column {
+                    alarmList.forEach { alarmDetails ->
+                        HistoryInfoSection(alarmDetails)
                     }
-                } else {
-                    history_info_contact_name_TextView.text = phonenumber
-                    title = phonenumber.toString()
-                }
-
-                val photoUri = getContactPhotoUri(contactName)
-                if (photoUri != null) {
-                    // Load the contact photo into the ImageView
-                    contactImageView.setImageURI(photoUri)
-                    // Create a rounded drawable and set it directly to the ImageView
-                    val roundedDrawable = RoundedBitmapDrawableFactory.create(
-                        resources, (contactImageView.drawable as BitmapDrawable).bitmap
-                    )
-                    roundedDrawable.isCircular = true // Set to true if you want circular corners
-                    contactImageView.setImageDrawable(roundedDrawable)
-                    photoUri_result = photoUri.toString()
-                } else {
-                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
-                    photoUri_result = null
-                }
-
-                val words = phonenumber.split(",".toRegex()).dropLastWhile { it.isEmpty() }
-                    .toTypedArray()
-
-                val output = StringBuilder()
-                for (word in words) {
-                    output.append(word.trim { it <= ' ' }).append("\n")
-                }
-
-                val phonenumber_result = output.toString()
-
-
-                val history_info_message_TextView =
-                    dynamicTextViewLayout.findViewById<TextView>(R.id.history_info_message)
-                history_info_message_TextView.text = message
-
-                val history_info_date_and_time_TextView =
-                    dynamicTextViewLayout.findViewById<TextView>(R.id.history_info_date_and_time)
-
-                val TimeAndDate = "$formattedDateStart | $formattedClockTime"
-
-                history_info_date_and_time_TextView.text =
-                    (resources.getString(R.string.history_info_Date_name) + " " + formattedDateStart
-                            + ", " + resources.getString(R.string.history_info_Time_name) + " " + formattedClockTime)
-
-                linearLayout.addView(dynamicTextViewLayout)
-
-                var finalPhotoUri_result = photoUri_result
-
-                dynamicLinearLayout.setOnClickListener {
-                    val intent = Intent(
-                        this@ScheduledList,
-                        ProfileActivity::class.java
-                    )
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmId)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_POTOURL", finalPhotoUri_result)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_TITLE", title)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", TimeAndDate)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_REPEATS", getRepeatSmS)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", phonenumber_result)
-                    intent.putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", message)
-                    startActivity(intent)
                 }
             }
         }
     }
 
-    fun getContactPhotoUri(contactID: String?): Uri? {
-        if (contactID == null) {
-            return null
+    @Composable
+    fun HistoryInfoSection(alarmDetails: MainActivity.Companion.AlarmDetails) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.White)
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_baseline_person_24),
+                    contentDescription = stringResource(id = R.string.todo),
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.Top)
+                        .padding(end = 8.dp)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                ) {
+                    (alarmDetails.phonenumber?.let { getContactName(it) } ?: alarmDetails.phonenumber)?.let {
+                        Text(
+                            text = it,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    alarmDetails.message?.let {
+                        Text(
+                            text = it,
+                            fontSize = 13.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    Text(
+                        text = SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis)+" | "+alarmDetails.repeatSmS,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.ic_baseline_info_outline_24),
+                    contentDescription = stringResource(id = R.string.todo),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            val intent = Intent(this@ScheduledList, ProfileActivity::class.java).apply {
+                                putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
+                                putExtra("EXTRA_HISTORY_PROFILE_POTOURL",
+                                    alarmDetails.phonenumber?.let { getContactPhotoUri(it)?.toString() })
+                                putExtra("EXTRA_HISTORY_PROFILE_TITLE", alarmDetails.phonenumber) // Replace with actual title
+                                putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
+                                putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)
+                                putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", alarmDetails.phonenumber)
+                                putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", alarmDetails.message)
+                            }
+                            startActivity(intent)
+                        }
+                )
+            }
         }
+    }
+
+    private fun getContactName(phoneNumber: String): String? {
+        val contentResolver = contentResolver
+        return MainActivity.getContactNameResolver(contentResolver, phoneNumber)
+    }
+
+    private fun getContactPhotoUri(phoneNumber: String): Uri? {
+        val contentResolver = contentResolver
         val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
         val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-        val selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?"
-        val selectionArgs = arrayOf(contactID)
+        val selection = "${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?"
+        val selectionArgs = arrayOf(phoneNumber)
 
         val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
         var photoUri: Uri? = null
 
-        if (cursor != null && cursor.moveToFirst()) {
-            val photoUriString =
-                cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
-            if (photoUriString != null) {
-                photoUri = Uri.parse(photoUriString)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val photoUriString = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
+                if (photoUriString != null) {
+                    photoUri = Uri.parse(photoUriString)
+                }
             }
-            cursor.close()
         }
         return photoUri
     }
