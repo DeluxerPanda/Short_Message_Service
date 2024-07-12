@@ -3,10 +3,10 @@
 
 (Note: There may be potential for occasional bugs)
 
-[Download latest stable APK here](https://github.com/DeluxerPanda/Short_Message_Service/releases/latest "Download latest APK here")
+[Download latest stable APK here](https://github.com/DeluxerPanda/Short_Message_Service/releases/latest "Download latest stable APK here")
 
 
-[Download latest unstable APK here](https://github.com/DeluxerPanda/Short_Message_Service/blob/master/app/release/")
+[Download latest unstable APK here](https://github.com/DeluxerPanda/Short_Message_Service/blob/master/app/release/ "Download latest unstable APK here")
 
 ### - [Features]
 - Users have the ability for SMS scheduling on a daily, weekly, monthly, or yearly basis.
