@@ -18,7 +18,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.profile.ProfileActivity
 import se.deluxerpanda.short_message_service.scheduled.ScheduledList
+import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.getAllAlarms
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Random
@@ -62,7 +64,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 smsManager.sendMultipartTextMessage(number, null, parts, null, null)
             }
         } else {
-            Log.d("Hmmmm ", " phoneNumber: $phonenumber message: $message")
             smsManager.sendTextMessage(phonenumber, null, message, null, null)
         }
 
@@ -178,7 +179,6 @@ class AlarmReceiver : BroadcastReceiver() {
                 smsManager.sendMultipartTextMessage(number, null, parts, null, null)
             }
         } else {
-            Log.d("Hmmmm ", " phoneNumber: $phonenumber message: $message")
             smsManager.sendTextMessage(phonenumber, null, message, null, null)
         }
 
@@ -196,66 +196,60 @@ class AlarmReceiver : BroadcastReceiver() {
         context.startActivity(intenta)
         sendNotification(context)
     }
-    
+
     private fun sendNotification(context: Context) {
-        var channel: NotificationChannel? = null
+        // Create notification channel for Android O and above
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = NotificationChannel(
+            val channel = NotificationChannel(
                 MainActivity.CHANNEL_ID,
                 MainActivity.CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
+            val manager = context.getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
         }
-        val manager = context.getSystemService(
-            NotificationManager::class.java
-        )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(channel!!)
+
+        // Retrieve alarm details
+        val alarmDetails = MainActivity.getAlarmById(context, alarmId)
+        if (alarmDetails == null) {
+            Log.e("AlarmReceiver", "Alarm not found for ID: $alarmId")
+            return
         }
+
+        // Create an intent for ProfileActivity
+        val notificationIntent = Intent(context, ProfileActivity::class.java).apply {
+            putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
+            putExtra("EXTRA_HISTORY_PROFILE_POTOURL", MainActivity.getContactPhotoUri(context, alarmDetails.phonenumber!!))
+            putExtra("EXTRA_HISTORY_PROFILE_TITLE", alarmDetails.phonenumber)
+            putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
+            putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)
+            putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", alarmDetails.phonenumber)
+            putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", alarmDetails.message)
+        }
+
+        // Create a unique request code for the PendingIntent
+        val requestCode = Random().nextInt()
+
+        // Create a PendingIntent for the notification
+        val pendingIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // Build the notification
         val builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(
-                BitmapFactory.decodeResource(
-                    context.resources,
-                    R.mipmap.ic_launcher_foreground
-                )
-            )
-            .setContentTitle(context.resources.getString(R.string.sms_notify_message_sent_number_text) + " " + phonenumber)
-            .setContentText(context.resources.getString(R.string.sms_notify_message_sent_message_text) + " " + message)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher_foreground))
+            .setContentTitle(context.resources.getString(R.string.sms_notify_message_sent_number_text) + " " + alarmDetails.phonenumber)
+            .setContentText(context.resources.getString(R.string.sms_notify_message_sent_message_text) + " " + alarmDetails.message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        val random = Random()
-        val notificationId = random.nextInt()
-
-        // Create an intent for the notification
-        val notificationIntent = Intent(
-            context,
-            ScheduledList::class.java
-        )
-
-
-
-        val pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_MUTABLE)
-
-        builder.setContentIntent(pendingIntent)
+            .setContentIntent(pendingIntent) // Set the PendingIntent to be triggered when the notification is clicked
+            .setAutoCancel(true) // Automatically remove the notification when it is clicked
 
         // Show the notification
         val notificationManager = NotificationManagerCompat.from(context)
-        if (ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider requesting the missing permissions
             return
         }
-        notificationManager.notify(notificationId, builder.build())
+        notificationManager.notify(requestCode, builder.build())
     }
+
 }

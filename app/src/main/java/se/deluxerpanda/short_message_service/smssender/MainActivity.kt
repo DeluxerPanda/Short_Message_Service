@@ -228,8 +228,16 @@ class MainActivity : AppCompatActivity() {
         var day = c[Calendar.DAY_OF_MONTH]
         DateSet = String.format("%04d-%02d-%02d", year, month + 1, day)
 
-        val hour = c[Calendar.HOUR_OF_DAY]
-        val minute = c[Calendar.MINUTE]
+        var hour: Int
+        var minute: Int
+
+        // Add 6 minutes to the current time
+        val newTime = c.apply {
+            add(Calendar.MINUTE, 6)
+        }
+        hour = newTime[Calendar.HOUR_OF_DAY]
+        minute = newTime[Calendar.MINUTE]
+
         TimeSet = String.format("%02d:%02d", hour, minute)
 
 
@@ -327,6 +335,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
+
                             var phonenumber_extra_numbers = 0
                             val phonenumber_number_extra_entry =
                                 entry.savedStateHandle.get<Int>("EXTRA_MAINACTIVITY_CURRENT_NUMBER")
@@ -345,17 +354,13 @@ class MainActivity : AppCompatActivity() {
                             ) {
                                 Button(
                                     onClick = {
-                                        //   intent = Intent(this@MainActivityTest, AddMoreNumbersActivity::class.java)
-                                        // launchPhoneList_extra_numbers.launch(intent)
                                         phoneNumber = phonenumber_extra
                                         navController.navigate("AddMoreNumbersScreen")
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = phonenumber_extra_numbers.toString() + " " + stringResource(
-                                            id = R.string.text_add_phone_number
-                                        ),
+                                        text = stringResource(id = R.string.text_add_phone_number)+" "+ phonenumber_extra_numbers.toString()+" / "+MaxNumbers,
                                         fontSize = 20.sp,
 
                                     )
@@ -987,7 +992,7 @@ class MainActivity : AppCompatActivity() {
                                                 )
                                                 putExtra(
                                                     "EXTRA_HISTORY_PROFILE_POTOURL",
-                                                    getContactPhotoUri(alarmDetails.phonenumber!!)?.toString()
+                                                    getContactPhotoUri(this@MainActivity,alarmDetails.phonenumber!!)
                                                 )
                                                 putExtra(
                                                     "EXTRA_HISTORY_PROFILE_TITLE",
@@ -1381,6 +1386,18 @@ class MainActivity : AppCompatActivity() {
         return alarmList
     }
 
+
+        fun getAlarmById(context: Context, alarmId: Int): AlarmDetails? {
+            val allAlarms = getAllAlarms(context)
+            for (alarm in allAlarms) {
+                if (alarm.alarmId == alarmId) {
+                    return alarm
+                }
+            }
+            return null
+        }
+
+
     fun deleteAlarm(alarmId: Int, context: Context) {
         val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
@@ -1445,38 +1462,32 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    }
 
-    private fun getContactPhotoUri(phoneNumber: String): Uri? {
-        val contentResolver = contentResolver
-        val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-        val selection = "${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?"
-        val selectionArgs = arrayOf(phoneNumber)
+        fun getContactPhotoUri(context: Context, phoneNumber: String): Uri? {
+            val contentResolver: ContentResolver = context.contentResolver
+            val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+            val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
+            val selection = "${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?"
+            val selectionArgs = arrayOf(phoneNumber)
 
-        val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
-        var photoUri: Uri? = null
+            val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
+            var photoUri: Uri? = null
 
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val photoUriString =
-                    it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
-                if (photoUriString != null) {
-                    photoUri = Uri.parse(photoUriString)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val photoUriString = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
+                    if (photoUriString != null) {
+                        photoUri = Uri.parse(photoUriString)
+                    }
                 }
             }
+            return photoUri
         }
-        return photoUri
     }
 
-    fun deleteAlarm(alarmId: Int, profileActivity: ProfileActivity) {
-return Companion.deleteAlarm(alarmId ,profileActivity)
-    }
-    data class NavigationItems(
-        val title: String,
-        val selectedIcon: ImageVector,
-        val unselectedIcon: ImageVector,
-        val badgeCount: Int? = null
-    )
 
+
+    fun deleteAlarm(alarmId: Int, context: Context) {
+return Companion.deleteAlarm(alarmId ,context)
+    }
 }
