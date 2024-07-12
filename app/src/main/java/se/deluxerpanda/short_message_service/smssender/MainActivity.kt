@@ -232,11 +232,11 @@ class MainActivity : AppCompatActivity() {
         var minute: Int
 
         // Add 6 minutes to the current time
-        val newTime = c.apply {
+        val addTime = c.apply {
             add(Calendar.MINUTE, 6)
         }
-        hour = newTime[Calendar.HOUR_OF_DAY]
-        minute = newTime[Calendar.MINUTE]
+        hour = addTime[Calendar.HOUR_OF_DAY]
+        minute = addTime[Calendar.MINUTE]
 
         TimeSet = String.format("%02d:%02d", hour, minute)
 
