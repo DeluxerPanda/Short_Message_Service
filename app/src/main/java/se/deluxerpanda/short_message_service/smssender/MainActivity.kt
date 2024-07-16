@@ -1,7 +1,6 @@
 package se.deluxerpanda.short_message_service.smssender
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -14,7 +13,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -23,22 +21,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -46,56 +39,40 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -105,7 +82,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -115,8 +91,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.compose.AppTheme
-import kotlinx.coroutines.launch
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
+import com.google.android.material.snackbar.Snackbar
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.profile.ProfileActivity
 import java.text.ParseException
@@ -221,6 +197,16 @@ class MainActivity : AppCompatActivity() {
             requestPermission()
         }
 
+        val messageResId = intent.getIntExtra("EXTRA_SNACKBAR_MESSAGE", -1)
+        if (messageResId != -1) {
+            // Show the Snackbar with the message from the resource ID
+            Snackbar.make(
+                findViewById(android.R.id.content),
+                messageResId,
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+
         // Use the current date as the default date in the picker.
         val c = Calendar.getInstance()
         var year = c[Calendar.YEAR]
@@ -244,6 +230,7 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
+
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "MainScreen") {
                     composable("MainScreen") { entry ->
@@ -259,7 +246,8 @@ class MainActivity : AppCompatActivity() {
                                 fontWeight = FontWeight.Black,
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.onBackground
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -269,7 +257,7 @@ class MainActivity : AppCompatActivity() {
                             val launchPhoneList = rememberLauncherForActivityResult(
                                 contract = ActivityResultContracts.StartActivityForResult()
                             ) { result ->
-                                if (result.resultCode == Activity.RESULT_OK) {
+                                if (result.resultCode == RESULT_OK) {
                                     val phoneNumberData =
                                         result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
                                     phoneNumberData?.let { _ ->
@@ -320,21 +308,23 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
-                                    contentDescription = stringResource(id = R.string.todo),
+                                    contentDescription = "To contacts",
+                                    colorFilter = ColorFilter.tint(Color(0xFF4c566a)),
                                     modifier = Modifier
                                         .size(40.dp)
                                         .padding(end = 8.dp)
                                         .align(Alignment.CenterEnd)
                                         .clickable {
-
-                                            intent = Intent(this@MainActivity, PhoneListActivity::class.java)
-
+                                            intent = Intent(
+                                                this@MainActivity,
+                                                PhoneListActivity::class.java
+                                            )
                                             launchPhoneList.launch(intent)
                                         }
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                       //     Spacer(modifier = Modifier.height(16.dp))
 
                             var phonenumber_extra_numbers = 0
                             val phonenumber_number_extra_entry =
@@ -352,22 +342,36 @@ class MainActivity : AppCompatActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Button(
+                                var selected by remember { mutableStateOf(true) }
+
+                                FilterChip(
                                     onClick = {
                                         phoneNumber = phonenumber_extra
-                                        navController.navigate("AddMoreNumbersScreen")
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
+                                        navController.navigate("AddMoreNumbersScreen") },
+                                    label = { Text(
                                         text = stringResource(id = R.string.text_add_phone_number)+" "+ phonenumber_extra_numbers.toString()+" / "+MaxNumbers,
-                                        fontSize = 20.sp,
-
-                                    )
-                                }
+                                        fontSize = 20.sp,) },
+                                    selected = selected,
+                                    leadingIcon = if (selected) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Filled.Add,
+                                                contentDescription = "Done icon",
+                                                modifier = Modifier
+                                                    .size(FilterChipDefaults.IconSize)
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    },
+                                )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+
+
+
+
+                         //   Spacer(modifier = Modifier.height(16.dp))
                             //  MessageSection()
                             var message by remember { mutableStateOf(MessageFieldText) }
                             Box(
@@ -444,7 +448,8 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.set_time_button_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Button(
                                     onClick = { mTimePickerDialog.show() },
@@ -494,7 +499,8 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.set_date_start_button_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Button(
                                     onClick = { mDatePickerDialog.show() },
@@ -523,7 +529,8 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.send_sms_every_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Button(
                                     onClick = { ShowOptionsDialog = true },
@@ -560,9 +567,11 @@ class MainActivity : AppCompatActivity() {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Button(
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF38761D)),
+                                modifier = Modifier
+                                    .fillMaxWidth(),
                                 onClick = {
-
-                                    if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()){
+                                    if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()) {
 
                                         if (isSmsTooLong(message!!)) {
                                             println("The message is too long.")
@@ -571,91 +580,100 @@ class MainActivity : AppCompatActivity() {
                                         }
 
                                         val sdf = SimpleDateFormat("yyyy-MM-dd H:m")
-                                        val sdfDateTime = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
+                                        val sdfDateTime =
+                                            DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
                                         val dateTimeString: String = DateSet + " " + TimeSet
                                         val date = sdf.parse(dateTimeString)
                                         val triggerTime = date?.time
 
-                                            val selectedDateTime = LocalDateTime.parse("$DateSet $TimeSet", sdfDateTime)
-                                            val currentDateTime = LocalDateTime.now()
+                                        val selectedDateTime =
+                                            LocalDateTime.parse("$DateSet $TimeSet", sdfDateTime)
+                                        val currentDateTime = LocalDateTime.now()
 
-                                            if (selectedDateTime.isAfter(currentDateTime)) {
+                                        if (selectedDateTime.isAfter(currentDateTime)) {
 
-                                        try {
-                                            var PhoneNumberFieldTextEdit: String = ""
-                                            if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && PhoneNumberFieldText!!.isNotEmpty()) {
-                                                PhoneNumberFieldTextEdit =
-                                                    "$PhoneNumberFieldText,$editedphoneNumber"
-                                            } else if (PhoneNumberFieldText!!.isNotEmpty()) {
-                                                PhoneNumberFieldTextEdit = "$PhoneNumberFieldText"
+                                            try {
+                                                var PhoneNumberFieldTextEdit: String = ""
+                                                if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && PhoneNumberFieldText!!.isNotEmpty()) {
+                                                    PhoneNumberFieldTextEdit =
+                                                        "$PhoneNumberFieldText,$editedphoneNumber"
+                                                } else if (PhoneNumberFieldText!!.isNotEmpty()) {
+                                                    PhoneNumberFieldTextEdit =
+                                                        "$PhoneNumberFieldText"
+                                                }
+
+                                                val alarmId = UUID.randomUUID().hashCode()
+
+                                                val alarmManager =
+                                                    getSystemService(ALARM_SERVICE) as AlarmManager
+
+                                                val intent: Intent = Intent(
+                                                    this@MainActivity,
+                                                    AlarmReceiver::class.java
+                                                )
+
+                                                intent.putExtra(
+                                                    "EXTRA_PHONE_NUMBER",
+                                                    PhoneNumberFieldTextEdit
+                                                )
+                                                intent.putExtra("EXTRA_MESSAGES", message)
+                                                intent.putExtra("EXTRA_ALARMID", alarmId)
+                                                intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
+                                                intent.putExtra("EXTRA_REPEATSMS", repeatsEdited)
+
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                    startForegroundService(intent)
+                                                } else {
+                                                    startService(intent)
+                                                }
+
+                                                val pendingIntent = PendingIntent.getBroadcast(
+                                                    this@MainActivity, alarmId, intent,
+                                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                                                )
+
+                                                alarmManager.setExactAndAllowWhileIdle(
+                                                    AlarmManager.RTC_WAKEUP,
+                                                    triggerTime!!,
+                                                    pendingIntent
+                                                )
+
+
+                                                saveAlarmDetails(
+                                                    this@MainActivity,
+                                                    alarmId,
+                                                    triggerTime,
+                                                    repeatsEdited,
+                                                    PhoneNumberFieldTextEdit,
+                                                    message
+                                                )
+
+                                                val BackToStartIntent = Intent(
+                                                    this@MainActivity,
+                                                    MainActivity::class.java
+                                                )
+                                                BackToStartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                                BackToStartIntent.putExtra("EXTRA_SNACKBAR_MESSAGE", R.string.SnackBar_text_sms_scheduled)
+                                                startActivity(BackToStartIntent)
+
+
+                                            } catch (e: ParseException) {
+                                                e.printStackTrace()
                                             }
 
-                                            val alarmId = UUID.randomUUID().hashCode()
-
-                                            val alarmManager =
-                                                getSystemService(ALARM_SERVICE) as AlarmManager
-
-                                            val intent: Intent = Intent(
-                                                this@MainActivity,
-                                                AlarmReceiver::class.java
-                                            )
-
-                                            intent.putExtra(
-                                                "EXTRA_PHONE_NUMBER",
-                                                PhoneNumberFieldTextEdit
-                                            )
-                                            intent.putExtra("EXTRA_MESSAGES", message)
-                                            intent.putExtra("EXTRA_ALARMID", alarmId)
-                                            intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
-                                            intent.putExtra("EXTRA_REPEATSMS", repeatsEdited)
-
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                                startForegroundService(intent)
-                                            } else {
-                                                startService(intent)
-                                            }
-
-                                            val pendingIntent = PendingIntent.getBroadcast(
-                                                this@MainActivity, alarmId, intent,
-                                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-                                            )
-
-                                            alarmManager.setExactAndAllowWhileIdle(
-                                                AlarmManager.RTC_WAKEUP,
-                                                triggerTime!!,
-                                                pendingIntent
-                                            )
-
-
-                                            saveAlarmDetails(
-                                                this@MainActivity,
-                                                alarmId,
-                                                triggerTime,
-                                                repeatsEdited,
-                                                PhoneNumberFieldTextEdit,
-                                                message
-                                            )
-
-                                            val intenta = Intent(this@MainActivity, MainActivity::class.java)
-                                            intenta.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                            startActivity(intenta)
-                                        } catch (e: ParseException) {
-                                            e.printStackTrace()
-                                        }
                                     }else{
                                      showNoBackInTimeDialog = true
                                     }
                                     }else {
                                         showNoMainPhoneOrMessageDialog = true
                                     }
-                                },
-                                modifier = Modifier.fillMaxWidth()
+                                }
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.schedule_sms_button_text),
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                                    color = Color(0xFFe5e9f0),
                                 )
                             }
 
@@ -667,6 +685,7 @@ class MainActivity : AppCompatActivity() {
                                 fontWeight = FontWeight.Black,
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -676,6 +695,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     composable("AddMoreNumbersScreen") {
+
                         val scrollBehavior =
                             TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                         Scaffold(
@@ -739,7 +759,7 @@ class MainActivity : AppCompatActivity() {
                             val keyboardController = LocalSoftwareKeyboardController.current
                             var list by remember {
                                 mutableStateOf(
-                                    phoneNumber?.split(",") ?: listOf()
+                                    phoneNumber?.split(",")?.filter { it.isNotEmpty() } ?: listOf()
                                 )
                             }
                             var isPhoneNumberChanged by remember { mutableStateOf(false) }
@@ -755,7 +775,7 @@ class MainActivity : AppCompatActivity() {
                                     val launchPhoneList = rememberLauncherForActivityResult(
                                         contract = ActivityResultContracts.StartActivityForResult()
                                     ) { result ->
-                                        if (result.resultCode == Activity.RESULT_OK) {
+                                        if (result.resultCode == RESULT_OK) {
                                             val phoneNumberData =
                                                 result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
                                             // Handle the phone number data received
@@ -769,7 +789,7 @@ class MainActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
-                                    CurrentNumber = index + 1
+                                    CurrentNumber = list.filter { it.isNotEmpty() }.size
                                     OutlinedTextField(
                                         value = phone,
                                         onValueChange = {
@@ -866,12 +886,14 @@ class MainActivity : AppCompatActivity() {
                                         ToastBool = false
                                     }
                                 )
+
                                 // Update phoneNumber if it's not changed
                                 if (!isPhoneNumberChanged) {
                                     editedphoneNumber = phoneNumber
                                 }
                             }
                         }
+
                     }
                 }
 
@@ -992,7 +1014,10 @@ class MainActivity : AppCompatActivity() {
                                                 )
                                                 putExtra(
                                                     "EXTRA_HISTORY_PROFILE_POTOURL",
-                                                    getContactPhotoUri(this@MainActivity,alarmDetails.phonenumber!!)
+                                                    getContactPhotoUri(
+                                                        this@MainActivity,
+                                                        alarmDetails.phonenumber!!
+                                                    )
                                                 )
                                                 putExtra(
                                                     "EXTRA_HISTORY_PROFILE_TITLE",
@@ -1134,7 +1159,6 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         Text(
                             text = stringResource(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 },
@@ -1146,7 +1170,6 @@ class MainActivity : AppCompatActivity() {
                     ) {
                         Text(
                             text = stringResource(R.string.text_Cancel),
-                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }

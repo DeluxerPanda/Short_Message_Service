@@ -11,6 +11,8 @@
 
     <string name="schedule_sms_button_text">Schedule SMS</string>
 
+
+    <string name="SnackBar_text_sms_scheduled">SMS has been scheduled</string>
     <string name="set_time_button_text">set time</string>
     <string name="set_time_clock">00:00</string>
 
@@ -86,7 +88,6 @@
     <string name="puse">Pause</string>
     <string name="send_now_Titel">Send now!</string>
     <string name="send_now_Description">Do you want to send this SMS now?</string>
-    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Delete Scheduled Message</string>
     <string name="delete_name">Delete</string>

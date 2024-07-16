@@ -12,6 +12,7 @@
 
     <string name="schedule_sms_button_text">Schemalägg SMS</string>
 
+    <string name="SnackBar_text_sms_scheduled">SMS har schemalagts</string>
     <string name="set_time_button_text">Sätt tid</string>
     <string name="set_time_clock">00:00</string>
 

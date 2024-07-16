@@ -1,14 +1,11 @@
 package se.deluxerpanda.short_message_service.profile
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.ParseException
 import android.net.Uri
@@ -77,13 +74,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.compose.AppTheme
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.AlarmReceiver
 import se.deluxerpanda.short_message_service.smssender.MainActivity
@@ -207,10 +202,6 @@ class ProfileActivity  : ComponentActivity() {
 
                             topBar = {
                                 CenterAlignedTopAppBar(
-                                    colors = TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    ),
                                     title = {
                                     },
                                     navigationIcon = {
@@ -584,10 +575,6 @@ class ProfileActivity  : ComponentActivity() {
 
                             topBar = {
                                 CenterAlignedTopAppBar(
-                                    colors = TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    ),
                                     title = {
                                         Text(
                                             stringResource(id = R.string.history_info_Profile_Edit_TimeAndDate_name),
@@ -757,10 +744,6 @@ class ProfileActivity  : ComponentActivity() {
 
                             topBar = {
                                 CenterAlignedTopAppBar(
-                                    colors = TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    ),
                                     title = {
                                         Text(
                                             stringResource(id = R.string.history_info_Profile_Edit_Phone_number_name),
@@ -826,7 +809,7 @@ class ProfileActivity  : ComponentActivity() {
                                     val launchPhoneList = rememberLauncherForActivityResult(
                                         contract = ActivityResultContracts.StartActivityForResult()
                                     ) { result ->
-                                        if (result.resultCode == Activity.RESULT_OK) {
+                                        if (result.resultCode == RESULT_OK) {
                                             val phoneNumberData = result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
                                             // Handle the phone number data received
                                             list = list.toMutableList().also { list ->
@@ -949,10 +932,6 @@ class ProfileActivity  : ComponentActivity() {
 
                             topBar = {
                                 CenterAlignedTopAppBar(
-                                    colors = TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    ),
                                     title = {
                                             Text(
                                                 stringResource(id = R.string.history_info_Profile_Edit_Message_name),
@@ -1252,14 +1231,15 @@ class ProfileActivity  : ComponentActivity() {
                             .width(130.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(
-                                MaterialTheme.colorScheme.errorContainer,
+                                MaterialTheme.colorScheme.error,
                             ),
                         onClick = {
                         onDismiss()
                         onSave()
                     }) {
                         Text(getString(R.string.delete_name),
-                            color = MaterialTheme.colorScheme.secondary)
+                            color = MaterialTheme.colorScheme.onError,
+                        fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
@@ -1273,7 +1253,7 @@ class ProfileActivity  : ComponentActivity() {
                             ),
                         onClick = { onDismiss() }) {
                         Text(getString(R.string.text_Cancel),
-                            color = MaterialTheme.colorScheme.secondary)
+                                fontWeight = FontWeight.Bold)
                     }
                 },
                 properties = DialogProperties(),
