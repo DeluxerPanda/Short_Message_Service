@@ -351,7 +351,8 @@ class MainActivity : AppCompatActivity() {
                                     label = {
                                         Text(
                                             text = stringResource(id = R.string.text_add_phone_number) + " " + phonenumber_extra_numbers.toString() + " / " + MaxNumbers,
-                                            fontSize = 20.sp,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
                                         )
                                     },
                                     selected = selected,
