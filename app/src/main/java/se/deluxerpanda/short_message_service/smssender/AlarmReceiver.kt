@@ -50,11 +50,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         alarmId = intent.getIntExtra("EXTRA_ALARMID", 0).toString().toInt()
 
-        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)  {
-            context.getSystemService(SmsManager::class.java)
-        } else {
-            SmsManager.getDefault()
-        }
+        val smsManager = context.getSystemService(SmsManager::class.java)
 
         val isMultiNumber = phonenumber?.contains(",") ?: false
 
@@ -166,11 +162,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         alarmId = intent.getIntExtra("EXTRA_ALARMID", 0).toString().toInt()
 
-        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.getSystemService(SmsManager::class.java)
-        } else {
-            SmsManager.getDefault()
-        }
+        val smsManager = context.getSystemService(SmsManager::class.java)
 
         val isMultiNumber = phonenumber!!.contains(",")
         if (isMultiNumber) {
