@@ -159,8 +159,6 @@ class PhoneListActivity : AppCompatActivity() {
                         roundedDrawable.isCircular = true
                         contactImageView.setImageDrawable(roundedDrawable)
                     } else {
-                        // Handle the case where the drawable is null or not a BitmapDrawable
-                        Log.e("PhoneListActivity", "Drawable is null or not a BitmapDrawable after setting URI")
                         contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
                     }
                 } else {

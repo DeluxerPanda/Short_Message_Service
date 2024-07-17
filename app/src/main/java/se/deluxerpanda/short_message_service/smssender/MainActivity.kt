@@ -54,6 +54,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -68,11 +69,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -230,6 +229,9 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
 
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "MainScreen") {
@@ -247,7 +249,6 @@ class MainActivity : AppCompatActivity() {
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.onBackground
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -267,9 +268,9 @@ class MainActivity : AppCompatActivity() {
 
                                 }
                             }
-     //
+                            //
 
-       //
+                            //
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -290,7 +291,6 @@ class MainActivity : AppCompatActivity() {
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Bold,
                                             textAlign = TextAlign.Center,
-                                            color = Color.Gray
                                         ),
                                         decorationBox = { innerTextField ->
                                             if (number!!.isEmpty()) {
@@ -309,7 +309,6 @@ class MainActivity : AppCompatActivity() {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
                                     contentDescription = "To contacts",
-                                    colorFilter = ColorFilter.tint(Color(0xFF4c566a)),
                                     modifier = Modifier
                                         .size(40.dp)
                                         .padding(end = 8.dp)
@@ -324,7 +323,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
 
-                       //     Spacer(modifier = Modifier.height(16.dp))
+                                 Spacer(modifier = Modifier.height(16.dp))
 
                             var phonenumber_extra_numbers = 0
                             val phonenumber_number_extra_entry =
@@ -347,10 +346,14 @@ class MainActivity : AppCompatActivity() {
                                 FilterChip(
                                     onClick = {
                                         phoneNumber = phonenumber_extra
-                                        navController.navigate("AddMoreNumbersScreen") },
-                                    label = { Text(
-                                        text = stringResource(id = R.string.text_add_phone_number)+" "+ phonenumber_extra_numbers.toString()+" / "+MaxNumbers,
-                                        fontSize = 20.sp,) },
+                                        navController.navigate("AddMoreNumbersScreen")
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = R.string.text_add_phone_number) + " " + phonenumber_extra_numbers.toString() + " / " + MaxNumbers,
+                                            fontSize = 20.sp,
+                                        )
+                                    },
                                     selected = selected,
                                     leadingIcon = if (selected) {
                                         {
@@ -368,10 +371,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
 
-
-
-
-                         //   Spacer(modifier = Modifier.height(16.dp))
+                               Spacer(modifier = Modifier.height(16.dp))
                             //  MessageSection()
                             var message by remember { mutableStateOf(MessageFieldText) }
                             Box(
@@ -448,8 +448,7 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.set_time_button_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    textAlign = TextAlign.Center
                                 )
                                 Button(
                                     onClick = { mTimePickerDialog.show() },
@@ -499,8 +498,7 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.set_date_start_button_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    textAlign = TextAlign.Center
                                 )
                                 Button(
                                     onClick = { mDatePickerDialog.show() },
@@ -529,8 +527,7 @@ class MainActivity : AppCompatActivity() {
                                     text = stringResource(id = R.string.send_sms_every_text),
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    textAlign = TextAlign.Center
                                 )
                                 Button(
                                     onClick = { ShowOptionsDialog = true },
@@ -567,7 +564,11 @@ class MainActivity : AppCompatActivity() {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Button(
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF38761D)),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF38761D
+                                    )
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 onClick = {
@@ -653,7 +654,10 @@ class MainActivity : AppCompatActivity() {
                                                     MainActivity::class.java
                                                 )
                                                 BackToStartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                                BackToStartIntent.putExtra("EXTRA_SNACKBAR_MESSAGE", R.string.SnackBar_text_sms_scheduled)
+                                                BackToStartIntent.putExtra(
+                                                    "EXTRA_SNACKBAR_MESSAGE",
+                                                    R.string.SnackBar_text_sms_scheduled
+                                                )
                                                 startActivity(BackToStartIntent)
 
 
@@ -661,10 +665,10 @@ class MainActivity : AppCompatActivity() {
                                                 e.printStackTrace()
                                             }
 
-                                    }else{
-                                     showNoBackInTimeDialog = true
-                                    }
-                                    }else {
+                                        } else {
+                                            showNoBackInTimeDialog = true
+                                        }
+                                    } else {
                                         showNoMainPhoneOrMessageDialog = true
                                     }
                                 }
@@ -685,7 +689,6 @@ class MainActivity : AppCompatActivity() {
                                 fontWeight = FontWeight.Black,
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -899,6 +902,7 @@ class MainActivity : AppCompatActivity() {
 
             }
         }
+        }
     }
 
     @Composable
@@ -914,7 +918,6 @@ class MainActivity : AppCompatActivity() {
                     text = stringResource(R.string.history_info_no_SMS_scheduled),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
         }

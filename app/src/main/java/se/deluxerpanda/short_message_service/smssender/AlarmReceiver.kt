@@ -231,7 +231,8 @@ class AlarmReceiver : BroadcastReceiver() {
         val requestCode = Random().nextInt()
 
         // Create a PendingIntent for the notification
-        val pendingIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val pendingIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         // Build the notification
         val builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
