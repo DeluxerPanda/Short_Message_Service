@@ -50,7 +50,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
         alarmId = intent.getIntExtra("EXTRA_ALARMID", 0).toString().toInt()
 
-        val smsManager = context.getSystemService(SmsManager::class.java)
+        val smsManager: SmsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            context.getSystemService(SmsManager::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            SmsManager.getDefault()
+        }
 
         val isMultiNumber = phonenumber?.contains(",") ?: false
 
@@ -127,13 +132,7 @@ class AlarmReceiver : BroadcastReceiver() {
             context.startService(intent)
         }
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarmId,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-        )
-
+        val pendingIntent = PendingIntent.getActivity(context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             newtriggerTime,
@@ -162,7 +161,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
         alarmId = intent.getIntExtra("EXTRA_ALARMID", 0).toString().toInt()
 
-        val smsManager = context.getSystemService(SmsManager::class.java)
+        val smsManager: SmsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            context.getSystemService(SmsManager::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            SmsManager.getDefault()
+        }
 
         val isMultiNumber = phonenumber!!.contains(",")
         if (isMultiNumber) {
@@ -223,8 +227,12 @@ class AlarmReceiver : BroadcastReceiver() {
         val requestCode = Random().nextInt()
 
         // Create a PendingIntent for the notification
+        val pendingIntent =   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+}else{
+    PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+}
 
-        val pendingIntent = PendingIntent.getActivity(context, requestCode, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         // Build the notification
         val builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
