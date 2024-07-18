@@ -1,17 +1,17 @@
 package se.deluxerpanda.short_message_service.profile
 
-import android.annotation.SuppressLint
+import android.Manifest
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -36,14 +36,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -74,6 +74,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -132,6 +133,7 @@ class ProfileActivity  : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         var intent = intent
         if (intent != null) {
             title = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TITLE")
@@ -141,7 +143,6 @@ class ProfileActivity  : ComponentActivity() {
             if (photoUriString != null){
                 photoUri = Uri.parse(photoUriString)
             }
-
 
             timeAndDate = intent.getStringExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE")
 
@@ -153,6 +154,12 @@ class ProfileActivity  : ComponentActivity() {
             } else {
                 phoneNumber
             }
+            if (!phoneNumber!!.contains(",")) {
+                contactNameAndLast = ContactInfo.getContactName(contentResolver,phoneNumber,this)
+                photoUri = ContactInfo.getContactPhotoUri2(this@ProfileActivity,contactNameAndLast)
+            }
+
+
             MessageFieldText = intent.getStringExtra("EXTRA_HISTORY_PROFILE_MESSAGE")
         }
         setContent {
@@ -192,7 +199,10 @@ class ProfileActivity  : ComponentActivity() {
                             } else {
                                 phoneNumber
                             }
-                             photoUri = getContactPhotoUri(contactNameAndLast)
+                            if (!phoneNumber!!.contains(",")) {
+                                photoUri = ContactInfo.getContactPhotoUri2(this@ProfileActivity,contactNameAndLast)
+                            }
+
                         }
 
                         val scrollBehavior =
@@ -349,10 +359,9 @@ class ProfileActivity  : ComponentActivity() {
                                             showDeleteDialog = true
                                         })
                                         {
-                                            Icon(
+                                            Image(
                                                 painter = painterResource(id = R.drawable.ic_baseline_delete_outline),
-                                                contentDescription = "Delete button",
-                                                tint = MaterialTheme.colorScheme.error
+                                                contentDescription = "Delete button"
                                             )
                                         }
                                     },
@@ -370,8 +379,10 @@ class ProfileActivity  : ComponentActivity() {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             )
                             {
+
+                                var title = ContactInfo.processPhoneNumbers(phoneNumber, contentResolver, this@ProfileActivity)
                                 Text(
-                                    text = title!!,
+                                    text = title,
                                     textAlign = TextAlign.Center,
                                     fontSize = 24.sp,
                                     fontFamily = SansSerif,
@@ -406,7 +417,7 @@ class ProfileActivity  : ComponentActivity() {
                                                     .align(Alignment.CenterHorizontally)
                                             )
                                         } else if (phoneNumber!!.contains(",")) {
-                                            Image(
+                                            Icon(
                                                 painter = painterResource(id = R.drawable.baseline_groups),
                                                 contentDescription = null,
                                                 modifier = Modifier
@@ -414,8 +425,8 @@ class ProfileActivity  : ComponentActivity() {
                                                     .align(Alignment.CenterHorizontally)
                                             )
                                         }else{
-                                            Image(
-                                                painter = painterResource(id = R.drawable.ic_baseline_person_24),
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_person),
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .size(130.dp)
@@ -453,7 +464,7 @@ class ProfileActivity  : ComponentActivity() {
                                                     bottom = 10.dp
                                                 )
                                             )
-                                            Image(
+                                            Icon(
                                                 painter = painterResource(id = R.drawable.ic_baseline_edit_24),
                                                 contentDescription = "To Edit",
                                                 modifier = Modifier
@@ -499,7 +510,7 @@ class ProfileActivity  : ComponentActivity() {
                                                     bottom = 10.dp
                                                 )
                                             )
-                                            Image(
+                                            Icon(
                                                 painter = painterResource(id = R.drawable.ic_baseline_edit_24),
                                                 contentDescription = "To Edit Phone Number",
                                                 modifier = Modifier
@@ -546,7 +557,7 @@ class ProfileActivity  : ComponentActivity() {
                                                     .padding(top = 10.dp, bottom = 10.dp)
                                             )
 
-                                            Image(
+                                            Icon(
                                                 painter = painterResource(id = R.drawable.ic_baseline_edit_24),
                                                 contentDescription = "To Edit",
                                                 modifier = Modifier
@@ -680,11 +691,10 @@ class ProfileActivity  : ComponentActivity() {
                                 )
 
                                 Text(text = getString(R.string.history_info_Time_name))
-                                OutlinedButton(onClick = {
+                                Button(onClick = {
                                     mTimePickerDialog.show()
                                 }) {
-                                    Text(text = Time,
-                                        color = MaterialTheme.colorScheme.secondary)
+                                    Text(text = Time)
 
                                 }
 
@@ -708,19 +718,17 @@ class ProfileActivity  : ComponentActivity() {
 
 
                                 Text(text = getString(R.string.history_info_Date_name))
-                                OutlinedButton(onClick = {
+                                Button(onClick = {
                                     mDatePickerDialog.show()
                                 }) {
-                                    Text(text = Date,
-                                        color = MaterialTheme.colorScheme.secondary)
+                                    Text(text = Date)
                                 }
                                 var showDialog by remember { mutableStateOf(false) }
                                 Text(text = getString(R.string.send_sms_every_text))
-                                OutlinedButton(onClick = {
+                                Button(onClick = {
                                     showDialog = true
                                 }) {
-                                    Text(text = repeatsEdited.toString(),
-                                        color = MaterialTheme.colorScheme.secondary)
+                                    Text(text = repeatsEdited.toString())
 
                                 }
                                 ShowOptionsDialog(
@@ -822,7 +830,7 @@ class ProfileActivity  : ComponentActivity() {
                                             }
                                         }
                                     }
-                                    OutlinedTextField(
+                                    TextField(
                                         value = phone,
                                         onValueChange = {
                                             list =
@@ -908,7 +916,7 @@ class ProfileActivity  : ComponentActivity() {
                                         }
                                 }) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.baseline_add),
+                                        painter = painterResource(id = R.drawable.baseline_person_add),
                                         contentDescription = "add button"
                                     )
                                 }
@@ -984,7 +992,7 @@ class ProfileActivity  : ComponentActivity() {
                             ) {
 
                                 text?.let {
-                                    OutlinedTextField(
+                                    TextField(
                                         value = it,
                                         onValueChange = {
                                             if (it.toByteArray().size <= 140){
@@ -1047,8 +1055,8 @@ class ProfileActivity  : ComponentActivity() {
             val titleBuilder = StringBuilder()
 
             for (number in phoneNumbers) {
-                contactName = MainActivity.getContactFirstName(contentResolver, number.trim { it <= ' ' })
-                contactNameAndLast = MainActivity.getContactNameResolver(contentResolver, number.trim { it <= ' ' })
+                contactName = ContactInfo.getContactFirstName(contentResolver, number.trim { it <= ' ' },this)
+                contactNameAndLast = ContactInfo.getContactName(contentResolver, number.trim { it <= ' ' },this)
                 if (contactName != null) {
                     titleBuilder.append(contactName)
                         .append(", ")
@@ -1064,8 +1072,9 @@ class ProfileActivity  : ComponentActivity() {
 
         } else {
             editedphoneNumberNew = editedphoneNumber
-            contactName = MainActivity.getContactFirstName(contentResolver, editedphoneNumber)
-            contactNameAndLast = MainActivity.getContactNameResolver(contentResolver, editedphoneNumber)
+                contactName = ContactInfo.getContactFirstName(contentResolver, editedphoneNumber,this)
+                contactNameAndLast = ContactInfo.getContactName(contentResolver, editedphoneNumber,this)
+
             if (contactName != null) {
                 title = contactName.toString()
             } else {
@@ -1074,29 +1083,8 @@ class ProfileActivity  : ComponentActivity() {
         }
     }
 
-    @SuppressLint("Range")
-    fun getContactPhotoUri(contactID: String?): Uri? {
-        if (contactID == null) {
-            return null
-        }
-        val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-        val selection = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + "=?"
-        val selectionArgs = arrayOf(contactID)
 
-        val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
-        var photoUri: Uri? = null
 
-        if (cursor != null && cursor.moveToFirst()) {
-            val photoUriString =
-                cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
-            if (photoUriString != null) {
-                photoUri = Uri.parse(photoUriString)
-            }
-            cursor.close()
-        }
-        return photoUri
-    }
 
     @Composable
     fun NoBackInTimeDialog(
@@ -1130,8 +1118,7 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                         onSave()
                     }) {
-                        Text(getString(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_ok))
                     }
                 },
 
@@ -1178,8 +1165,7 @@ class ProfileActivity  : ComponentActivity() {
                             onSave()
                             onDismiss()
                         }) {
-                        Text(getString(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_ok))
                     }
                 },
 
@@ -1193,8 +1179,7 @@ class ProfileActivity  : ComponentActivity() {
                                 MaterialTheme.colorScheme.surface,
                             ),
                         onClick = { onDismiss() }) {
-                        Text(getString(R.string.text_Cancel),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_Cancel))
                     }
                 },
                 properties = DialogProperties(
@@ -1297,8 +1282,7 @@ class ProfileActivity  : ComponentActivity() {
                         onDismiss()
                         onSave()
                     }) {
-                        Text(getString(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_ok))
                     }
                 },
                 dismissButton = {
@@ -1308,11 +1292,10 @@ class ProfileActivity  : ComponentActivity() {
                             .width(130.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(
-                                MaterialTheme.colorScheme.errorContainer,
+                                MaterialTheme.colorScheme.surface,
                             ),
                         onClick = { onDismiss() }) {
-                        Text(getString(R.string.text_Cancel),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_Cancel))
                     }
                 },
                 properties = DialogProperties(),
@@ -1372,8 +1355,7 @@ class ProfileActivity  : ComponentActivity() {
                             onDismiss()
                         }
                     ) {
-                        Text(text = stringResource(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(text = stringResource(R.string.text_ok))
                     }
                 },
                 dismissButton = {
@@ -1382,8 +1364,7 @@ class ProfileActivity  : ComponentActivity() {
                             onDismiss()
                         }
                     ) {
-                        Text(text = stringResource(R.string.text_Cancel),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(text = stringResource(R.string.text_Cancel))
                     }
                 }
             )
@@ -1422,8 +1403,7 @@ class ProfileActivity  : ComponentActivity() {
                         onClick = {
                             onSave()
                         }) {
-                        Text(getString(R.string.text_ok),
-                            color = MaterialTheme.colorScheme.secondary)
+                        Text(getString(R.string.text_ok))
                     }
                 },
 
@@ -1436,8 +1416,6 @@ class ProfileActivity  : ComponentActivity() {
                 )
         }
     }
-
-
 }
 
 

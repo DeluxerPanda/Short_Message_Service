@@ -8,14 +8,12 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.registerForActivityResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,7 +22,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,10 +32,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.profile.ContactInfo
 import se.deluxerpanda.short_message_service.profile.ProfileActivity
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import java.text.SimpleDateFormat
-import java.util.StringTokenizer
 
 class ScheduledList : AppCompatActivity() {
 
@@ -108,7 +108,7 @@ class ScheduledList : AppCompatActivity() {
                     .wrapContentHeight()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.ic_baseline_person_24),
+                    painter = painterResource(id = R.drawable.baseline_person),
                     contentDescription = stringResource(id = R.string.todo),
                     modifier = Modifier
                         .size(48.dp)
@@ -121,16 +121,16 @@ class ScheduledList : AppCompatActivity() {
                         .weight(1f)
                         .padding(end = 8.dp)
                 ) {
-                    (alarmDetails.phonenumber?.let { getContactName(it) } ?: alarmDetails.phonenumber)?.let {
+                    val title = ContactInfo.processPhoneNumbers(alarmDetails.phonenumber, contentResolver, this@ScheduledList)
                         Text(
-                            text = it,
+                            text = title,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            style = TextStyle(textDecoration = TextDecoration.Underline)
                         )
-                    }
                     alarmDetails.message?.let {
                         Text(
                             text = it,
@@ -170,11 +170,6 @@ class ScheduledList : AppCompatActivity() {
                 )
             }
         }
-    }
-
-    private fun getContactName(phoneNumber: String): String? {
-        val contentResolver = contentResolver
-        return MainActivity.getContactNameResolver(contentResolver, phoneNumber)
     }
 
     private fun getContactPhotoUri(phoneNumber: String): Uri? {

@@ -7,7 +7,7 @@
     <string name="text_hint_phone_number">Enter Phone Number</string>
     <string name="text_add_phone_number">Add more phone numbers:</string>
     <string name="text_add_phone_number_add_text">Add more phone numbers</string>
-    <string name="text_hint_message">Enter message\n(max 160 characters)</string>
+    <string name="text_hint_message">Enter message (max 160 characters)</string>
 
     <string name="schedule_sms_button_text">Schedule SMS</string>
 

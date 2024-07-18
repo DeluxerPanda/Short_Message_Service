@@ -215,7 +215,6 @@ class AlarmReceiver : BroadcastReceiver() {
         // Create an intent for ProfileActivity
         val notificationIntent = Intent(context, ProfileActivity::class.java).apply {
             putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
-            putExtra("EXTRA_HISTORY_PROFILE_POTOURL", MainActivity.getContactPhotoUri(context, alarmDetails.phonenumber!!))
             putExtra("EXTRA_HISTORY_PROFILE_TITLE", alarmDetails.phonenumber)
             putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
             putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)

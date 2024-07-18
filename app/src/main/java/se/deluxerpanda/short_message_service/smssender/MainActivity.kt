@@ -5,14 +5,12 @@ import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -33,13 +31,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -57,6 +54,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -67,6 +65,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -80,6 +79,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,10 +90,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import com.google.android.material.snackbar.Snackbar
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.profile.ContactInfo
 import se.deluxerpanda.short_message_service.profile.ProfileActivity
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -139,6 +140,7 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.POST_NOTIFICATIONS,
         )
 
+
         // Check if all permissions are granted
         for (permission in permissions) {
             if (ContextCompat.checkSelfPermission(
@@ -154,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun checkPermissionsSMS(): Boolean {
+     fun checkPermissionsSMS(): Boolean {
         // Define an array of all the permissions you want to check
         val permissions = arrayOf(
             Manifest.permission.SEND_SMS,
@@ -192,6 +194,7 @@ class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (!checkPermissions()) {
             requestPermission()
         }
@@ -263,14 +266,11 @@ class MainActivity : AppCompatActivity() {
                                         result.data?.getStringExtra("PHONE_NUMBER_FROM_CONTACTS")
                                     phoneNumberData?.let { _ ->
                                         number = phoneNumberData
-                                        // Now you can use textFieldValue
                                     }
 
                                 }
                             }
-                            //
 
-                            //
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -279,34 +279,19 @@ class MainActivity : AppCompatActivity() {
                             ) {
 
                                 number?.let {
-                                    BasicTextField(
+                                    TextField(
                                         value = it,
                                         onValueChange = { number = it },
                                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Phone),
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(Color.White, RoundedCornerShape(4.dp))
-                                            .padding(16.dp),
-                                        textStyle = TextStyle(
-                                            fontSize = 20.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            textAlign = TextAlign.Center,
-                                        ),
-                                        decorationBox = { innerTextField ->
-                                            if (number!!.isEmpty()) {
-                                                Text(
-                                                    text = stringResource(id = R.string.text_hint_phone_number),
-                                                    fontSize = 20.sp,
-                                                    fontWeight = FontWeight.Normal,
-                                                    textAlign = TextAlign.Center
-                                                )
-                                            }
-                                            innerTextField()
-                                        }
+                                            .fillMaxWidth(),
+                                        label = {Text(
+                                            text = stringResource(id = R.string.text_hint_phone_number)
+                                        )}
                                     )
                                     PhoneNumberFieldText = number
                                 }
-                                Image(
+                                Icon(
                                     painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
                                     contentDescription = "To contacts",
                                     modifier = Modifier
@@ -323,7 +308,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
 
-                                 Spacer(modifier = Modifier.height(16.dp))
+                                 Spacer(modifier = Modifier.height(5.dp))
 
                             var phonenumber_extra_numbers = 0
                             val phonenumber_number_extra_entry =
@@ -338,12 +323,13 @@ class MainActivity : AppCompatActivity() {
                                 phonenumber_extra = phonenumber_extra_entry
                             }
                             Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                        modifier = Modifier
+                                        .align(Alignment.CenterHorizontally),
                             ) {
                                 var selected by remember { mutableStateOf(true) }
 
                                 FilterChip(
+
                                     onClick = {
                                         phoneNumber = phonenumber_extra
                                         navController.navigate("AddMoreNumbersScreen")
@@ -351,15 +337,14 @@ class MainActivity : AppCompatActivity() {
                                     label = {
                                         Text(
                                             text = stringResource(id = R.string.text_add_phone_number) + " " + phonenumber_extra_numbers.toString() + " / " + MaxNumbers,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
+
                                         )
                                     },
                                     selected = selected,
                                     leadingIcon = if (selected) {
                                         {
                                             Icon(
-                                                imageVector = Icons.Filled.Add,
+                                                painter = painterResource(id = R.drawable.baseline_person_add),
                                                 contentDescription = "Done icon",
                                                 modifier = Modifier
                                                     .size(FilterChipDefaults.IconSize)
@@ -372,42 +357,26 @@ class MainActivity : AppCompatActivity() {
                             }
 
 
-                               Spacer(modifier = Modifier.height(16.dp))
+                               Spacer(modifier = Modifier.height(5.dp))
                             //  MessageSection()
                             var message by remember { mutableStateOf(MessageFieldText) }
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .wrapContentHeight()
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(RoundedCornerShape(12.dp)),
+
                             ) {
                                 message?.let {
-                                    BasicTextField(
+                                    TextField(
                                         value = it,
                                         onValueChange = { message = it },
                                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(79.dp)
-                                            .background(Color.White, RoundedCornerShape(4.dp))
-                                            .padding(16.dp),
-                                        textStyle = TextStyle(
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            textAlign = TextAlign.Center,
-                                        ),
-
-                                        decorationBox = { innerTextField ->
-                                            if (message!!.isEmpty()) {
-                                                Text(
-                                                    text = stringResource(id = R.string.text_hint_message),
-                                                    fontSize = 20.sp,
-                                                    fontWeight = FontWeight.Normal,
-                                                    textAlign = TextAlign.Center
-                                                )
-                                            }
-                                            innerTextField()
-                                        }
+                                            .fillMaxWidth(),
+                                 label = {Text(
+                                            text = stringResource(id = R.string.text_hint_message)
+                                        )}
                                     )
                                     MessageFieldText = message
                                 }
@@ -516,6 +485,7 @@ class MainActivity : AppCompatActivity() {
                             var ShowOptionsDialog by remember { mutableStateOf(false) }
                             var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                             var showNoMainPhoneOrMessageDialog by remember { mutableStateOf(false) }
+                            var showMessageCharactersRetchDialog by remember { mutableStateOf(false) }
                             if (repeats == "null") {
                                 repeats = stringResource(id = R.string.send_sms_every_year_text)
                             }
@@ -560,6 +530,12 @@ class MainActivity : AppCompatActivity() {
                                         showNoMainPhoneOrMessageDialog = false
                                     }
                                 )
+                                MessageCharactersRetchDialog(
+                                    showMessageCharactersRetchDialog = showMessageCharactersRetchDialog,
+                                    onSave = {
+                                        showMessageCharactersRetchDialog = false
+                                    }
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -574,12 +550,8 @@ class MainActivity : AppCompatActivity() {
                                     .fillMaxWidth(),
                                 onClick = {
                                     if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()) {
+                                        if (!isSmsTooLong(message!!)) {
 
-                                        if (isSmsTooLong(message!!)) {
-                                            println("The message is too long.")
-                                        } else {
-                                            println("The message length is within the limit.")
-                                        }
 
                                         val sdf = SimpleDateFormat("yyyy-MM-dd H:m")
                                         val sdfDateTime =
@@ -670,6 +642,9 @@ class MainActivity : AppCompatActivity() {
                                             showNoBackInTimeDialog = true
                                         }
                                     } else {
+                                            showMessageCharactersRetchDialog = true
+                                        }
+                                } else {
                                         showNoMainPhoneOrMessageDialog = true
                                     }
                                 }
@@ -697,6 +672,7 @@ class MainActivity : AppCompatActivity() {
 
                             Spacer(modifier = Modifier.height(16.dp))
                         }
+
                     }
                     composable("AddMoreNumbersScreen") {
 
@@ -707,10 +683,6 @@ class MainActivity : AppCompatActivity() {
 
                             topBar = {
                                 CenterAlignedTopAppBar(
-                                    colors = TopAppBarDefaults.topAppBarColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    ),
                                     title = {
                                         Text(
                                             stringResource(id = R.string.text_add_phone_number_add_text),
@@ -793,8 +765,10 @@ class MainActivity : AppCompatActivity() {
                                             }
                                         }
                                     }
-                                    CurrentNumber = list.filter { it.isNotEmpty() }.size
-                                    OutlinedTextField(
+
+                                     CurrentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
+
+                                    TextField(
                                         value = phone,
                                         onValueChange = {
                                             list =
@@ -842,6 +816,7 @@ class MainActivity : AppCompatActivity() {
                                                         list.toMutableList()
                                                             .also { list ->
                                                                 list.removeAt(index)
+                                                                CurrentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
                                                                 editedphoneNumber =
                                                                     list.joinToString(",")
                                                                 isPhoneNumberChanged = true
@@ -879,7 +854,7 @@ class MainActivity : AppCompatActivity() {
                                         }
                                 }) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.baseline_add),
+                                        painter = painterResource(id = R.drawable.baseline_person_add),
                                         contentDescription = "add button"
                                     )
                                 }
@@ -929,128 +904,105 @@ class MainActivity : AppCompatActivity() {
                                 .fillMaxWidth()
                                 .wrapContentHeight()
                                 .clip(RoundedCornerShape(12.dp))
-                                .padding(top = 12.dp)
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .wrapContentHeight()
+                                    .padding(12.dp)
                             ) {
+                                   if (alarmDetails.phonenumber!!.contains(",")) {
+                                       Icon(
+                                           painter = painterResource(id =  R.drawable.baseline_groups),
+                                           contentDescription = null,
+                                           modifier = Modifier
+                                               .size(48.dp)
+                                               .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                       )
+                                    } else {
+                                       contactNameAndLast = ContactInfo.getContactName(contentResolver,alarmDetails.phonenumber,this@MainActivity)
+                                       photoUri = ContactInfo.getContactPhotoUri2(this@MainActivity,contactNameAndLast)
+                                        if (photoUri != null) {
+                                            Image(
+                                                painter = rememberAsyncImagePainter(photoUri),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .size(48.dp)
+                                                    .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                                    .clip(RoundedCornerShape(50.dp))
+                                            )
+                                        }else{
+                                            Icon(
+                                                painter = painterResource(id =  R.drawable.baseline_person),
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                                    .padding(end = 8.dp)
+                                            )
+                                        }
 
-                                if (photoUri != null) {
-                                    Image(
-                                        painter = rememberAsyncImagePainter(photoUri),
+                                    }
 
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                } else if (alarmDetails.phonenumber!!.contains(",")) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.baseline_groups),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                }else{
-                                    Image(
-                                        painter = painterResource(id = R.drawable.ic_baseline_person_24),
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .align(Alignment.CenterVertically)
-                                    )
-                                }
 
                                 Column(
                                     modifier = Modifier
                                         .weight(1f)
-                                        .padding(end = 8.dp)
                                 ) {
-                                    (alarmDetails.phonenumber?.let { getContactName(it) }
-                                        ?: alarmDetails.phonenumber)?.let {
-                                        Text(
-                                            text = it,
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier.padding(top = 8.dp)
-                                        )
-                                    }
+                                    var title = ContactInfo.processPhoneNumbers(alarmDetails.phonenumber, contentResolver, this@MainActivity)
+                                    Text(
+                                        text = title,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(bottom = 8.dp),
+                                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                                    )
+
                                     Text(
                                         text = alarmDetails.message!!,
                                         fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(bottom = 8.dp)
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(start = 4.dp)
                                     )
                                     Text(
-                                        text = " | "+ SimpleDateFormat("yyyy-MM-dd | H:mm").format(
-                                            alarmDetails.timeInMillis
-                                        ) + " | " + alarmDetails.repeatSmS +" | ",
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold,
+                                        text = SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis) + " | " + alarmDetails.repeatSmS,
+                                        fontSize = 13.sp,
+                                        maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
-                                            .padding(bottom = 8.dp)
                                     )
                                 }
 
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_baseline_info_outline_24),
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_settings),
                                     contentDescription = stringResource(id = R.string.todo),
                                     modifier = Modifier
-                                        .size(50.dp)
-                                        .padding(end = 8.dp)
+                                        .size(34.dp)
                                         .align(Alignment.CenterVertically)
                                         .clickable {
                                             val intent = Intent(
                                                 this@MainActivity,
                                                 ProfileActivity::class.java
                                             ).apply {
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_ALARMID",
-                                                    alarmDetails.alarmId
-                                                )
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_POTOURL",
-                                                    getContactPhotoUri(
-                                                        this@MainActivity,
-                                                        alarmDetails.phonenumber!!
-                                                    )
-                                                )
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_TITLE",
-                                                    alarmDetails.phonenumber
-                                                ) // Replace with actual title
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_TIMEANDDATE",
-                                                    SimpleDateFormat("yyyy-MM-dd | H:mm").format(
-                                                        alarmDetails.timeInMillis
-                                                    )
-                                                )
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_REPEATS",
-                                                    alarmDetails.repeatSmS
-                                                )
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_PHONENUMBER",
-                                                    alarmDetails.phonenumber
-                                                )
-                                                putExtra(
-                                                    "EXTRA_HISTORY_PROFILE_MESSAGE",
-                                                    alarmDetails.message
-                                                )
+                                                putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
+                                                putExtra("EXTRA_HISTORY_PROFILE_POTOURL",photoUri)
+                                                putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
+                                                putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)
+                                                putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", alarmDetails.phonenumber)
+                                                putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", alarmDetails.message)
                                             }
                                             startActivity(intent)
                                         }
                                 )
                             }
                         }
+
                     }
             }
     }
@@ -1273,9 +1225,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getContactName(phoneNumber: String): String? {
-        val contentResolver = contentResolver
-        return getContactNameResolver(contentResolver, phoneNumber)
+    @Composable
+    fun MessageCharactersRetchDialog(
+        showMessageCharactersRetchDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showMessageCharactersRetchDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_max_characters_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+
+                text = { Text(
+                    text = getString(R.string.sms_max_characters_Text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
     }
 
     companion object {
@@ -1283,60 +1276,6 @@ class MainActivity : AppCompatActivity() {
         var CHANNEL_ID: String = UUID.randomUUID().hashCode().toString()
 
         var CHANNEL_NAME: String = java.lang.String.valueOf(R.string.app_name)
-
-
-        fun getContactNameResolver(contentResolver: ContentResolver, phoneNumber: String?): String? {
-            val uri = Uri.withAppendedPath(
-                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                Uri.encode(phoneNumber)
-            )
-            val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
-
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        // Contact exists, return the name
-                        val contactName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                        return contactName
-                    }
-                } finally {
-                    cursor.close()
-                }
-            }
-            // Contact doesn't exist
-            return null
-        }
-
-        fun getContactFirstName(contentResolver: ContentResolver, phoneNumber: String?): String? {
-            val uri = Uri.withAppendedPath(
-                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
-                Uri.encode(phoneNumber)
-            )
-            val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
-
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        // Contact exists, extract the first name from the display name
-                        val contactName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                        val parts =
-                            contactName.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
-                                .toTypedArray() // Split by whitespace
-                        return parts[0] // Return the first part
-                    }
-                } finally {
-                    cursor.close()
-                }
-            }
-            // Contact doesn't exist
-            return null
-        }
 
         fun saveAlarmDetails(
         mainActivity: Context,
@@ -1488,33 +1427,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-
-        fun getContactPhotoUri(context: Context, phoneNumber: String): Uri? {
-            val contentResolver: ContentResolver = context.contentResolver
-            val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-            val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-            val selection = "${ContactsContract.CommonDataKinds.Phone.NUMBER} = ?"
-            val selectionArgs = arrayOf(phoneNumber)
-
-            val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
-            var photoUri: Uri? = null
-
-            cursor?.use {
-                if (it.moveToFirst()) {
-                    val photoUriString = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
-                    if (photoUriString != null) {
-                        photoUri = Uri.parse(photoUriString)
-                    }
-                }
-            }
-            return photoUri
-        }
     }
-
-
 
     fun deleteAlarm(alarmId: Int, context: Context) {
 return Companion.deleteAlarm(alarmId ,context)
     }
+
+
+
 }

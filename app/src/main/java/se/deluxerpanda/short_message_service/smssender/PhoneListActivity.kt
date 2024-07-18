@@ -9,21 +9,54 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.Settings
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ExpandableListView
-import android.widget.ExpandableListView.OnGroupClickListener
 import android.widget.ImageView
 import android.widget.SimpleExpandableListAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import se.deluxerpanda.short_message_service.R
+import se.deluxerpanda.short_message_service.profile.ContactInfo
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 
 class PhoneListActivity : AppCompatActivity() {
     private lateinit var contactListView: ExpandableListView
@@ -44,45 +77,102 @@ class PhoneListActivity : AppCompatActivity() {
 
         // Initialize the ExpandableListView and permission check
         contactListView = findViewById(R.id.Phone_list)
-        checkPermissionAndLoadContacts()
+
+            checkPermissionAndLoadContacts()
+
     }
 
+
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun checkPermissionAndLoadContacts() {
         val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
 
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             loadContacts()
         } else {
-            showPermissionExplanationDialog()
+            setContent {
+                AppTheme {
+                    val scrollBehavior =
+                        TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+                    Scaffold(
+                    topBar = {
+                        CenterAlignedTopAppBar(
+                            title = {
+                                Text(
+                                    stringResource(id = R.string.app_contacts_name),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    finish()
+                                }
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                                        contentDescription = "back button"
+                                    )
+                                }
+                            },
+                            scrollBehavior = scrollBehavior,
+                        )
+                    },
+                    ) { innerPadding ->
+                        showPermissionExplanationDialog(innerPadding)
+                }
+
+                }
+            }
+
         }
     }
 
-    private fun showPermissionExplanationDialog() {
-        val phoneList: ExpandableListView = findViewById(R.id.Phone_list)
-        val textBoxText: TextView = findViewById(R.id.Phone_list_TextBox_text)
-        val textBoxText2: TextView = findViewById(R.id.Phone_list_TextBox_text2)
-        val textBoxButton: Button = findViewById(R.id.Phone_list_TextBox_button)
+    @Composable
+    private fun showPermissionExplanationDialog(innerPadding: PaddingValues) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding)
+                .padding(horizontal = 15.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
 
-        phoneList.visibility = View.GONE
+        ){
+        Text(
+            text = stringResource(R.string.sms_no_permission_contacts_titel),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
 
-        textBoxText.visibility = View.VISIBLE
-        textBoxText.text = getString(R.string.sms_no_permission_contacts_titel)
-        textBoxText.gravity = Gravity.CENTER
+            Spacer(modifier = Modifier.height(16.dp))
 
-        textBoxText2.visibility = View.VISIBLE
-        textBoxText2.text = getString(R.string.sms_no_permission_contacts_text)
-        textBoxText2.gravity = Gravity.CENTER
+            Text(
+                text = stringResource(R.string.sms_no_permission_contacts_text),
+                fontSize = 15.sp,
+                textAlign = TextAlign.Center,
+            )
 
-        textBoxButton.visibility = View.VISIBLE
-        textBoxButton.text = getString(R.string.text_ask_give_permission_settings)
-        textBoxButton.gravity = Gravity.CENTER
-        textBoxButton.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            val uri = Uri.fromParts("package", packageName, null)
-            intent.data = uri
-            startActivity(intent)
-        }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                },
+
+            ) {
+                Text(
+                    text = stringResource(R.string.text_ask_give_permission_settings),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+    }
     }
 
     private fun loadContacts() {
@@ -148,7 +238,7 @@ class PhoneListActivity : AppCompatActivity() {
         ) {
             override fun getGroupView(groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup): View {
                 val view = super.getGroupView(groupPosition, isExpanded, convertView, parent)
-                val photoUri = getContactPhotoUri(groupData[groupPosition]["CONTACTID"])
+                val photoUri = ContactInfo.getContactPhotoUri(groupData[groupPosition]["CONTACTID"],contentResolver, this@PhoneListActivity)
                 val contactImageView: ImageView = view.findViewById(R.id.group_image)
                 if (photoUri != null) {
                     contactImageView.setImageURI(photoUri)
@@ -159,10 +249,10 @@ class PhoneListActivity : AppCompatActivity() {
                         roundedDrawable.isCircular = true
                         contactImageView.setImageDrawable(roundedDrawable)
                     } else {
-                        contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
+                        contactImageView.setImageResource(R.drawable.baseline_person)
                     }
                 } else {
-                    contactImageView.setImageResource(R.drawable.ic_baseline_person_24)
+                    contactImageView.setImageResource(R.drawable.baseline_person)
                 }
 
 
@@ -250,22 +340,5 @@ class PhoneListActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun getContactPhotoUri(contactID: String?): Uri? {
-        val contactUri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-        val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.PHOTO_URI)
-        val selection = "${ContactsContract.CommonDataKinds.Phone.CONTACT_ID}=?"
-        val selectionArgs = arrayOf(contactID)
 
-        var photoUri: Uri? = null
-        val cursor = contentResolver.query(contactUri, projection, selection, selectionArgs, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val photoUriString = it.getString(it.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.PHOTO_URI))
-                if (photoUriString != null) {
-                    photoUri = Uri.parse(photoUriString)
-                }
-            }
-        }
-        return photoUri
-    }
 }

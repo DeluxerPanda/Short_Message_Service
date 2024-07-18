@@ -24,7 +24,7 @@ private val lightScheme = lightColorScheme(
     onErrorContainer = onErrorContainerLight,
     background = backgroundLight,
     onBackground = onBackgroundLight,
-    surface = surfaceLight,
+    surface = backgroundLight,
     onSurface = onSurfaceLight,
     surfaceVariant = surfaceVariantLight,
     onSurfaceVariant = onSurfaceVariantLight,
@@ -62,7 +62,7 @@ private val darkScheme = darkColorScheme(
     onErrorContainer = onErrorContainerDark,
     background = backgroundDark,
     onBackground = onBackgroundDark,
-    surface = surfaceDark,
+    surface = backgroundDark,
     onSurface = onSurfaceDark,
     surfaceVariant = surfaceVariantDark,
     onSurfaceVariant = onSurfaceVariantDark,
@@ -84,7 +84,7 @@ private val darkScheme = darkColorScheme(
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
   val colorScheme = when {
       darkTheme -> darkScheme
