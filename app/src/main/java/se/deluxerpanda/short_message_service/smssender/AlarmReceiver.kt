@@ -17,13 +17,12 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.profile.ProfileActivity
-import se.deluxerpanda.short_message_service.scheduled.ScheduledList
-import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.getAllAlarms
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.Random
+
 
 class AlarmReceiver : BroadcastReceiver() {
     private var phonenumber: String? = null
@@ -89,13 +88,13 @@ class AlarmReceiver : BroadcastReceiver() {
         repeatSmS: String?,
         alarmId: Int
     ) {
-        SimpleDateFormat("yyyy-MM-dd HH:mm")
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         val date = Date(triggerTime)
 
-        day = context.getString(R.string.send_sms_every_day_text)
-        week = context.getString(R.string.send_sms_every_week_text)
-        month = context.getString(R.string.send_sms_every_month_text)
-        year = context.getString(R.string.send_sms_every_year_text)
+        day = context.getString(se.deluxerpanda.short_message_service.R.string.send_sms_every_day_text)
+        week = context.getString(se.deluxerpanda.short_message_service.R.string.send_sms_every_week_text)
+        month = context.getString(se.deluxerpanda.short_message_service.R.string.send_sms_every_month_text)
+        year = context.getString(se.deluxerpanda.short_message_service.R.string.send_sms_every_year_text)
 
         var intervalMillis: Long = 0
 
@@ -126,13 +125,15 @@ class AlarmReceiver : BroadcastReceiver() {
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS)
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent)
-        } else {
-            context.startService(intent)
-        }
+        context.startForegroundService(intent)
 
-        val pendingIntent = PendingIntent.getActivity(context, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            alarmId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             newtriggerTime,
@@ -195,15 +196,13 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private fun sendNotification(context: Context) {
         // Create notification channel for Android O and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                MainActivity.CHANNEL_ID,
-                MainActivity.CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = context.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            MainActivity.CHANNEL_ID,
+            MainActivity.CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(channel)
 
         // Retrieve alarm details
         val alarmDetails = MainActivity.getAlarmById(context, alarmId)
@@ -216,7 +215,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val notificationIntent = Intent(context, ProfileActivity::class.java).apply {
             putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
             putExtra("EXTRA_HISTORY_PROFILE_TITLE", alarmDetails.phonenumber)
-            putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
+            putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm", Locale.getDefault()).format(alarmDetails.timeInMillis))
             putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)
             putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", alarmDetails.phonenumber)
             putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", alarmDetails.message)
@@ -235,10 +234,10 @@ class AlarmReceiver : BroadcastReceiver() {
 
         // Build the notification
         val builder = NotificationCompat.Builder(context, MainActivity.CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher_foreground))
-            .setContentTitle(context.resources.getString(R.string.sms_notify_message_sent_number_text) + " " + alarmDetails.phonenumber)
-            .setContentText(context.resources.getString(R.string.sms_notify_message_sent_message_text) + " " + alarmDetails.message)
+            .setSmallIcon(se.deluxerpanda.short_message_service.R.mipmap.ic_launcher)
+            .setLargeIcon(BitmapFactory.decodeResource(context.resources, se.deluxerpanda.short_message_service.R.mipmap.ic_launcher_foreground))
+            .setContentTitle(context.resources.getString(se.deluxerpanda.short_message_service.R.string.sms_notify_message_sent_number_text) + " " + alarmDetails.phonenumber)
+            .setContentText(context.resources.getString(se.deluxerpanda.short_message_service.R.string.sms_notify_message_sent_message_text) + " " + alarmDetails.message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent) // Set the PendingIntent to be triggered when the notification is clicked
             .setAutoCancel(true) // Automatically remove the notification when it is clicked

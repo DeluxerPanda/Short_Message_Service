@@ -1278,14 +1278,14 @@ class MainActivity : AppCompatActivity() {
         var CHANNEL_NAME: String = java.lang.String.valueOf(R.string.app_name)
 
         fun saveAlarmDetails(
-        mainActivity: Context,
+            context: Context,
         alarmId: Int,
         triggerTime: Long,
         repeatSmS: String?,
         phonenumber: String?,
         message: String?
     ) {
-        val preferences = mainActivity.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
+        val preferences = context.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
         val editor = preferences.edit()
 
         // Use unique keys for each alarm and each value
@@ -1314,6 +1314,7 @@ class MainActivity : AppCompatActivity() {
     )
 
     // Retrieve a list of all alarms
+    @JvmStatic
     fun getAllAlarms(context: Context): List<AlarmDetails> {
         val alarmList: MutableList<AlarmDetails> = ArrayList()
         val preferences = context.getSharedPreferences("AlarmDetails", MODE_PRIVATE)
