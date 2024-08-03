@@ -3,10 +3,9 @@
 
 (Note: There may be potential for occasional bugs)
 
-[Download latest stable APK here](https://github.com/DeluxerPanda/Short_Message_Service/releases/latest "Download latest stable APK here")
+[![Version](https://img.shields.io/github/v/release/DeluxerPanda/Short_Message_Service?color=%21b625&label=Latest%20Release&style=for-the-badge)](https://github.com/DeluxerPanda/Short_Message_Service/releases/latest)
 
-
-[Download latest unstable APK here](https://github.com/DeluxerPanda/Short_Message_Service/blob/master/app/release/app-release.apk "Download latest unstable APK here")
+[Latest unstable APK here](https://github.com/DeluxerPanda/Short_Message_Service/blob/master/app/release/app-release.apk "Download latest unstable APK here")
 
 ### - [Features]
 - Users have the ability for SMS scheduling on a daily, weekly, monthly, or yearly basis.
