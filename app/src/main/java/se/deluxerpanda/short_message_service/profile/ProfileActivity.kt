@@ -406,19 +406,18 @@ class ProfileActivity  : ComponentActivity() {
                                         modifier = Modifier.padding(15.dp),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        if (photoUri != null) {
-                                            Image(
-                                                painter = rememberAsyncImagePainter(photoUri),
-
+                                    ) {  if (phoneNumber!!.contains(",")) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.baseline_groups),
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .size(130.dp)
                                                     .align(Alignment.CenterHorizontally)
                                             )
-                                        } else if (phoneNumber!!.contains(",")) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.baseline_groups),
+                                        }else if (photoUri != null) {
+                                            Image(
+                                                painter = rememberAsyncImagePainter(photoUri),
+
                                                 contentDescription = null,
                                                 modifier = Modifier
                                                     .size(130.dp)
