@@ -5,6 +5,14 @@
 [Latest unstable APK here](https://github.com/DeluxerPanda/Short_Message_Service/blob/master/app/release/app-release.apk "Download latest unstable APK here")
 
 ##
+<table>
+<tr>
+<td><img src="assets/Screenshot_Main_Dark.png" alt="Preview" width="1080"/></td>
+<td><img src="assets/Screenshot_Main_Light.png" alt="Preview" width="1080"/></td>
+</tr>
+</table>
+
+
 
 \* There could be some issues. Please consider [submitting feedback](https://github.com/DeluxerPanda/Short_Message_Service/issues).
 
