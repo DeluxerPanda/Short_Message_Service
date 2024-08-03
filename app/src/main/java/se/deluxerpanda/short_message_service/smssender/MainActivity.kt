@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -31,9 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -48,7 +47,6 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -65,7 +63,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -235,7 +232,6 @@ class MainActivity : AppCompatActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
-
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "MainScreen") {
                     composable("MainScreen") { entry ->
@@ -245,14 +241,30 @@ class MainActivity : AppCompatActivity() {
                                 .padding(16.dp)
                                 .verticalScroll(rememberScrollState())
                         ) {
-                            Text(
-                                text = stringResource(id = R.string.app_screen_name),
-                                fontFamily = FontFamily.SansSerif,
-                                fontWeight = FontWeight.Black,
-                                fontSize = 24.sp,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
+
+
+                                Text(
+                                    text = stringResource(id = R.string.app_screen_name),
+                                    fontFamily = FontFamily.SansSerif,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 24.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+                                val pInfo: PackageInfo = getPackageManager()
+                                    .getPackageInfo(getPackageName(), 0)
+                                val version = pInfo.versionName
+
+                                Text(
+                                    text = "Version: $version",
+                                    fontFamily = FontFamily.SansSerif,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 16.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth(),
+                                )
+
+
 
                             Spacer(modifier = Modifier.height(16.dp))
 
@@ -990,12 +1002,29 @@ class MainActivity : AppCompatActivity() {
                                                 this@MainActivity,
                                                 ProfileActivity::class.java
                                             ).apply {
-                                                putExtra("EXTRA_HISTORY_PROFILE_ALARMID", alarmDetails.alarmId)
-                                                putExtra("EXTRA_HISTORY_PROFILE_POTOURL",photoUri)
-                                                putExtra("EXTRA_HISTORY_PROFILE_TIMEANDDATE", SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis))
-                                                putExtra("EXTRA_HISTORY_PROFILE_REPEATS", alarmDetails.repeatSmS)
-                                                putExtra("EXTRA_HISTORY_PROFILE_PHONENUMBER", alarmDetails.phonenumber)
-                                                putExtra("EXTRA_HISTORY_PROFILE_MESSAGE", alarmDetails.message)
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_ALARMID",
+                                                    alarmDetails.alarmId
+                                                )
+                                                putExtra("EXTRA_HISTORY_PROFILE_POTOURL", photoUri)
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_TIMEANDDATE",
+                                                    SimpleDateFormat("yyyy-MM-dd | H:mm").format(
+                                                        alarmDetails.timeInMillis
+                                                    )
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_REPEATS",
+                                                    alarmDetails.repeatSmS
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_PHONENUMBER",
+                                                    alarmDetails.phonenumber
+                                                )
+                                                putExtra(
+                                                    "EXTRA_HISTORY_PROFILE_MESSAGE",
+                                                    alarmDetails.message
+                                                )
                                             }
                                             startActivity(intent)
                                         }
