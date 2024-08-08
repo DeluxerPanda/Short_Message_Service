@@ -372,6 +372,7 @@ class MainActivity : AppCompatActivity() {
                                Spacer(modifier = Modifier.height(5.dp))
                             //  MessageSection()
                             var message by remember { mutableStateOf(MessageFieldText) }
+                            var showMessageCharactersRetchDialog by remember { mutableStateOf(false) }
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -382,7 +383,13 @@ class MainActivity : AppCompatActivity() {
                                 message?.let {
                                     TextField(
                                         value = it,
-                                        onValueChange = { message = it },
+                                        onValueChange = {
+                                            if (!isSmsTooLong(it)) {
+                                                message = it
+                                            }else{
+                                                showMessageCharactersRetchDialog = true
+                                            }
+                                            },
                                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
                                         modifier = Modifier
                                             .fillMaxWidth(),
@@ -497,7 +504,7 @@ class MainActivity : AppCompatActivity() {
                             var ShowOptionsDialog by remember { mutableStateOf(false) }
                             var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                             var showNoMainPhoneOrMessageDialog by remember { mutableStateOf(false) }
-                            var showMessageCharactersRetchDialog by remember { mutableStateOf(false) }
+
                             if (repeats == "null") {
                                 repeats = stringResource(id = R.string.send_sms_every_year_text)
                             }

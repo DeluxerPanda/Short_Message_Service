@@ -83,6 +83,7 @@ import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.AlarmReceiver
 import se.deluxerpanda.short_message_service.smssender.MainActivity
+import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.isSmsTooLong
 import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
 import java.time.LocalDateTime
@@ -982,6 +983,7 @@ class ProfileActivity  : ComponentActivity() {
 
                             var text by remember { mutableStateOf(MessageFieldText)}
                             var ToastBool by remember { mutableStateOf(false) }
+                            var showMessageCharactersRetchDialog by remember { mutableStateOf(false) }
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -994,17 +996,10 @@ class ProfileActivity  : ComponentActivity() {
                                     TextField(
                                         value = it,
                                         onValueChange = {
-                                            if (it.toByteArray().size <= 140){
+                                            if (!isSmsTooLong(it)) {
                                                 text = it
-                                                editedMessage = text
-                                                isMessageChanged = true
                                             }else{
-
-                                                ToastContent = getString(R.string.history_info_Profile_Edit_cannot_have_more_number)+
-                                                        " "+MaxNumbers.toString()+" "+getString(R.string.More_Then_One_Number_name)
-
-                                                ToastBool = true
-                                                keyboardController?.hide()
+                                                showMessageCharactersRetchDialog = true
                                             }
                                         },
                                         keyboardOptions = KeyboardOptions(
@@ -1025,7 +1020,12 @@ class ProfileActivity  : ComponentActivity() {
                                     )
                                 }
                             }
-
+                            MessageCharactersRetchDialog(
+                                showMessageCharactersRetchDialog = showMessageCharactersRetchDialog,
+                                onSave = {
+                                    showMessageCharactersRetchDialog = false
+                                }
+                            )
                             ToastDialog(
                                 ToastBool = ToastBool,
                                 onSave = {
@@ -1083,7 +1083,51 @@ class ProfileActivity  : ComponentActivity() {
     }
 
 
+    @Composable
+    fun MessageCharactersRetchDialog(
+        showMessageCharactersRetchDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showMessageCharactersRetchDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_max_characters_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
 
+                text = { Text(
+                    text = getString(R.string.sms_max_characters_Text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
 
     @Composable
     fun NoBackInTimeDialog(
