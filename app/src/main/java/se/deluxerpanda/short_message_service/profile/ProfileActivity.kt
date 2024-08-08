@@ -998,6 +998,8 @@ class ProfileActivity  : ComponentActivity() {
                                         onValueChange = {
                                             if (!isSmsTooLong(it)) {
                                                 text = it
+                                                editedMessage = text
+                                                isMessageChanged = true
                                             }else{
                                                 showMessageCharactersRetchDialog = true
                                             }
