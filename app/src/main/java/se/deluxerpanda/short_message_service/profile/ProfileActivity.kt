@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -1297,23 +1298,91 @@ class ProfileActivity  : ComponentActivity() {
         onSave: () -> Unit,
         onDismiss: () -> Unit
     ) {
+        val scrollState = rememberScrollState()
         if (showReSceduledOrNotDialog) {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(
-                    text = getString(R.string.ReSceduleOrNotDialog_title),
-                    fontWeight = FontWeight.Bold,
-                    style = TextStyle(
-                        fontSize = 20.sp,
-                    ))},
-                text = { Text(
-                    text = getString(R.string.ReSceduleOrNotDialog_text)
-                            + "\n" + timeAndDate
-                            + "\n" + getString(R.string.history_info_Repeat_name) + " " + repeats
-                            + "\n" + phoneNumber
-                            + "\n" + MessageFieldText,
-                    fontWeight = FontWeight.Bold,
-                )},
+                    text = getString(R.string.ReSceduleOrNotDialog_title))},
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .verticalScroll(scrollState),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        if (phoneNumber!!.contains(",")) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_groups),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                    .clip(RoundedCornerShape(50.dp))
+                            )
+                        }else if (photoUri != null) {
+                            Image(
+                                painter = rememberAsyncImagePainter(photoUri),
+
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                    .clip(RoundedCornerShape(50.dp))
+                            )
+                        }else{
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_person),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(end = 8.dp, top = 4.dp, bottom = 4.dp)
+                                    .clip(RoundedCornerShape(50.dp))
+                            )
+                        }
+
+                        Text(
+                            text = timeAndDate
+                                    + "\n" + getString(R.string.history_info_Repeat_name) + " " + repeats,
+                            fontWeight = FontWeight.Bold,
+                        )
+
+
+                            Text(
+                                text = getString(R.string.history_info_Profile_Send_to),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                                if (phoneNumber!!.contains(",")) {
+
+                                    Text(
+                                        text = phoneNumber!!.replace(",", "\n"),
+                                    )
+                                } else {
+                                    Text(
+                                        text = phoneNumber!!,
+                                    )
+                            }
+                        }
+
+                            Text(
+                                text = getString(R.string.history_info_Message_name),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                                Text(
+                                    text = MessageFieldText!!,
+                                )
+                        }
+
+                    }
+                      },
                 confirmButton = {
                     TextButton(
                         modifier = Modifier

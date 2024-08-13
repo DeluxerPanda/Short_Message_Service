@@ -8,7 +8,7 @@
     <string name="text_hint_phone_number">Skriv in telefonnummer</string>
     <string name="text_add_phone_number">Lägg till fler telefonnummer:</string>
     <string name="text_add_phone_number_add_text">Lägg till fler telefonnummer</string>
-    <string name="text_hint_message">Skriv meddelande (max 160 tecken)</string>
+    <string name="text_hint_message">Skriv meddelande</string>
 
     <string name="schedule_sms_button_text">Schemalägg SMS</string>
 
@@ -91,8 +91,7 @@
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Ta bort schemalagt meddelande</string>
     <string name="delete_name">Radera</string>
-    <string name="ReSceduleOrNotDialog_title">Omplanera detta sms</string>
-    <string name="ReSceduleOrNotDialog_text">Vill du omplanera detta sms?</string>
+    <string name="ReSceduleOrNotDialog_title">Vill du omplanera?</string>
 
     <string name="More_Then_One_Number_name">nummer</string>
 </resources>

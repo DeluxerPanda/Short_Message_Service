@@ -7,7 +7,7 @@
     <string name="text_hint_phone_number">Enter Phone Number</string>
     <string name="text_add_phone_number">Add more phone numbers:</string>
     <string name="text_add_phone_number_add_text">Add more phone numbers</string>
-    <string name="text_hint_message">Enter message (max 160 characters)</string>
+    <string name="text_hint_message">Enter message</string>
 
     <string name="schedule_sms_button_text">Schedule SMS</string>
 
@@ -91,8 +91,7 @@
     <string name="exit_name">Exit</string>
     <string name="DeleteScheduleMessage">Delete Scheduled Message</string>
     <string name="delete_name">Delete</string>
-    <string name="ReSceduleOrNotDialog_title">Reschedule this SMS</string>
-    <string name="ReSceduleOrNotDialog_text">Do you want to reschedule this SMS?</string>
+    <string name="ReSceduleOrNotDialog_title">Do you want to reschedule?</string>
 
      <string name="More_Then_One_Number_name">numbers</string>
 </resources>

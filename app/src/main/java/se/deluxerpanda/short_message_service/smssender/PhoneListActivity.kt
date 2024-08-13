@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.provider.Settings
+import android.util.Log
 import android.widget.ExpandableListView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -144,6 +145,7 @@ class PhoneListActivity : ComponentActivity() {
         contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null)?.use { cursor ->
             while (cursor.moveToNext()) {
                 val contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+
                 val name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
                 val photoUri = ContactInfo.getContactPhotoUri(contactId, contentResolver, this)
                 val phoneNumbers = mutableListOf<PhoneNumber>()
@@ -184,13 +186,34 @@ fun ContactListScreen(contacts: List<ContactData>) {
                 }
             )
         }
+
     ) { innerPadding ->
+        if (contacts.isNotEmpty()) {
+
         LazyColumn(
             contentPadding = innerPadding,
             modifier = Modifier.fillMaxSize()
         ) {
+
             items(contacts) { contact ->
                 ContactItem(contact)
+            }
+            }
+        }else{
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.No_contacts_found),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }
@@ -202,10 +225,11 @@ fun ContactListScreen(contacts: List<ContactData>) {
             .fillMaxWidth()
             .padding(16.dp)) {
 
-                val isSinglePhoneNumber = contact.phoneNumbers.size == 1
             val uniquePhoneNumbers = contact.phoneNumbers
-                .distinctBy { it.number }
-                .sortedBy {it.type }
+                .distinctBy { Pair(it.number, it.type) }
+                .sortedBy { it.type }
+
+            val isSinglePhoneNumber = uniquePhoneNumbers.size == 1
 
             Column(
                     modifier = Modifier
@@ -225,7 +249,6 @@ fun ContactListScreen(contacts: List<ContactData>) {
                 ) {
                     var expanded by remember { mutableStateOf(false) }
                     if (!isSinglePhoneNumber) {
-
                         Row(
                             verticalAlignment = Alignment.Top,
                             horizontalArrangement = Arrangement.End,
@@ -261,7 +284,7 @@ fun ContactListScreen(contacts: List<ContactData>) {
                                         .height(40.dp),
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    Text(contact.name, fontWeight = FontWeight.Bold,
+                                    Text(contact.name+ contact.phoneNumbers.size + isSinglePhoneNumber , fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
@@ -343,7 +366,7 @@ fun ContactListScreen(contacts: List<ContactData>) {
                                     .weight(1f)
                                     .height(40.dp),
                             ) {
-                                Text(contact.name, fontWeight = FontWeight.Bold,
+                                Text(contact.name + contact.phoneNumbers.size + isSinglePhoneNumber, fontWeight = FontWeight.Bold,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier
