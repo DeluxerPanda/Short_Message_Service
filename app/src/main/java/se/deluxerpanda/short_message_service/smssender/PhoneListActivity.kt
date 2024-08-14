@@ -284,7 +284,8 @@ fun ContactListScreen(contacts: List<ContactData>) {
                                         .height(40.dp),
                                     verticalArrangement = Arrangement.Center
                                 ) {
-                                    Text(contact.name+ contact.phoneNumbers.size + isSinglePhoneNumber , fontWeight = FontWeight.Bold,
+                                    Text(contact.name,
+                                        fontWeight = FontWeight.Bold,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier
@@ -366,7 +367,8 @@ fun ContactListScreen(contacts: List<ContactData>) {
                                     .weight(1f)
                                     .height(40.dp),
                             ) {
-                                Text(contact.name + contact.phoneNumbers.size + isSinglePhoneNumber, fontWeight = FontWeight.Bold,
+                                Text(contact.name,
+                                    fontWeight = FontWeight.Bold,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                     modifier = Modifier
