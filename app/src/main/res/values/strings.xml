@@ -3,6 +3,7 @@
     <string name="app_name_short">SMS app</string>
     <string name="app_screen_name">Sms Scheduler</string>
     <string name="app_contacts_name">Contacts</string>
+    <string name="app_settings_name">Settings</string>
 
     <string name="text_hint_phone_number">Enter Phone Number</string>
     <string name="text_add_phone_number">Add more phone numbers:</string>

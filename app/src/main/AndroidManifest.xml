@@ -40,7 +40,7 @@
         </activity>
         <activity android:name=".smssender.PhoneListActivity">
         </activity>
-        <activity android:name=".scheduled.ScheduledList">
+        <activity android:name=".smssender.SettingsActivity">
         </activity>
         <receiver android:name=".smssender.AlarmReceiver" />
         <receiver android:name=".smssender.BootCompleteReceiver" android:exported="false">

@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontFamily.Companion.SansSerif
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -1303,7 +1304,11 @@ class ProfileActivity  : ComponentActivity() {
             AlertDialog(
                 onDismissRequest = {},
                 title = { Text(
-                    text = getString(R.string.ReSceduleOrNotDialog_title))},
+                        text = getString(R.string.ReSceduleOrNotDialog_title),
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                    )},
                 text = {
                     Column(
                         modifier = Modifier.fillMaxWidth()

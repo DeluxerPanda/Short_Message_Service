@@ -4,6 +4,7 @@
     <string name="app_name_short">SMS app</string>
     <string name="app_screen_name">Sms Schemaläggare</string>
     <string name="app_contacts_name">Kontakter</string>
+    <string name="app_settings_name">inställningar</string>
 
     <string name="text_hint_phone_number">Skriv in telefonnummer</string>
     <string name="text_add_phone_number">Lägg till fler telefonnummer:</string>

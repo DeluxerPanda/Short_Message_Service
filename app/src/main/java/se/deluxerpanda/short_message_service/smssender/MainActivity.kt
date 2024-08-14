@@ -237,11 +237,29 @@ class MainActivity : AppCompatActivity() {
                     composable("MainScreen") { entry ->
                         Column(
                             modifier = Modifier
-                                .fillMaxSize()
                                 .padding(16.dp)
-                                .verticalScroll(rememberScrollState())
+                                .verticalScroll(rememberScrollState()),
+
                         ) {
 
+                            Box() {
+                                /*              IconButton(onClick = {
+                                                  intent = Intent(
+                                                      this@MainActivity,
+                                                      SettingsActivity::class.java
+                                                  )
+                                                  startActivity(intent)
+                                              },
+                                                  modifier = Modifier
+                                                      .size(34.dp)
+                                                      .align(Alignment.TopStart)
+
+                                              ) {
+                                                  Icon(
+                                                      painter = painterResource(id = R.drawable.baseline_settings),
+                                                      contentDescription = "Save button"
+                                                  )
+                                              }*/
 
                                 Text(
                                     text = stringResource(id = R.string.app_screen_name),
@@ -251,6 +269,8 @@ class MainActivity : AppCompatActivity() {
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier.fillMaxWidth(),
                                 )
+                            }
+
                                 val pInfo: PackageInfo = getPackageManager()
                                     .getPackageInfo(getPackageName(), 0)
                                 val version = pInfo.versionName
