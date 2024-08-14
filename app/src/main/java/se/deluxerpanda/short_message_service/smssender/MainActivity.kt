@@ -243,24 +243,6 @@ class MainActivity : AppCompatActivity() {
                         ) {
 
                             Box() {
-                                /*              IconButton(onClick = {
-                                                  intent = Intent(
-                                                      this@MainActivity,
-                                                      SettingsActivity::class.java
-                                                  )
-                                                  startActivity(intent)
-                                              },
-                                                  modifier = Modifier
-                                                      .size(34.dp)
-                                                      .align(Alignment.TopStart)
-
-                                              ) {
-                                                  Icon(
-                                                      painter = painterResource(id = R.drawable.baseline_settings),
-                                                      contentDescription = "Save button"
-                                                  )
-                                              }*/
-
                                 Text(
                                     text = stringResource(id = R.string.app_screen_name),
                                     fontFamily = FontFamily.SansSerif,
