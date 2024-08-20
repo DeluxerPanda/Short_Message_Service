@@ -48,6 +48,9 @@
     <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
     <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
 
+    <string name="masage_are_empty_titel">Message are required</string>
+    <string name="masage_are_empty_text">Please provide a message.</string>
+
     <string name="text_ok">OK</string>
     <string name="text_Cancel">Cancel</string>
 

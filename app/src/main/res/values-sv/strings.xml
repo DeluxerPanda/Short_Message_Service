@@ -49,6 +49,9 @@
     <string name="sms_number_or_masage_are_empty_titel">Nummer och meddelande krävs</string>
     <string name="sms_number_or_masage_are_empty_text">Ange både telefonnummer och meddelande.</string>
 
+    <string name="masage_are_empty_titel">Meddelande krävs</string>
+    <string name="masage_are_empty_text">Ange ett meddelande.</string>
+
     <string name="text_ok">OK</string>
     <string name="text_Cancel">Avbryt</string>
 
