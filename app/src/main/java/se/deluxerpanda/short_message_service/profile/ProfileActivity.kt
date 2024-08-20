@@ -936,6 +936,7 @@ class ProfileActivity  : ComponentActivity() {
                         }
                     }
                     composable("MessageField"){
+                        var showNoMessageDialog by remember { mutableStateOf(false) }
                         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
                         Scaffold(
                             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -951,10 +952,14 @@ class ProfileActivity  : ComponentActivity() {
                                     },
                                     navigationIcon = {
                                         IconButton(onClick = {
+                                            if (editedMessage?.isEmpty() != true){
                                             navController.previousBackStackEntry
                                                 ?.savedStateHandle
                                                 ?.set("EXTRA_PROFILE_EDITOR_FINAL_MESSAGE", editedMessage)
                                                 navController.popBackStack()
+                                        }else{
+                                                showNoMessageDialog = true
+                                            }
                                         }
                                         ) {
                                             Icon(
@@ -1024,6 +1029,12 @@ class ProfileActivity  : ComponentActivity() {
                                     )
                                 }
                             }
+                            NoMessageDialog(
+                                showNoMessageDialog = showNoMessageDialog,
+                                onSave = {
+                                    showNoMessageDialog = false
+                                }
+                            )
                             MessageCharactersRetchDialog(
                                 showMessageCharactersRetchDialog = showMessageCharactersRetchDialog,
                                 onSave = {
@@ -1289,6 +1300,52 @@ class ProfileActivity  : ComponentActivity() {
                     }
                 },
                 properties = DialogProperties(),
+            )
+        }
+    }
+
+    @Composable
+    fun NoMessageDialog(
+        showNoMessageDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showNoMessageDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.masage_are_empty_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+
+                text = { Text(
+                    text = getString(R.string.masage_are_empty_text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ok),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
             )
         }
     }
