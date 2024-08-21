@@ -41,7 +41,7 @@ class AlarmReceiver : BroadcastReceiver() {
     private var year: String? = null
     override fun onReceive(context: Context, intent: Intent) {
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED) {
             sendNotificationSMSNoPermission(context)
         } else {
