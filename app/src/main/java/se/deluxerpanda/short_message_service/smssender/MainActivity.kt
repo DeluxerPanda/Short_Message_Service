@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -188,13 +189,10 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (!checkPermissions()) {
-            requestPermission()
-        }
 
         val messageResId = intent.getIntExtra("EXTRA_SNACKBAR_MESSAGE", -1)
         if (messageResId != -1) {
@@ -506,6 +504,7 @@ class MainActivity : AppCompatActivity() {
                             var ShowOptionsDialog by remember { mutableStateOf(false) }
                             var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                             var showNoMainPhoneOrMessageDialog by remember { mutableStateOf(false) }
+                            var showNoPermissonSMSDialog by remember { mutableStateOf(false) }
 
                             if (repeats == "null") {
                                 repeats = stringResource(id = R.string.send_sms_every_year_text)
@@ -557,6 +556,17 @@ class MainActivity : AppCompatActivity() {
                                         showMessageCharactersRetchDialog = false
                                     }
                                 )
+                                NoPermissonSMSDialog(
+                                    showNoPermissonSMSDialog = showNoPermissonSMSDialog,
+                                    onSave = {
+                                        showNoPermissonSMSDialog = false
+
+                                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = Uri.fromParts("package", packageName, null)
+                                        }
+                                        startActivity(intent)
+                                    }
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -570,6 +580,8 @@ class MainActivity : AppCompatActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 onClick = {
+                                    if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.SEND_SMS)
+                                        == PackageManager.PERMISSION_GRANTED) {
                                     if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()) {
                                         if (!isSmsTooLong(message!!)) {
 
@@ -659,14 +671,17 @@ class MainActivity : AppCompatActivity() {
                                                 e.printStackTrace()
                                             }
 
-                                        } else {
+                                    } else {
                                             showNoBackInTimeDialog = true
-                                        }
+                                    }
                                     } else {
                                             showMessageCharactersRetchDialog = true
-                                        }
-                                } else {
+                                    }
+                                    } else {
                                         showNoMainPhoneOrMessageDialog = true
+                                    }
+                                    }else{
+                                        showNoPermissonSMSDialog = true
                                     }
                                 }
                             ) {
@@ -1309,6 +1324,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Composable
+    fun NoPermissonSMSDialog(
+        showNoPermissonSMSDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showNoPermissonSMSDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_no_permission_sms_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+
+                text = { Text(
+                    text = getString(R.string.sms_no_permission_sms_text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ask_give_permission_settings),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+    }
+
     companion object {
 
         var CHANNEL_ID: String = UUID.randomUUID().hashCode().toString()
@@ -1466,6 +1527,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
 
     fun deleteAlarm(alarmId: Int, context: Context) {
