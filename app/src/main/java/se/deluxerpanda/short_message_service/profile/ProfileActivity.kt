@@ -1,6 +1,6 @@
 package se.deluxerpanda.short_message_service.profile
 
-import android.Manifest
+import  android.Manifest
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -12,6 +12,7 @@ import android.net.ParseException
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -310,6 +311,18 @@ class ProfileActivity  : ComponentActivity() {
 
                                     actions = {
                                         var showSendNowDialog by remember { mutableStateOf(false) }
+                                        var showNoPermissonSMSDialog by remember { mutableStateOf(false) }
+                                        NoPermissonSMSDialog(
+                                            showNoPermissonSMSDialog = showNoPermissonSMSDialog,
+                                            onSave = {
+                                                showNoPermissonSMSDialog = false
+
+                                                val intent2 = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                                    data = Uri.fromParts("package", packageName, null)
+                                                }
+                                                startActivity(intent2)
+                                            }
+                                        )
                                         SendNowDialog(
                                             showSendNowDialog = showSendNowDialog,
                                             onSave = {
@@ -334,7 +347,12 @@ class ProfileActivity  : ComponentActivity() {
                                             }
                                         )
                                         IconButton(onClick = {
+                                            if (ContextCompat.checkSelfPermission(this@ProfileActivity, Manifest.permission.SEND_SMS)
+                                                != PackageManager.PERMISSION_GRANTED) {
                                             showSendNowDialog = true
+                                            }else{
+                                            showNoPermissonSMSDialog = true
+                                            }
                                         })
                                         {
                                             Icon(
@@ -1591,6 +1609,53 @@ class ProfileActivity  : ComponentActivity() {
 
                 )
         }
+    }
+
+    @Composable
+    fun NoPermissonSMSDialog(
+        showNoPermissonSMSDialog: Boolean,
+        onSave: () -> Unit,
+    ) {
+        if (showNoPermissonSMSDialog) {
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(
+                    text = getString(R.string.sms_no_permission_sms_titel),
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                    ))},
+
+                text = { Text(
+                    text = getString(R.string.sms_no_permission_sms_text),
+                    fontWeight = FontWeight.Bold,
+                )},
+
+                confirmButton = {
+                    TextButton(
+                        modifier = Modifier
+                            .shadow(4.dp, shape = RoundedCornerShape(14.dp))
+                            .width(300.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                MaterialTheme.colorScheme.surface,
+                            ),
+                        onClick = {
+                            onSave()
+                        }) {
+                        Text(getString(R.string.text_ask_give_permission_settings),
+                            color = MaterialTheme.colorScheme.secondary)
+                    }
+                },
+
+                dismissButton = {},
+                properties = DialogProperties(
+                    dismissOnBackPress = false,
+                    dismissOnClickOutside = false,
+                ),
+            )
+        }
+
     }
 }
 

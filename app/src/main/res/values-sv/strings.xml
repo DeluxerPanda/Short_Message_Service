@@ -39,11 +39,11 @@
     <string name="sms_max_characters_Text">Den maximala teckengränsen är 160</string>
     <string name="sms_max_characters_Text_int">inte</string>
 
-    <string name="sms_no_permission_contacts_titel">Ge Short Message Service åtkomst till Kontakter</string>
+    <string name="sms_no_permission_contacts_titel">Tillåt Short Message Service att visa dina kontakter</string>
     <string name="sms_no_permission_contacts_text">Detta gör att du kan se alla dina kontakter i din telefonbok. och sedan kan du klicka på en av kontakterna för att undvika att ange numret manuellt</string>
 
-    <string name="sms_no_permission_sms_titel">Ge Short Message Service åtkomst till SMS</string>
-    <string name="sms_no_permission_sms_text">Detta gör att ditt schemalagda SMS skickas</string>
+    <string name="sms_no_permission_sms_titel">Vänligen aktivera SMS behörighet</string>
+    <string name="sms_no_permission_sms_text">Detta gör att dina schemalagda SMS-meddelanden kan skickas</string>
 
 
     <string name="sms_number_or_masage_are_empty_titel">Nummer och meddelande krävs</string>

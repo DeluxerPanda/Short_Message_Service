@@ -39,11 +39,11 @@
     <string name="sms_max_characters_Text">The maximum character limit is 160</string>
     <string name="sms_max_characters_Text_int">not</string>
 
-    <string name="sms_no_permission_contacts_titel">Give Short Message Service access to Contacts</string>
+    <string name="sms_no_permission_contacts_titel">Allow Short Message Service to show your contacts</string>
     <string name="sms_no_permission_contacts_text">This allows you to see all your contacts in your phone book. and then you can click on one of the contacts to avoid entering the number manually</string>
 
-    <string name="sms_no_permission_sms_titel">Give Short Message Service access to SMS</string>
-    <string name="sms_no_permission_sms_text">This makes your scheduled SMS to be sent</string>
+    <string name="sms_no_permission_sms_titel">Please enable SMS permission</string>
+    <string name="sms_no_permission_sms_text">This allows your scheduled SMS messages to be sent</string>
 
     <string name="sms_number_or_masage_are_empty_titel">Number and message are required</string>
     <string name="sms_number_or_masage_are_empty_text">Please provide both phone number and message.</string>
