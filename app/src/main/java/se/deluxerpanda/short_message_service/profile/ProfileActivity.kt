@@ -348,7 +348,7 @@ class ProfileActivity  : ComponentActivity() {
                                         )
                                         IconButton(onClick = {
                                             if (ContextCompat.checkSelfPermission(this@ProfileActivity, Manifest.permission.SEND_SMS)
-                                                != PackageManager.PERMISSION_GRANTED) {
+                                                == PackageManager.PERMISSION_GRANTED) {
                                             showSendNowDialog = true
                                             }else{
                                             showNoPermissonSMSDialog = true
