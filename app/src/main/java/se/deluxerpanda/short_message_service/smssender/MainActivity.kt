@@ -194,6 +194,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (!checkPermissions()){
+            requestPermission()
+        }
+
         val messageResId = intent.getIntExtra("EXTRA_SNACKBAR_MESSAGE", -1)
         if (messageResId != -1) {
             // Show the Snackbar with the message from the resource ID
