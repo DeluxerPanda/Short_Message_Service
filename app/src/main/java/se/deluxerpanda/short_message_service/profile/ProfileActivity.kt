@@ -1,6 +1,6 @@
 package se.deluxerpanda.short_message_service.profile
 
-import  android.Manifest
+import android.Manifest
 import android.app.AlarmManager
 import android.app.DatePickerDialog
 import android.app.PendingIntent
@@ -10,7 +10,6 @@ import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.ParseException
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.DatePicker
@@ -26,7 +25,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,11 +43,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -67,7 +65,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontFamily.Companion.SansSerif
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -82,16 +79,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import se.deluxerpanda.short_message_service.R
 import se.deluxerpanda.short_message_service.smssender.AlarmReceiver
 import se.deluxerpanda.short_message_service.smssender.MainActivity
 import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.isSmsTooLong
 import se.deluxerpanda.short_message_service.smssender.MainActivity.Companion.saveAlarmDetails
 import se.deluxerpanda.short_message_service.smssender.PhoneListActivity
+import se.deluxerpanda.short_message_service.ui.theme.AppTheme
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 
@@ -109,7 +107,6 @@ class ProfileActivity  : ComponentActivity() {
     private var photoUriString: String? = null
 
     private var timeAndDate: String? = null
-    private var editedtimeAndDate: String? = null
     private var  isTimeAndDateChanged: Boolean = false
 
     private  var repeats: String? = null
@@ -118,9 +115,6 @@ class ProfileActivity  : ComponentActivity() {
     private var phoneNumberNew: String? = null
     private var editedphoneNumber: String? = null
     private var editedphoneNumberNew: String? = null
-
-    private var phoneNumberID: String? = null
-    private var phoneNumberData: String? = null
 
     private var MessageFieldText: String? = null
 
@@ -223,14 +217,14 @@ class ProfileActivity  : ComponentActivity() {
                                         ReSceduledOrNotDialog(
                                             showReSceduledOrNotDialog = showReSceduledOrNotDialog,
                                             onSave = {
-                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm") // Corrected the format to match the input string
+                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm",Locale.getDefault()) // Corrected the format to match the input string
 
                                                 try {
                                                     val date: Date? = timeAndDate.let { sdf.parse(it.toString()) }
                                                     val triggerTime: Long? = date?.time
 
 
-                                                    var intent2: Intent = Intent(
+                                                    val intent2 = Intent(
                                                         this@ProfileActivity,
                                                         AlarmReceiver::class.java
                                                     )
@@ -244,11 +238,7 @@ class ProfileActivity  : ComponentActivity() {
                                                     intent2.putExtra("EXTRA_REPEATSMS", repeats)
 
 
-                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                                        startForegroundService(intent2)
-                                                    } else {
-                                                        startService(intent2)
-                                                    }
+                                                    startForegroundService(intent2)
 
 
                                                     val pendingIntent = PendingIntent.getBroadcast(
@@ -294,7 +284,7 @@ class ProfileActivity  : ComponentActivity() {
                                             }
                                         )
                                         IconButton(onClick = {
-                                            if (UpdateSceduluedSmS == true){
+                                            if (UpdateSceduluedSmS){
                                                 showReSceduledOrNotDialog = true
                                             }else{
                                                 finish()
@@ -327,8 +317,8 @@ class ProfileActivity  : ComponentActivity() {
                                             showSendNowDialog = showSendNowDialog,
                                             onSave = {
                                                 val alarmreceiver = AlarmReceiver()
-                                                var intentAlarmReceiver: Intent = Intent()
-                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm")
+                                                val intentAlarmReceiver = Intent()
+                                                val sdf = SimpleDateFormat("yyyy-MM-dd | HH:mm",Locale.getDefault())
                                                 val date: Date? = timeAndDate.let { sdf.parse(it.toString()) }
                                                 val triggerTime: Long? = date?.time
                                                 intentAlarmReceiver.putExtra("EXTRA_PHONE_NUMBER", phoneNumber)
@@ -401,7 +391,7 @@ class ProfileActivity  : ComponentActivity() {
                             )
                             {
 
-                                var title = ContactInfo.processPhoneNumbers(phoneNumber, contentResolver, this@ProfileActivity)
+                                val title = ContactInfo.processPhoneNumbers(phoneNumber, contentResolver, this@ProfileActivity)
                                 Text(
                                     text = title,
                                     textAlign = TextAlign.Center,
@@ -700,8 +690,8 @@ class ProfileActivity  : ComponentActivity() {
                                 val mTimePickerDialog = TimePickerDialog(
                                     mContext,
                                     { _, hour: Int, minute: Int ->
-                                        val formattedHour = String.format("%02d", hour)
-                                        val formattedMinute = String.format("%02d", minute)
+                                        val formattedHour = String.format(Locale.getDefault(),"%02d", hour)
+                                        val formattedMinute = String.format(Locale.getDefault(),"%02d", minute)
                                         val newTime = "$formattedHour:$formattedMinute"
                                         timeAndDateEdited = timeAndDateEdited!!.replaceAfterLast("| ", newTime)
                                         Time = newTime
@@ -728,8 +718,8 @@ class ProfileActivity  : ComponentActivity() {
                                 val mDatePickerDialog = DatePickerDialog(
                                     mContext,
                                     { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                                        val formattedMonth = String.format("%02d", month + 1)
-                                        val formattedDay = String.format("%02d", dayOfMonth)
+                                        val formattedMonth = String.format(Locale.getDefault(),"%02d", month + 1)
+                                        val formattedDay = String.format(Locale.getDefault(),"%02d", dayOfMonth)
                                         val newDate = "$year-$formattedMonth-$formattedDay"
                                         timeAndDateEdited = timeAndDateEdited!!.replaceBeforeLast(" |", newDate)
                                         Date = newDate
@@ -1017,7 +1007,7 @@ class ProfileActivity  : ComponentActivity() {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
 
-                                text?.let {
+                                text?.let { it ->
                                     TextField(
                                         value = it,
                                         onValueChange = {
@@ -1107,10 +1097,10 @@ class ProfileActivity  : ComponentActivity() {
                 contactName = ContactInfo.getContactFirstName(contentResolver, editedphoneNumber,this)
                 contactNameAndLast = ContactInfo.getContactName(contentResolver, editedphoneNumber,this)
 
-            if (contactName != null) {
-                title = contactName.toString()
+            title = if (contactName != null) {
+                contactName.toString()
             } else {
-                title = title.toString()
+                title.toString()
             }
         }
     }

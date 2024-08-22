@@ -5,11 +5,11 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import se.deluxerpanda.short_message_service.R
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class BootCompleteReceiver : BroadcastReceiver() {
     private var day: String? = null
@@ -48,7 +48,7 @@ class BootCompleteReceiver : BroadcastReceiver() {
         repeatSmS: String,
         alarmId: Int
     ) {
-        SimpleDateFormat("yyyy-MM-dd HH:mm")
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         Date(triggerTime)
 
         day = context.getString(R.string.send_sms_every_day_text)
@@ -65,11 +65,7 @@ class BootCompleteReceiver : BroadcastReceiver() {
         intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
         intent.putExtra("EXTRA_REPEATSMS", repeatSmS)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(Intent(context, AlarmReceiver::class.java))
-        } else {
-            context.startService(Intent(context, AlarmReceiver::class.java))
-        }
+        context.startForegroundService(Intent(context, AlarmReceiver::class.java))
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,

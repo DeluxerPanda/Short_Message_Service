@@ -58,6 +58,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -98,6 +99,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Locale
 import java.util.UUID
 
 
@@ -124,41 +126,23 @@ class MainActivity : AppCompatActivity() {
 
     private var repeats: String? = "null"
 
-    private var phoneNumberPattern = Regex("^\\d$")
-
     private var contactNameAndLast: String? = null
 
     private var photoUri: Uri? = null
 
+
     private fun checkPermissions(): Boolean {
         // Define an array of all the permissions you want to check
-        val permissions = arrayOf(
+        val permissions = mutableListOf(
             Manifest.permission.SEND_SMS,
             Manifest.permission.READ_CONTACTS,
-            Manifest.permission.POST_NOTIFICATIONS,
+            Manifest.permission.READ_PHONE_STATE
         )
 
-
-        // Check if all permissions are granted
-        for (permission in permissions) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    permission
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // Return false if any permission is not granted
-                return false
-            }
+        // Only add POST_NOTIFICATIONS permission if the API level is 33 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
         }
-        // Return true if all permissions are granted
-        return true
-    }
-
-     fun checkPermissionsSMS(): Boolean {
-        // Define an array of all the permissions you want to check
-        val permissions = arrayOf(
-            Manifest.permission.SEND_SMS,
-        )
 
         // Check if all permissions are granted
         for (permission in permissions) {
@@ -177,17 +161,26 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun requestPermission() {
+        val permissions = mutableListOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.READ_PHONE_STATE
+        )
+
+        // Only add POST_NOTIFICATIONS permission if the API level is 33 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         ActivityCompat.requestPermissions(
             this,
-            arrayOf(
-                Manifest.permission.SEND_SMS,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.POST_NOTIFICATIONS,
-                Manifest.permission.READ_PHONE_STATE
-            ),
+            permissions.toTypedArray(),
             SMS_PERMISSION_REQUEST_CODE
         )
     }
+
+
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -209,13 +202,13 @@ class MainActivity : AppCompatActivity() {
 
         // Use the current date as the default date in the picker.
         val c = Calendar.getInstance()
-        var year = c[Calendar.YEAR]
-        var month = c[Calendar.MONTH]
-        var day = c[Calendar.DAY_OF_MONTH]
-        DateSet = String.format("%04d-%02d-%02d", year, month + 1, day)
+        val year = c[Calendar.YEAR]
+        val month = c[Calendar.MONTH]
+        val day = c[Calendar.DAY_OF_MONTH]
+        DateSet = String.format(Locale.getDefault(),"%04d-%02d-%02d", year, month + 1, day)
 
-        var hour: Int
-        var minute: Int
+        val hour: Int
+        val minute: Int
 
         // Add 6 minutes to the current time
         val addTime = c.apply {
@@ -224,7 +217,7 @@ class MainActivity : AppCompatActivity() {
         hour = addTime[Calendar.HOUR_OF_DAY]
         minute = addTime[Calendar.MINUTE]
 
-        TimeSet = String.format("%02d:%02d", hour, minute)
+        TimeSet = String.format(Locale.getDefault(),"%02d:%02d", hour, minute)
 
 
 
@@ -341,7 +334,7 @@ class MainActivity : AppCompatActivity() {
                                         modifier = Modifier
                                         .align(Alignment.CenterHorizontally),
                             ) {
-                                var selected by remember { mutableStateOf(true) }
+                                val selected by remember { mutableStateOf(true) }
 
                                 FilterChip(
 
@@ -425,8 +418,8 @@ class MainActivity : AppCompatActivity() {
                             val mTimePickerDialog = TimePickerDialog(
                                 mContext,
                                 { _, hour: Int, minute: Int ->
-                                    val formattedHour = String.format("%02d", hour)
-                                    val formattedMinute = String.format("%02d", minute)
+                                    val formattedHour = String.format(Locale.getDefault(),"%02d", hour)
+                                    val formattedMinute = String.format(Locale.getDefault(),"%02d", minute)
                                     val newTime = "$formattedHour:$formattedMinute"
                                     TimeSet = newTime
                                     Time = newTime
@@ -475,8 +468,8 @@ class MainActivity : AppCompatActivity() {
                             val mDatePickerDialog = DatePickerDialog(
                                 mContext,
                                 { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
-                                    val formattedMonth = String.format("%02d", month + 1)
-                                    val formattedDay = String.format("%02d", dayOfMonth)
+                                    val formattedMonth = String.format(Locale.getDefault(),"%02d", month + 1)
+                                    val formattedDay = String.format(Locale.getDefault(),"%02d", dayOfMonth)
                                     val newDate = "$year-$formattedMonth-$formattedDay"
                                     DateSet = newDate
                                     Date = newDate
@@ -585,14 +578,14 @@ class MainActivity : AppCompatActivity() {
                                 onClick = {
                                     if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.SEND_SMS)
                                         == PackageManager.PERMISSION_GRANTED) {
-                                    if (!PhoneNumberFieldText!!.isNullOrEmpty() && !message!!.isNullOrEmpty()) {
+                                    if (PhoneNumberFieldText!!.isNotEmpty() && message!!.isNotEmpty()) {
                                         if (!isSmsTooLong(message!!)) {
 
 
-                                        val sdf = SimpleDateFormat("yyyy-MM-dd H:m")
+                                        val sdf = SimpleDateFormat("yyyy-MM-dd H:m", Locale.getDefault())
                                         val sdfDateTime =
                                             DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
-                                        val dateTimeString: String = DateSet + " " + TimeSet
+                                        val dateTimeString = "$DateSet $TimeSet"
                                         val date = sdf.parse(dateTimeString)
                                         val triggerTime = date?.time
 
@@ -603,7 +596,7 @@ class MainActivity : AppCompatActivity() {
                                         if (selectedDateTime.isAfter(currentDateTime)) {
 
                                             try {
-                                                var PhoneNumberFieldTextEdit: String = ""
+                                                var PhoneNumberFieldTextEdit = ""
                                                 if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && PhoneNumberFieldText!!.isNotEmpty()) {
                                                     PhoneNumberFieldTextEdit =
                                                         "$PhoneNumberFieldText,$editedphoneNumber"
@@ -617,7 +610,7 @@ class MainActivity : AppCompatActivity() {
                                                 val alarmManager =
                                                     getSystemService(ALARM_SERVICE) as AlarmManager
 
-                                                val intent: Intent = Intent(
+                                                val intent = Intent(
                                                     this@MainActivity,
                                                     AlarmReceiver::class.java
                                                 )
@@ -631,11 +624,7 @@ class MainActivity : AppCompatActivity() {
                                                 intent.putExtra("EXTRA_TRIGGERTIME", triggerTime)
                                                 intent.putExtra("EXTRA_REPEATSMS", repeatsEdited)
 
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                                    startForegroundService(intent)
-                                                } else {
-                                                    startService(intent)
-                                                }
+                                                startForegroundService(intent)
 
                                                 val pendingIntent = PendingIntent.getBroadcast(
                                                     this@MainActivity, alarmId, intent,
@@ -988,7 +977,7 @@ class MainActivity : AppCompatActivity() {
                                     modifier = Modifier
                                         .weight(1f)
                                 ) {
-                                    var title = ContactInfo.processPhoneNumbers(alarmDetails.phonenumber, contentResolver, this@MainActivity)
+                                    val title = ContactInfo.processPhoneNumbers(alarmDetails.phonenumber, contentResolver, this@MainActivity)
                                     Text(
                                         text = title,
                                         fontSize = 18.sp,
@@ -1009,7 +998,7 @@ class MainActivity : AppCompatActivity() {
                                         modifier = Modifier.padding(start = 4.dp)
                                     )
                                     Text(
-                                        text = SimpleDateFormat("yyyy-MM-dd | H:mm").format(alarmDetails.timeInMillis) + " | " + alarmDetails.repeatSmS,
+                                        text = SimpleDateFormat("yyyy-MM-dd | H:mm", Locale.getDefault()).format(alarmDetails.timeInMillis) + " | " + alarmDetails.repeatSmS,
                                         fontSize = 13.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
@@ -1036,7 +1025,7 @@ class MainActivity : AppCompatActivity() {
                                                 putExtra("EXTRA_HISTORY_PROFILE_POTOURL", photoUri)
                                                 putExtra(
                                                     "EXTRA_HISTORY_PROFILE_TIMEANDDATE",
-                                                    SimpleDateFormat("yyyy-MM-dd | H:mm").format(
+                                                    SimpleDateFormat("yyyy-MM-dd | H:mm", Locale.getDefault()).format(
                                                         alarmDetails.timeInMillis
                                                     )
                                                 )
@@ -1130,7 +1119,7 @@ class MainActivity : AppCompatActivity() {
             stringResource(R.string.send_sms_every_day_text)/*,
             stringResource(R.string.send_sms_every_now_text)*/
         )
-        var selectedOptionIndex by remember { mutableStateOf(0) }
+        var selectedOptionIndex by remember { mutableIntStateOf(0) }
 
         if (ShowOptionsDialog) {
             AlertDialog(
