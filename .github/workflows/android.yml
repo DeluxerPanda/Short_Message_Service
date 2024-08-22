@@ -1,4 +1,4 @@
-name: Android CI
+name: Build Latest unstable APK
 
 on:
   push:
@@ -8,19 +8,40 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 17
-      uses: actions/setup-java@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
       with:
-        java-version: '17'
         distribution: 'temurin'
-        cache: gradle
+        java-version: '17'
 
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+      run: chmod +x ./gradlew
+
+    - name: Build Beta Release
+      run: ./gradlew assembleRelease
+
+    - name: Sign APK/AAB
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      run: |
+        jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 \
+        -keystore app/my-release-key.keystore \
+        app/build/outputs/apk/release/app-release-unsigned.apk \
+        ${{ env.KEY_ALIAS }}
+        zipalign -v 4 \
+        app/build/outputs/apk/release/app-release-unsigned.apk \
+        app/build/outputs/apk/release/app-release.apk
+
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release-apk
+        path: app/build/outputs/apk/release/app-release.apk
