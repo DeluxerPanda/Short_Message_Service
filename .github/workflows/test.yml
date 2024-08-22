@@ -46,7 +46,7 @@ jobs:
 
       - name: Get release file apk path
         id: releaseApk
-        run: echo "apkfile=$(find app/release/*.apk)" >> $GITHUB_OUTPUT
+        run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v4
@@ -59,13 +59,12 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Pre-Release ${{ github.ref_name }}
+          tag_name: ${{ env.VERSION }}
+          name: Pre-Release ${{ env.VERSION }}
+          body: ""
           append_body: false
-          files: |
-            ${{ env.apkfile }}
+          files: ${{ env.apkfile }}
           prerelease: true
           generate_release_notes: true
         env:
-          version: ${{ env.version }}
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
