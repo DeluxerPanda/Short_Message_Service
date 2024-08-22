@@ -1,9 +1,5 @@
 name: Build Latest unstable APK
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
   workflow_dispatch: # Manual trigger added
 
 jobs:
@@ -70,3 +66,6 @@ jobs:
             ${{ env.apkfile }}
           prerelease: true
           generate_release_notes: true
+        env:
+          version: ${{ env.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
