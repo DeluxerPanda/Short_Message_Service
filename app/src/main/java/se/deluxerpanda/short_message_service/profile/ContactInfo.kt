@@ -13,8 +13,13 @@ class ContactInfo {
 
 
     companion object {
-        fun getContactName(contentResolver: ContentResolver, phoneNumber: String?, context: Context): String? {
-            val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
+        fun getContactName(
+            contentResolver: ContentResolver,
+            phoneNumber: String?,
+            context: Context
+        ): String? {
+            val permissionCheck =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 return null
             }
@@ -24,26 +29,25 @@ class ContactInfo {
             )
             val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
 
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        // Contact exists, return the name
-                        val contactName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                        return contactName
-                    }
-                } finally {
-                    cursor.close()
+            contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    // Contact exists, return the name
+                    val contactName =
+                        cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                    return contactName
                 }
             }
             // Contact doesn't exist
             return null
         }
 
-        fun getContactFirstName(contentResolver: ContentResolver, phoneNumber: String?, context: Context): String? {
-            val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
+        fun getContactFirstName(
+            contentResolver: ContentResolver,
+            phoneNumber: String?,
+            context: Context
+        ): String? {
+            val permissionCheck =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS)
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 return null
             }
@@ -53,28 +57,22 @@ class ContactInfo {
             )
             val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
 
-            val cursor = contentResolver.query(uri, projection, null, null, null)
-
-            if (cursor != null) {
-                try {
-                    if (cursor.moveToFirst()) {
-                        // Contact exists, extract the first name from the display name
-                        val contactName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
-                        val parts =
-                            contactName.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
-                                .toTypedArray() // Split by whitespace
-                        return parts[0] // Return the first part
-                    }
-                } finally {
-                    cursor.close()
+            contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    // Contact exists, extract the first name from the display name
+                    val contactName =
+                        cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME))
+                    val parts =
+                        contactName.split("\\s+".toRegex()).dropLastWhile { it.isEmpty() }
+                            .toTypedArray() // Split by whitespace
+                    return parts[0] // Return the first part
                 }
             }
             // Contact doesn't exist
             return null
         }
-        fun processPhoneNumbers(DetailsNumber: String?, contentResolver: ContentResolver, context: Context): String {
-            val phoneNumbers = DetailsNumber?.split(",") ?: emptyList()
+        fun processPhoneNumbers(detailsNumber: String?, contentResolver: ContentResolver, context: Context): String {
+            val phoneNumbers = detailsNumber?.split(",") ?: emptyList()
             val titleBuilder = StringBuilder()
             for (number in phoneNumbers) {
 
@@ -91,7 +89,7 @@ class ContactInfo {
                 }
             }
 
-            return titleBuilder.toString().removeSuffix(", ").toString()
+            return titleBuilder.toString().removeSuffix(", ")
         }
 
          fun getContactPhotoUri(contactID: String?, contentResolver: ContentResolver, context: Context): Uri? {

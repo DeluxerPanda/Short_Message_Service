@@ -29,7 +29,7 @@ import java.util.Random
 
 class AlarmReceiver : BroadcastReceiver() {
     private var phonenumber: String? = null
-    private var Phonenumber_Multi: String? = null
+    private var phonenumberMulti: String? = null
     private var message: String? = null
     private var triggerTime: Long = 0
     private var repeatSmS: String? = null
@@ -41,7 +41,7 @@ class AlarmReceiver : BroadcastReceiver() {
     private var year: String? = null
     override fun onReceive(context: Context, intent: Intent) {
 
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED) {
             sendNotificationSMSNoPermission(context)
         } else {
@@ -75,7 +75,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         rescheduleAlarm(
             phonenumber,
-            Phonenumber_Multi,
+            phonenumberMulti,
             message,
             context,
             triggerTime,
@@ -88,7 +88,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     private fun rescheduleAlarm(
         phonenumber: String?,
-        Phonenumber_Multi: String?,
+        phonenumberMulti: String?,
         message: String?,
         context: Context,
         triggerTime: Long,
@@ -121,7 +121,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val intent = Intent(context, AlarmReceiver::class.java)
 
-        if (Phonenumber_Multi !== "false") {
+        if (phonenumberMulti !== "false") {
             intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber)
         } else {
             intent.putExtra("EXTRA_PHONE_NUMBER", phonenumber)
@@ -191,7 +191,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
             rescheduleAlarm(
                 phonenumber,
-                Phonenumber_Multi,
+                phonenumberMulti,
                 message,
                 context,
                 triggerTime,
