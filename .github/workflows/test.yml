@@ -68,4 +68,4 @@ jobs:
           generate_release_notes: true
         env:
           version: ${{ env.version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
