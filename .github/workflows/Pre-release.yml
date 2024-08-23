@@ -60,7 +60,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.extract_version.outputs.version_name }}
-          name: "Pre-Release - Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}"
+          name: "Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}"
           body: ""
           prerelease: true
           generate_release_notes: true
