@@ -24,4 +24,4 @@ jobs:
 
       - name: Use extracted information
         run: |
-          echo "Version Name: ${{env.version_name }}"
+          echo "Version: ${{env.version_name }}"
