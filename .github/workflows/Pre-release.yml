@@ -1,4 +1,4 @@
-name: Build Latest Unstable APK
+name: Build Pre-release
 
 on:
   workflow_dispatch:
@@ -51,6 +51,9 @@ jobs:
         run: |
           VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/versionName = //;s/"//g' | xargs)
           echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+
+      - name: Rename APK
+        run: mv ${{steps.sign_app.outputs.signedReleaseFile}} app/build/outputs/apk/release/Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}.apk
 
       - name: Create and Upload Release
         id: create_release
