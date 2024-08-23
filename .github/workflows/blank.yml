@@ -24,4 +24,4 @@ jobs:
 
       - name: Use extracted information
         run: |
-          echo "Version: ${{env.version_name }}"
+          echo "Version: ${{ steps.extract_version.outputs.version_name }}"
