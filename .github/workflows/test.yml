@@ -36,17 +36,11 @@ jobs:
           RELEASE_KEYSTORE_ALIAS: ${{ secrets.KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleRelease --stacktrace
-
-      - name: Build Release bundle
-        env:
-          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          RELEASE_KEYSTORE_ALIAS: ${{ secrets.KEY_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew bundleRelease --stacktrace
-
+        
       - name: Get release file apk path
         id: releaseApk
         run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
+
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v4
@@ -68,10 +62,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.extract_version.outputs.version_name }}
-          name: Pre-Release "Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}"
+          name: Pre-Release - Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}
           body: ""
           append_body: false
-          files: ${{ env.apkfile }}
+          files: ${{  steps.releaseApk.outputs.apkfile }}
           prerelease: true
           generate_release_notes: true
         env:
