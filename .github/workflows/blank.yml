@@ -16,7 +16,7 @@ jobs:
       - name: Extract version from build.gradle
         id: extract_version
         run: |
-          VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/versionName //;s/"//g')
+          VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/versionName //;s/"//g' | xargs)
           
           echo "VERSION_NAME=$VERSION_NAME"
 
