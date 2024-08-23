@@ -20,12 +20,6 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2.0.10
 
-      - name: Decode Keystore
-        env:
-         ENCODED_STRING: ${{ secrets.KEYSTORE_BASE_64 }}
-        run: |
-         echo "$ENCODED_STRING" | base64 -d > keystore.jks
-
       - name: Build Release APK
         run: ./gradlew assembleRelease --stacktrace
         
@@ -34,17 +28,15 @@ jobs:
         run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
 
       - name: Sign APK
-        run: |
-          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-          -keystore keystore.jks \
-          -storepass $KEYSTORE_PASSWORD \
-          -keypass $KEY_PASSWORD \
-          ${{ steps.releaseApk.outputs.apkfile }} \
-          $KEYSTORE_ALIAS
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEYSTORE_ALIAS: ${{ secrets.KEY_ALIAS }}
+         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+         jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+          -keystore ${{ secrets.KEYSTORE_FILE }} \
+          ${{ steps.releaseApk.outputs.apkfile }} \
+          ${{ secrets.KEY_ALIAS }}
 
       - name: Zipalign APK
         run: |
