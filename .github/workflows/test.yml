@@ -1,13 +1,14 @@
-name: Build Latest unstable APK
+name: Build Latest Unstable APK
+
 on:
-  workflow_dispatch: # Manual trigger added
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checking out branch
+      - name: Checkout branch
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -25,49 +26,55 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
         run: |
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > keystore.jks
 
-      - name: Build Release apk
+      - name: Build Release APK
         run: ./gradlew assembleRelease --stacktrace
         
-      - name: Get release file apk path
+      - name: Get release APK path
         id: releaseApk
         run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
 
       - name: Sign APK
         run: |
-          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore keystore.jks -storepass $KEYSTORE_PASSWORD -keypass $KEY_PASSWORD app/build/outputs/apk/release/app-release-unsigned.apk $KEYSTORE_ALIAS
-          ${ANDROID_HOME}/build-tools/30.0.3/zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app-release.apk
+          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+          -keystore keystore.jks \
+          -storepass $KEYSTORE_PASSWORD \
+          -keypass $KEY_PASSWORD \
+          ${{ steps.releaseApk.outputs.apkfile }} \
+          $KEYSTORE_ALIAS
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEY_ALIAS }}
 
+      - name: Zipalign APK
+        run: |
+          ${ANDROID_HOME}/build-tools/30.0.3/zipalign -v 4 ${{ steps.releaseApk.outputs.apkfile }} app-release.apk
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v4
         with:
-           name: release-artifacts
-           path: ${{ steps.releaseApk.outputs.apkfile }}
+          name: release-artifacts
+          path: app-release.apk
 
       - name: Extract version from build.gradle
         id: extract_version
         run: |
           VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/versionName = //;s/"//g' | xargs)
-          
-          echo "VERSION_NAME=$VERSION_NAME"
-
           echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
-           
+
       - name: Create and Upload Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.extract_version.outputs.version_name }}
-          name: Pre-Release - Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}
+          name: "Pre-Release - Short_Message_Service_v${{ steps.extract_version.outputs.version_name }}"
           body: ""
-          append_body: false
-          files: ${{  steps.releaseApk.outputs.apkfile }}
           prerelease: true
           generate_release_notes: true
+          files: app-release.apk
         env:
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
