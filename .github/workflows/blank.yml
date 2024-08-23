@@ -1,8 +1,6 @@
 
 on:
 
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 name: Extract Android Info
@@ -18,30 +16,12 @@ jobs:
       - name: Extract version from build.gradle
         id: extract_version
         run: |
-          # Extract versionCode and versionName from build.gradle
-          VERSION_CODE=$(grep versionCode app/build.gradle.kts | sed 's/versionCode //')
           VERSION_NAME=$(grep versionName app/build.gradle.kts | sed 's/versionName "//;s/"//')
           
-          echo "VERSION_CODE=$VERSION_CODE"
           echo "VERSION_NAME=$VERSION_NAME"
           
-          # Set the extracted values as GitHub Actions outputs
-          echo "::set-output name=version_code::$VERSION_CODE"
           echo "::set-output name=version_name::$VERSION_NAME"
-
-      - name: Extract app name from AndroidManifest.xml
-        id: extract_app_name
-        run: |
-          # Extract the app name from AndroidManifest.xml
-          APP_NAME=$(grep 'android:label' app/src/main/AndroidManifest.xml | sed 's/android:label="@string\///;s/"//')
-          
-          echo "APP_NAME=$APP_NAME"
-          
-          # Set the extracted app name as a GitHub Actions output
-          echo "::set-output name=app_name::$APP_NAME"
 
       - name: Use extracted information
         run: |
-          echo "Version Code: ${{ steps.extract_version.outputs.version_code }}"
           echo "Version Name: ${{ steps.extract_version.outputs.version_name }}"
-          echo "App Name: ${{ steps.extract_app_name.outputs.app_name }}"
