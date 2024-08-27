@@ -105,24 +105,24 @@ import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
-    private val SMS_PERMISSION_REQUEST_CODE: Int = 1
 
-    private var ToastContent: String? = null
+    private val smsPermissionRequestCode: Int = 1
+    private var toastContent: String? = null
 
-    private var PhoneNumberFieldText: String? = ""
+    private var phoneNumberFieldText: String? = ""
 
-    private var MessageFieldText: String? = ""
+    private var messageFieldText: String? = ""
 
-    private val MaxNumbers = 9
-    private var CurrentNumber = 0
+    private val maxNumbers = 9
+    private var currentNumber = 0
     private var phoneNumber: String? = null
     private var editedphoneNumber: String? = null
 
-    private var phonenumber_extra: String? = null
+    private var phonenumberExtra: String? = null
 
-    private var DateSet: String? = null
+    private var dateSet: String? = null
 
-    private var TimeSet: String? = null
+    private var timeSet: String? = null
 
     private var repeats: String? = "null"
 
@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(
             this,
             permissions.toTypedArray(),
-            SMS_PERMISSION_REQUEST_CODE
+            smsPermissionRequestCode
         )
     }
 
@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
         val year = c[Calendar.YEAR]
         val month = c[Calendar.MONTH]
         val day = c[Calendar.DAY_OF_MONTH]
-        DateSet = String.format(Locale.getDefault(),"%04d-%02d-%02d", year, month + 1, day)
+        dateSet = String.format(Locale.getDefault(),"%04d-%02d-%02d", year, month + 1, day)
 
         val hour: Int
         val minute: Int
@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity() {
         hour = addTime[Calendar.HOUR_OF_DAY]
         minute = addTime[Calendar.MINUTE]
 
-        TimeSet = String.format(Locale.getDefault(),"%02d:%02d", hour, minute)
+        timeSet = String.format(Locale.getDefault(),"%02d:%02d", hour, minute)
 
 
 
@@ -236,7 +236,7 @@ class MainActivity : AppCompatActivity() {
 
                         ) {
 
-                            Box() {
+                            Box {
                                 Text(
                                     text = stringResource(id = R.string.app_screen_name),
                                     fontFamily = FontFamily.SansSerif,
@@ -247,8 +247,8 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
 
-                                val pInfo: PackageInfo = getPackageManager()
-                                    .getPackageInfo(getPackageName(), 0)
+                                val pInfo: PackageInfo = packageManager
+                                    .getPackageInfo(packageName, 0)
                                 val version = pInfo.versionName
 
                                 Text(
@@ -265,7 +265,7 @@ class MainActivity : AppCompatActivity() {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             //  PhoneNumberSection()
-                            var number by remember { mutableStateOf(PhoneNumberFieldText) }
+                            var number by remember { mutableStateOf(phoneNumberFieldText) }
                             val launchPhoneList = rememberLauncherForActivityResult(
                                 contract = ActivityResultContracts.StartActivityForResult()
                             ) { result ->
@@ -286,7 +286,7 @@ class MainActivity : AppCompatActivity() {
                                     .clip(RoundedCornerShape(12.dp))
                             ) {
 
-                                number?.let {
+                                number?.let { it ->
                                     TextField(
                                         value = it,
                                         onValueChange = { number = it },
@@ -297,7 +297,7 @@ class MainActivity : AppCompatActivity() {
                                             text = stringResource(id = R.string.text_hint_phone_number)
                                         )}
                                     )
-                                    PhoneNumberFieldText = number
+                                    phoneNumberFieldText = number
                                 }
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_baseline_import_contacts),
@@ -318,17 +318,17 @@ class MainActivity : AppCompatActivity() {
 
                                  Spacer(modifier = Modifier.height(5.dp))
 
-                            var phonenumber_extra_numbers = 0
-                            val phonenumber_number_extra_entry =
+                            var phonenumberExtraNumbers = 0
+                            val phonenumberNumberExtraEntry =
                                 entry.savedStateHandle.get<Int>("EXTRA_MAINACTIVITY_CURRENT_NUMBER")
-                            if (phonenumber_number_extra_entry != null) {
-                                phonenumber_extra_numbers = phonenumber_number_extra_entry
+                            if (phonenumberNumberExtraEntry != null) {
+                                phonenumberExtraNumbers = phonenumberNumberExtraEntry
                             }
 
-                            val phonenumber_extra_entry =
+                            val phonenumberExtraEntry =
                                 entry.savedStateHandle.get<String>("EXTRA_MAINACTIVITY_FINAL_PHONENUMBER")
-                            if (phonenumber_extra_entry != null) {
-                                phonenumber_extra = phonenumber_extra_entry
+                            if (phonenumberExtraEntry != null) {
+                                phonenumberExtra = phonenumberExtraEntry
                             }
                             Column(
                                         modifier = Modifier
@@ -339,12 +339,12 @@ class MainActivity : AppCompatActivity() {
                                 FilterChip(
 
                                     onClick = {
-                                        phoneNumber = phonenumber_extra
+                                        phoneNumber = phonenumberExtra
                                         navController.navigate("AddMoreNumbersScreen")
                                     },
                                     label = {
                                         Text(
-                                            text = stringResource(id = R.string.text_add_phone_number) + " " + phonenumber_extra_numbers.toString() + " / " + MaxNumbers,
+                                            text = stringResource(id = R.string.text_add_phone_number) + " " + phonenumberExtraNumbers.toString() + " / " + maxNumbers,
 
                                         )
                                     },
@@ -367,7 +367,7 @@ class MainActivity : AppCompatActivity() {
 
                                Spacer(modifier = Modifier.height(5.dp))
                             //  MessageSection()
-                            var message by remember { mutableStateOf(MessageFieldText) }
+                            var message by remember { mutableStateOf(messageFieldText) }
                             var showMessageCharactersRetchDialog by remember { mutableStateOf(false) }
                             Box(
                                 modifier = Modifier
@@ -376,7 +376,7 @@ class MainActivity : AppCompatActivity() {
                                     .clip(RoundedCornerShape(12.dp)),
 
                             ) {
-                                message?.let {
+                                message?.let { it ->
                                     TextField(
                                         value = it,
                                         onValueChange = {
@@ -393,7 +393,7 @@ class MainActivity : AppCompatActivity() {
                                             text = stringResource(id = R.string.text_hint_message)
                                         )}
                                     )
-                                    MessageFieldText = message
+                                    messageFieldText = message
                                 }
                             }
 
@@ -401,15 +401,15 @@ class MainActivity : AppCompatActivity() {
 
                             // TimePickerSection()
                             val mContext = LocalContext.current
-                            var Time by remember { mutableStateOf(TimeSet) }
+                            var time by remember { mutableStateOf(timeSet) }
                             // Parsing hour and minute from the Time string
                             val mHour = try {
-                                Time!!.substringBeforeLast(":").trim().toInt()
+                                time!!.substringBeforeLast(":").trim().toInt()
                             } catch (e: NumberFormatException) {
                                 0
                             }
                             val mMinute = try {
-                                Time!!.substringAfterLast(":").trim().toInt()
+                                time!!.substringAfterLast(":").trim().toInt()
                             } catch (e: NumberFormatException) {
                                 0
                             }
@@ -421,8 +421,8 @@ class MainActivity : AppCompatActivity() {
                                     val formattedHour = String.format(Locale.getDefault(),"%02d", hour)
                                     val formattedMinute = String.format(Locale.getDefault(),"%02d", minute)
                                     val newTime = "$formattedHour:$formattedMinute"
-                                    TimeSet = newTime
-                                    Time = newTime
+                                    timeSet = newTime
+                                    time = newTime
                                 }, mHour, mMinute, true
                             )
                             Column(
@@ -440,27 +440,27 @@ class MainActivity : AppCompatActivity() {
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = TimeSet!!,
+                                        text = timeSet!!,
                                         fontSize = 20.sp,
                                     )
                                 }
                             }
 
                             //DatePickerSection()
-                            var Date by remember { mutableStateOf(DateSet) }
+                            var date by remember { mutableStateOf(dateSet) }
                             // Parsing year, month, and day from the Date string
                             val mYear = try {
-                                Date!!.substringBefore("-").trim().toInt()
+                                date!!.substringBefore("-").trim().toInt()
                             } catch (e: NumberFormatException) {
                                 0
                             }
                             val mMonth = try {
-                                Date!!.substringAfter("-").substringBefore("-").trim().toInt()
+                                date!!.substringAfter("-").substringBefore("-").trim().toInt()
                             } catch (e: NumberFormatException) {
                                 0
                             } - 1
                             val mDay = try {
-                                Date!!.substringAfterLast("-").substringBefore(" | ").trim().toInt()
+                                date!!.substringAfterLast("-").substringBefore(" | ").trim().toInt()
                             } catch (e: NumberFormatException) {
                                 0
                             }
@@ -471,8 +471,8 @@ class MainActivity : AppCompatActivity() {
                                     val formattedMonth = String.format(Locale.getDefault(),"%02d", month + 1)
                                     val formattedDay = String.format(Locale.getDefault(),"%02d", dayOfMonth)
                                     val newDate = "$year-$formattedMonth-$formattedDay"
-                                    DateSet = newDate
-                                    Date = newDate
+                                    dateSet = newDate
+                                    date = newDate
                                 }, mYear, mMonth, mDay
                             )
                             Column(
@@ -490,14 +490,14 @@ class MainActivity : AppCompatActivity() {
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
-                                        text = DateSet!!,
+                                        text = dateSet!!,
                                         fontSize = 20.sp,
                                     )
                                 }
                             }
 
                             //   SendEverySection()
-                            var ShowOptionsDialog by remember { mutableStateOf(false) }
+                            var showOptionsDialog by remember { mutableStateOf(false) }
                             var showNoBackInTimeDialog by remember { mutableStateOf(false) }
                             var showNoMainPhoneOrMessageDialog by remember { mutableStateOf(false) }
                             var showNoPermissonSMSDialog by remember { mutableStateOf(false) }
@@ -517,7 +517,7 @@ class MainActivity : AppCompatActivity() {
                                     textAlign = TextAlign.Center
                                 )
                                 Button(
-                                    onClick = { ShowOptionsDialog = true },
+                                    onClick = { showOptionsDialog = true },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
 
@@ -527,8 +527,8 @@ class MainActivity : AppCompatActivity() {
                                     )
                                 }
                                 OptionsDialog(
-                                    ShowOptionsDialog = ShowOptionsDialog,
-                                    onDismiss = { ShowOptionsDialog = false },
+                                    showOptionsDialog = showOptionsDialog,
+                                    onDismiss = { showOptionsDialog = false },
                                     onConfirm = { selectedOption ->
                                         repeatsEdited = selectedOption
                                         repeats = repeatsEdited
@@ -578,31 +578,31 @@ class MainActivity : AppCompatActivity() {
                                 onClick = {
                                     if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.SEND_SMS)
                                         == PackageManager.PERMISSION_GRANTED) {
-                                    if (PhoneNumberFieldText!!.isNotEmpty() && message!!.isNotEmpty()) {
+                                    if (phoneNumberFieldText!!.isNotEmpty() && message!!.isNotEmpty()) {
                                         if (!isSmsTooLong(message!!)) {
 
 
                                         val sdf = SimpleDateFormat("yyyy-MM-dd H:m", Locale.getDefault())
                                         val sdfDateTime =
                                             DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm")
-                                        val dateTimeString = "$DateSet $TimeSet"
-                                        val date = sdf.parse(dateTimeString)
-                                        val triggerTime = date?.time
+                                        val dateTimeString = "$dateSet $timeSet"
+                                        val dateParse = sdf.parse(dateTimeString)
+                                        val triggerTime = dateParse?.time
 
                                         val selectedDateTime =
-                                            LocalDateTime.parse("$DateSet $TimeSet", sdfDateTime)
+                                            LocalDateTime.parse("$dateSet $timeSet", sdfDateTime)
                                         val currentDateTime = LocalDateTime.now()
 
                                         if (selectedDateTime.isAfter(currentDateTime)) {
 
                                             try {
-                                                var PhoneNumberFieldTextEdit = ""
-                                                if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && PhoneNumberFieldText!!.isNotEmpty()) {
-                                                    PhoneNumberFieldTextEdit =
-                                                        "$PhoneNumberFieldText,$editedphoneNumber"
-                                                } else if (PhoneNumberFieldText!!.isNotEmpty()) {
-                                                    PhoneNumberFieldTextEdit =
-                                                        "$PhoneNumberFieldText"
+                                                var phoneNumberFieldTextEdit = ""
+                                                if (editedphoneNumber != null && editedphoneNumber!!.isNotEmpty() && phoneNumberFieldText!!.isNotEmpty()) {
+                                                    phoneNumberFieldTextEdit =
+                                                        "$phoneNumberFieldText,$editedphoneNumber"
+                                                } else if (phoneNumberFieldText!!.isNotEmpty()) {
+                                                    phoneNumberFieldTextEdit =
+                                                        "$phoneNumberFieldText"
                                                 }
 
                                                 val alarmId = UUID.randomUUID().hashCode()
@@ -617,7 +617,7 @@ class MainActivity : AppCompatActivity() {
 
                                                 intent.putExtra(
                                                     "EXTRA_PHONE_NUMBER",
-                                                    PhoneNumberFieldTextEdit
+                                                    phoneNumberFieldTextEdit
                                                 )
                                                 intent.putExtra("EXTRA_MESSAGES", message)
                                                 intent.putExtra("EXTRA_ALARMID", alarmId)
@@ -643,20 +643,20 @@ class MainActivity : AppCompatActivity() {
                                                     alarmId,
                                                     triggerTime,
                                                     repeatsEdited,
-                                                    PhoneNumberFieldTextEdit,
+                                                    phoneNumberFieldTextEdit,
                                                     message
                                                 )
 
-                                                val BackToStartIntent = Intent(
+                                                val backToStartIntent = Intent(
                                                     this@MainActivity,
                                                     MainActivity::class.java
                                                 )
-                                                BackToStartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                                                BackToStartIntent.putExtra(
+                                                backToStartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                                backToStartIntent.putExtra(
                                                     "EXTRA_SNACKBAR_MESSAGE",
                                                     R.string.SnackBar_text_sms_scheduled
                                                 )
-                                                startActivity(BackToStartIntent)
+                                                startActivity(backToStartIntent)
 
 
                                             } catch (e: ParseException) {
@@ -724,7 +724,7 @@ class MainActivity : AppCompatActivity() {
                                                 ?.savedStateHandle
                                                 ?.set(
                                                     "EXTRA_MAINACTIVITY_CURRENT_NUMBER",
-                                                    CurrentNumber
+                                                    currentNumber
                                                 )
 
                                             navController.previousBackStackEntry
@@ -794,7 +794,7 @@ class MainActivity : AppCompatActivity() {
                                         }
                                     }
 
-                                     CurrentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
+                                    currentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
 
                                     TextField(
                                         value = phone,
@@ -844,7 +844,7 @@ class MainActivity : AppCompatActivity() {
                                                         list.toMutableList()
                                                             .also { list ->
                                                                 list.removeAt(index)
-                                                                CurrentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
+                                                                currentNumber = list.filter { it.isNotEmpty() }.let { if (it.isEmpty()) 0 else it.size }
                                                                 editedphoneNumber =
                                                                     list.joinToString(",")
                                                                 isPhoneNumberChanged = true
@@ -863,21 +863,21 @@ class MainActivity : AppCompatActivity() {
                                             .padding(8.dp),
                                     )
                                 }
-                                var ToastBool by remember { mutableStateOf(false) }
+                                var toastBool by remember { mutableStateOf(false) }
                                 IconButton(onClick = {
                                     list =
                                         list.toMutableList().also { list ->
-                                            if (list.size < MaxNumbers) {
+                                            if (list.size < maxNumbers) {
                                                 list.add("")
                                                 isPhoneNumberChanged = true
                                             } else {
-                                                ToastContent =
+                                                toastContent =
                                                     getString(R.string.history_info_Profile_Edit_cannot_have_more_number) +
-                                                            " " + MaxNumbers.toString() + " " + getString(
+                                                            " " + maxNumbers.toString() + " " + getString(
                                                         R.string.More_Then_One_Number_name
                                                     )
 
-                                                ToastBool = true
+                                                toastBool = true
                                             }
                                         }
                                 }) {
@@ -888,9 +888,9 @@ class MainActivity : AppCompatActivity() {
                                 }
 
                                 ToastDialog(
-                                    ToastBool = ToastBool,
+                                    toastBool = toastBool,
                                     onSave = {
-                                        ToastBool = false
+                                        toastBool = false
                                     }
                                 )
 
@@ -1054,10 +1054,10 @@ class MainActivity : AppCompatActivity() {
 
     @Composable
     fun ToastDialog(
-        ToastBool: Boolean,
+        toastBool: Boolean,
         onSave: () -> Unit,
     ) {
-        if (ToastBool) {
+        if (toastBool) {
             AlertDialog(
 
                 onDismissRequest = {},
@@ -1072,7 +1072,7 @@ class MainActivity : AppCompatActivity() {
 
                 text = {
                     Text(
-                        text = ToastContent.toString(),
+                        text = toastContent.toString(),
                         fontWeight = FontWeight.Bold,
                     )
                 },
@@ -1108,7 +1108,7 @@ class MainActivity : AppCompatActivity() {
 
     @Composable
     fun OptionsDialog(
-        ShowOptionsDialog: Boolean,
+        showOptionsDialog: Boolean,
         onDismiss: () -> Unit,
         onConfirm: (String) -> Unit
     ) {
@@ -1121,7 +1121,7 @@ class MainActivity : AppCompatActivity() {
         )
         var selectedOptionIndex by remember { mutableIntStateOf(0) }
 
-        if (ShowOptionsDialog) {
+        if (showOptionsDialog) {
             AlertDialog(
                 onDismissRequest = {
                     onDismiss()
